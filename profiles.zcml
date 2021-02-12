@@ -1,0 +1,33 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:five="http://namespaces.zope.org/five"
+    i18n_domain="eea">
+
+  <five:registerPackage package="." initialize=".initialize" />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="eea.restapi.dataconnector"
+      directory="profiles/default"
+      description="Installs the eea.restapi.dataconnector add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="eea.restapi.dataconnector (uninstall)"
+      directory="profiles/uninstall"
+      description="Uninstalls the eea.restapi.dataconnector add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.uninstall"
+      />
+
+  <utility
+      factory=".setuphandlers.HiddenProfiles"
+      name="eea.restapi.dataconnector-hiddenprofiles"
+      />
+
+
+</configure>
