@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-        GIT_NAME = "eea.restapi.dataconnector"
+        GIT_NAME = "eea.api.dataconnector"
         SONARQUBE_TAGS = "www.eea.europa.eu"
     }
 

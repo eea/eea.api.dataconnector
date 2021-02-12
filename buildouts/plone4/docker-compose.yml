@@ -5,7 +5,7 @@ services:
     ports:
     - "8080"
     volumes:
-    - ../../:/plone/instance/src/eea.restapi.dataconnector
+    - ../../:/plone/instance/src/eea.api.dataconnector
     environment:
-      ADDONS: "eea.restapi.dataconnector[test]"
-      DEVELOP: "src/eea.restapi.dataconnector"
+      ADDONS: "eea.api.dataconnector[test]"
+      DEVELOP: "src/eea.api.dataconnector"

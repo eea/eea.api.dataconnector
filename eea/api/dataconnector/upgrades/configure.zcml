@@ -6,11 +6,11 @@
   <genericsetup:upgradeSteps
     source="*"
     destination="1.0"
-    profile="eea.restapi.dataconnector:default">
+    profile="eea.api.dataconnector:default">
 
     <genericsetup:upgradeDepends
-       title="Import all steps from eea.restapi.dataconnector default profile"
-       import_profile="eea.restapi.dataconnector:default"
+       title="Import all steps from eea.api.dataconnector default profile"
+       import_profile="eea.api.dataconnector:default"
       />
 
   </genericsetup:upgradeSteps>

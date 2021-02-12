@@ -2,7 +2,7 @@
 """
 import doctest
 import unittest
-from eea.restapi.dataconnector.tests.base import FUNCTIONAL_TESTING
+from eea.api.dataconnector.tests.base import FUNCTIONAL_TESTING
 from plone.testing import layered
 
 OPTIONFLAGS = (
@@ -19,7 +19,7 @@ def test_suite():
                 doctest.DocFileSuite(
                     "README.txt",
                     optionflags=OPTIONFLAGS,
-                    package="eea.restapi.dataconnector",
+                    package="eea.api.dataconnector",
                 ),
                 layer=FUNCTIONAL_TESTING,
             ),

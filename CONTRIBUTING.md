@@ -13,7 +13,7 @@ top of things.
 
 * Make sure you have a [GitHub account](https://github.com/signup/free)
 * If you need to submit a ticket do it under EEA Organisation area (https://github.com/eea)
-  under the respective package, e.g. https://github.com/eea/eea.restapi.dataconnector/issues
+  under the respective package, e.g. https://github.com/eea/eea.api.dataconnector/issues
 * Submit a ticket for your issue, assuming one does not already exist.
   * Clearly describe the issue including steps to reproduce when it is a bug.
   * If case state the browser and operating system used.

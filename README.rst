@@ -1,14 +1,14 @@
 ==========================
-eea.restapi.dataconnector
+eea.api.dataconnector
 ==========================
-.. image:: https://ci.eionet.europa.eu/buildStatus/icon?job=eea/eea.restapi.dataconnector/develop
-  :target: https://ci.eionet.europa.eu/job/eea/job/eea.restapi.dataconnector/job/develop/display/redirect
+.. image:: https://ci.eionet.europa.eu/buildStatus/icon?job=eea/eea.api.dataconnector/develop
+  :target: https://ci.eionet.europa.eu/job/eea/job/eea.api.dataconnector/job/develop/display/redirect
   :alt: Develop
-.. image:: https://ci.eionet.europa.eu/buildStatus/icon?job=eea/eea.restapi.dataconnector/master
-  :target: https://ci.eionet.europa.eu/job/eea/job/eea.restapi.dataconnector/job/master/display/redirect
+.. image:: https://ci.eionet.europa.eu/buildStatus/icon?job=eea/eea.api.dataconnector/master
+  :target: https://ci.eionet.europa.eu/job/eea/job/eea.api.dataconnector/job/master/display/redirect
   :alt: Master
 
-The eea.restapi.dataconnector is a Plone add-on
+The eea.api.dataconnector is a Plone add-on
 
 .. contents::
 
@@ -23,43 +23,43 @@ Main features
 Install
 =======
 
-* Add eea.restapi.dataconnector to your eggs section in your buildout and
+* Add eea.api.dataconnector to your eggs section in your buildout and
   re-run buildout::
 
     [buildout]
     eggs +=
-      eea.restapi.dataconnector
+      eea.api.dataconnector
 
 * You can download a sample buildout from:
 
-  - https://github.com/eea/eea.restapi.dataconnector/tree/master/buildouts/plone4
-  - https://github.com/eea/eea.restapi.dataconnector/tree/master/buildouts/plone5
+  - https://github.com/eea/eea.api.dataconnector/tree/master/buildouts/plone4
+  - https://github.com/eea/eea.api.dataconnector/tree/master/buildouts/plone5
 
 * Or via docker::
 
-    $ docker run --rm -p 8080:8080 -e ADDONS="eea.restapi.dataconnector" plone
+    $ docker run --rm -p 8080:8080 -e ADDONS="eea.api.dataconnector" plone
 
-* Install *eea.restapi.dataconnector* within Site Setup > Add-ons
+* Install *eea.api.dataconnector* within Site Setup > Add-ons
 
 
 Buildout installation
 =====================
 
-- `Plone 4+ <https://github.com/eea/eea.restapi.dataconnector/tree/master/buildouts/plone4>`_
-- `Plone 5+ <https://github.com/eea/eea.restapi.dataconnector/tree/master/buildouts/plone5>`_
+- `Plone 4+ <https://github.com/eea/eea.api.dataconnector/tree/master/buildouts/plone4>`_
+- `Plone 5+ <https://github.com/eea/eea.api.dataconnector/tree/master/buildouts/plone5>`_
 
 
 Source code
 ===========
 
-- `Plone 4+ on github <https://github.com/eea/eea.restapi.dataconnector>`_
-- `Plone 5+ on github <https://github.com/eea/eea.restapi.dataconnector>`_
+- `Plone 4+ on github <https://github.com/eea/eea.api.dataconnector>`_
+- `Plone 5+ on github <https://github.com/eea/eea.api.dataconnector>`_
 
 
 Eggs repository
 ===============
 
-- https://pypi.python.org/pypi/eea.restapi.dataconnector
+- https://pypi.python.org/pypi/eea.api.dataconnector
 - http://eggrepo.eea.europa.eu/simple
 
 
@@ -70,12 +70,12 @@ It has been developed and tested for Plone 4 and 5. See buildouts section above.
 
 How to contribute
 =================
-See the `contribution guidelines (CONTRIBUTING.md) <https://github.com/eea/eea.restapi.dataconnector/blob/master/CONTRIBUTING.md>`_.
+See the `contribution guidelines (CONTRIBUTING.md) <https://github.com/eea/eea.api.dataconnector/blob/master/CONTRIBUTING.md>`_.
 
 Copyright and license
 =====================
 
-eea.restapi.dataconnector (the Original Code) is free software; you can
+eea.api.dataconnector (the Original Code) is free software; you can
 redistribute it and/or modify it under the terms of the
 GNU General Public License as published by the Free Software Foundation;
 either version 2 of the License, or (at your option) any later version.

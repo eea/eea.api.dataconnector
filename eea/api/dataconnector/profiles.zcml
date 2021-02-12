@@ -8,25 +8,25 @@
 
   <genericsetup:registerProfile
       name="default"
-      title="eea.restapi.dataconnector"
+      title="eea.api.dataconnector"
       directory="profiles/default"
-      description="Installs the eea.restapi.dataconnector add-on."
+      description="Installs the eea.api.dataconnector add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.post_install"
       />
 
   <genericsetup:registerProfile
       name="uninstall"
-      title="eea.restapi.dataconnector (uninstall)"
+      title="eea.api.dataconnector (uninstall)"
       directory="profiles/uninstall"
-      description="Uninstalls the eea.restapi.dataconnector add-on."
+      description="Uninstalls the eea.api.dataconnector add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.uninstall"
       />
 
   <utility
       factory=".setuphandlers.HiddenProfiles"
-      name="eea.restapi.dataconnector-hiddenprofiles"
+      name="eea.api.dataconnector-hiddenprofiles"
       />
 
 

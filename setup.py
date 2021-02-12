@@ -5,14 +5,14 @@ from os.path import join
 
 from setuptools import find_packages, setup
 
-NAME = "eea.restapi.dataconnector"
+NAME = "eea.api.dataconnector"
 PATH = NAME.split(".") + ["version.txt"]
 VERSION = open(join(*PATH)).read().strip()
 
 setup(
     name=NAME,
     version=VERSION,
-    description="restapi.dataconnector integration for Plone",
+    description="eea.restapi dataconnector integration for Plone",
     long_description=(
         open("README.rst").read()
         + "\n"
@@ -31,10 +31,10 @@ setup(
     keywords="EEA Add-ons Plone Zope",
     author="European Environment Agency: IDM2 A-Team",
     author_email="eea-edw-a-team-alerts@googlegroups.com",
-    url="https://github.com/eea/eea.restapi.dataconnector",
+    url="https://github.com/eea/eea.api.dataconnector",
     license="GPL version 2",
     packages=find_packages(exclude=["ez_setup"]),
-    namespace_packages=["eea", "eea.volto"],
+    namespace_packages=["eea", "eea.api"],
     include_package_data=True,
     zip_safe=False,
     python_requires="==2.7",

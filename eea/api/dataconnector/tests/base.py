@@ -16,18 +16,18 @@ class EEAFixture(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         """Setup Zope"""
-        import eea.restapi.dataconnector
+        import eea.api.dataconnector
         import plone.restapi
 
         self.loadZCML(package=plone.restapi)
-        self.loadZCML(package=eea.restapi.dataconnector)
+        self.loadZCML(package=eea.api.dataconnector)
 
         z2.installProduct(app, "plone.restapi")
-        z2.installProduct(app, "eea.restapi.dataconnector")
+        z2.installProduct(app, "eea.api.dataconnector")
 
     def setUpPloneSite(self, portal):
         """Setup Plone"""
-        applyProfile(portal, "eea.restapi.dataconnector:default")
+        applyProfile(portal, "eea.api.dataconnector:default")
 
         # Default workflow
         wftool = portal["portal_workflow"]
@@ -48,7 +48,7 @@ class EEAFixture(PloneSandboxLayer):
 
     def tearDownZope(self, app):
         """Uninstall Zope"""
-        z2.uninstallProduct(app, "eea.restapi.dataconnector")
+        z2.uninstallProduct(app, "eea.api.dataconnector")
 
 
 EEAFIXTURE = EEAFixture()
