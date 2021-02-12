@@ -1,0 +1,11 @@
+version: "2"
+services:
+  plone:
+    image: plone:5
+    ports:
+    - "8080"
+    volumes:
+    - ../../:/plone/instance/src/eea.restapi.dataconnector
+    environment:
+      ADDONS: "eea.restapi.dataconnector[test]"
+      DEVELOP: "src/eea.restapi.dataconnector"

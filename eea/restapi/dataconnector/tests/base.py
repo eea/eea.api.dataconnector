@@ -1,7 +1,12 @@
 """ Base test cases
 """
-from plone.app.testing import (TEST_USER_ID, FunctionalTesting,
-                               PloneSandboxLayer, applyProfile, setRoles)
+from plone.app.testing import (
+    TEST_USER_ID,
+    FunctionalTesting,
+    PloneSandboxLayer,
+    applyProfile,
+    setRoles,
+)
 from plone.testing import z2
 from Products.CMFPlone import setuphandlers
 

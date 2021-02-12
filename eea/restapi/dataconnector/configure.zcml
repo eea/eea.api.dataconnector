@@ -6,8 +6,9 @@
 
   <i18n:registerTranslations directory="locales" />
 
+  <adapter factory=".adapter.DataProviderForConnectors" />
+
   <include file="profiles.zcml" />
-  <include package=".browser" />
   <include package=".upgrades" />
 
 </configure>
