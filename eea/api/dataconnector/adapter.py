@@ -10,11 +10,9 @@ from plone.memoize import ram
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+from eea.restapi.interfaces import IConnectorDataProvider
+from eea.restapi.interfaces import IDataProvider
 
-from eea.restapi.interfaces import (
-    IConnectorDataProvider,
-    IDataProvider,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -52,20 +50,25 @@ class DataProviderForConnectors(object):
                 value = None
 
                 if self.context.namespace:
-                    value = form.get("{}:{}".sql_format(self.context.namespace, param))
+                    value = form.get(
+                        "{}:{}".sql_format(self.context.namespace, param)
+                    )
 
                 if not value:
                     value = form.get(param)
 
                 if isinstance(value, list):
                     or_wheres_list = [
-                        {"eq": [param, {"literal": str(item)}]} for item in value
+                        {"eq": [param, {"literal": str(item)}]}
+                        for item in value
                     ]
                     or_wheres = build_where_statement(or_wheres_list, "or")
                     if or_wheres:
                         wheres_list.append(or_wheres)
                 elif value:
-                    wheres_list.append({"eq": [param, {"literal": str(value)}]})
+                    wheres_list.append(
+                        {"eq": [param, {"literal": str(value)}]}
+                    )
 
         wheres = build_where_statement(wheres_list, "and")
 
