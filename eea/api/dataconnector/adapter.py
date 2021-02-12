@@ -4,14 +4,14 @@ import logging
 
 import requests
 from eea.restapi.utils import timing
+from eea.restapi.interfaces import IConnectorDataProvider
+from eea.restapi.interfaces import IDataProvider
 from moz_sql_parser import format as sql_format
 from moz_sql_parser import parse
 from plone.memoize import ram
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
-from eea.restapi.interfaces import IConnectorDataProvider
-from eea.restapi.interfaces import IDataProvider
 
 
 logger = logging.getLogger(__name__)
