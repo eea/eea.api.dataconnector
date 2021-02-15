@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.0 - (2021-02-15)
+---------------------------
+* Change: Automated release [valentinab25]
+
 1.0-dev0 - (unreleased)
 -----------------------
 
