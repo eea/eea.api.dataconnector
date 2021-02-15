@@ -13,6 +13,7 @@ setup(
     name=NAME,
     version=VERSION,
     description="eea.restapi dataconnector integration for Plone",
+    long_description_content_type="text/x-rst",
     long_description=(
         open("README.rst").read() +
         "\n" +
