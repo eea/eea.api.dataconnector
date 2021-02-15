@@ -3,7 +3,7 @@ pipeline {
 
   environment {
         GIT_NAME = "eea.api.dataconnector"
-        SONARQUBE_TAGS = "www.eea.europa.eu"
+        SONARQUBE_TAGS = "demo-biodiversity.eea.europa.eu"
     }
 
   stages {
@@ -142,13 +142,6 @@ pipeline {
         node(label: 'swarm') {
           script{
             checkout scm
-            dir("xunit-reports") {
-              unstash "xunit-reports"
-            }
-            unstash "coverage.xml"
-            dir('xunit-functional') {
-              unstash "xunit-functional"
-            }
             def scannerHome = tool 'SonarQubeScanner';
             def nodeJS = tool 'NodeJS11';
             withSonarQubeEnv('Sonarqube') {
