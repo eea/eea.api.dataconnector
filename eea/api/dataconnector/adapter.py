@@ -81,7 +81,9 @@ class DataProviderForConnectors(object):
                     if or_wheres:
                         wheres_list.append(or_wheres)
                 elif value:
-                    wheres_list.append({"eq": [param, {"literal": str(value)}]})
+                    wheres_list.append(
+                        {"eq": [param, {"literal": str(value)}]}
+                    )
 
         wheres = build_where_statement(wheres_list, "and")
 
