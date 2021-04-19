@@ -27,7 +27,7 @@ def build_where_statement(wheres, operator="and"):
 def has_required_parameters(request, context):
     """Check if required_parameters exists in form"""
 
-    if not context.required_parameters:  # or not len(context.required_parameters):
+    if not context.required_parameters:
         return True
 
     for param in context.required_parameters:
@@ -65,14 +65,17 @@ class DataProviderForConnectors(object):
                 value = None
 
                 if self.context.namespace:
-                    value = form.get("{}.{}".format(self.context.namespace, param))
+                    value = form.get(
+                        "{}.{}".format(self.context.namespace, param)
+                    )
 
                 if not value:
                     value = form.get(param)
 
                 if isinstance(value, list):
                     or_wheres_list = [
-                        {"eq": [param, {"literal": str(item)}]} for item in value
+                        {"eq": [param, {"literal": str(item)}]}
+                        for item in value
                     ]
                     or_wheres = build_where_statement(or_wheres_list, "or")
                     if or_wheres:
