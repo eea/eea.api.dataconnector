@@ -1,8 +1,10 @@
 Changelog
 =========
 
-1.2-dev0 - (unreleased)
+1.2 - (2021-04-26)
 ---------------------------
+* Change: Set collation for where clauses
+  [razvanMiu]
 
 1.1 - (2021-04-19)
 ---------------------------
