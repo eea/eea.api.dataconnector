@@ -3,14 +3,15 @@
 import logging
 
 import requests
-from eea.restapi.interfaces import IConnectorDataProvider, IDataProvider
-from eea.restapi.utils import timing
 from moz_sql_parser import format as sql_format
 from moz_sql_parser import parse
 from plone.memoize import ram
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+
+from eea.restapi.interfaces import IConnectorDataProvider, IDataProvider
+from eea.restapi.utils import timing
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,13 @@ def has_required_parameters(request, context):
     return True
 
 
+def get_param(param, collate):
+    """Get param with corresponding table and collate"""
+    if collate:
+        return {"collate": [param, collate]}
+    return param
+
+
 @adapter(IConnectorDataProvider, IBrowserRequest)
 @implementer(IDataProvider)
 class DataProviderForConnectors(object):
@@ -57,24 +65,38 @@ class DataProviderForConnectors(object):
 
         form = self.request.form
         query = parse(self.context.sql_query)
+        collate = self.context.collate
         wheres_list = []
         data = {}
 
         if self.context.parameters:
             for param in self.context.parameters:
+                # A param can have this structure table.param
+                # so we need to separate the table from param
+                field = param.split(".")
+                if len(field) > 1:
+                    field = field[1]
+                elif len(field) == 1:
+                    field = field[0]
+
                 value = None
 
                 if self.context.namespace:
                     value = form.get(
-                        "{}.{}".format(self.context.namespace, param)
+                        "{}.{}".format(self.context.namespace, field)
                     )
 
                 if not value:
-                    value = form.get(param)
+                    value = form.get(field)
 
                 if isinstance(value, list):
                     or_wheres_list = [
-                        {"eq": [param, {"literal": str(item)}]}
+                        {
+                            "eq": [
+                                get_param(param, collate),
+                                {"literal": str(item)},
+                            ]
+                        }
                         for item in value
                     ]
                     or_wheres = build_where_statement(or_wheres_list, "or")
@@ -82,7 +104,12 @@ class DataProviderForConnectors(object):
                         wheres_list.append(or_wheres)
                 elif value:
                     wheres_list.append(
-                        {"eq": [param, {"literal": str(value)}]}
+                        {
+                            "eq": [
+                                get_param(param, collate),
+                                {"literal": str(value)},
+                            ]
+                        }
                     )
 
         wheres = build_where_statement(wheres_list, "and")
