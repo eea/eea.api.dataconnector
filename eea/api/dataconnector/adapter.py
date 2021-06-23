@@ -2,8 +2,8 @@
 
 import logging
 
-import requests
 import re
+import requests
 from moz_sql_parser import format as sql_format
 from moz_sql_parser import parse
 from plone.memoize import ram
