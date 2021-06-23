@@ -1,8 +1,10 @@
 Changelog
 =========
 
-1.3-dev0 - (unreleased)
+1.3 - (2021-06-23)
 ---------------------------
+* Change: Removed comments from query before parsing
+  [razvanMiu]
 
 1.2 - (2021-04-26)
 ---------------------------
