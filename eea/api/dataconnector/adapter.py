@@ -2,6 +2,7 @@
 
 import logging
 
+import re
 import requests
 from moz_sql_parser import format as sql_format
 from moz_sql_parser import parse
@@ -64,7 +65,7 @@ class DataProviderForConnectors(object):
         # query = urllib.parse.quote_plus(self.query)
 
         form = self.request.form
-        query = parse(self.context.sql_query)
+        query = parse(re.sub(r'\/\*[\s\S]*?\*\/', '', self.context.sql_query))
         collate = self.context.collate
         wheres_list = []
         data = {}
