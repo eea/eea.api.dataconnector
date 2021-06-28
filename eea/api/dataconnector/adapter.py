@@ -49,6 +49,7 @@ def get_param(param, collate):
         return {"collate": [param, collate]}
     return param
 
+
 def get_value(form, namespace, field):
     """Get value from request form"""
     value = None
@@ -76,7 +77,9 @@ class DataProviderForConnectors(object):
         # query = urllib.parse.quote_plus(self.query)
 
         form = self.request.form
-        db_version = get_value(form, self.context.namespace, 'db_version') or 'latest'
+        db_version = 
+            get_value(form, self.context.namespace, 'db_version')
+            or 'latest'
         query = parse(re.sub(
             r'\/\*[\s\S]*?\*\/', '',
             self.context.sql_query.replace('DB_VERSION', db_version)
