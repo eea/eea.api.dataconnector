@@ -49,6 +49,17 @@ def get_param(param, collate):
         return {"collate": [param, collate]}
     return param
 
+def get_value(form, namespace, field):
+    """Get value from request form"""
+    value = None
+    if namespace:
+        value = form.get(
+            "{}.{}".format(namespace, field)
+        )
+    if not value:
+        value = form.get(field)
+    return value
+
 
 @adapter(IConnectorDataProvider, IBrowserRequest)
 @implementer(IDataProvider)
@@ -65,7 +76,11 @@ class DataProviderForConnectors(object):
         # query = urllib.parse.quote_plus(self.query)
 
         form = self.request.form
-        query = parse(re.sub(r'\/\*[\s\S]*?\*\/', '', self.context.sql_query))
+        db_version = get_value(form, self.context.namespace, 'db_version') or 'latest'
+        query = parse(re.sub(
+            r'\/\*[\s\S]*?\*\/', '',
+            self.context.sql_query.replace('DB_VERSION', db_version)
+        ))
         collate = self.context.collate
         wheres_list = []
         data = {}
@@ -80,15 +95,7 @@ class DataProviderForConnectors(object):
                 elif len(field) == 1:
                     field = field[0]
 
-                value = None
-
-                if self.context.namespace:
-                    value = form.get(
-                        "{}.{}".format(self.context.namespace, field)
-                    )
-
-                if not value:
-                    value = form.get(field)
+                value = get_value(form, self.context.namespace, field)
 
                 if isinstance(value, list):
                     or_wheres_list = [
