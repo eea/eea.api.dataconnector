@@ -43,11 +43,21 @@ def has_required_parameters(request, context):
     return True
 
 
-def get_param(param, collate):
+def get_param(param, value, op, collate):
     """Get param with corresponding table and collate"""
-    if collate:
+    if collate and isinstance(value, str):
         return {"collate": [param, collate]}
     return param
+
+
+def get_value(form, namespace, field):
+    """Get value from request form"""
+    value = None
+    if namespace:
+        value = form.get("{}.{}".format(namespace, field))
+    if not value:
+        value = form.get(field)
+    return value
 
 
 @adapter(IConnectorDataProvider, IBrowserRequest)
@@ -65,37 +75,52 @@ class DataProviderForConnectors(object):
         # query = urllib.parse.quote_plus(self.query)
 
         form = self.request.form
-        query = parse(re.sub(r'\/\*[\s\S]*?\*\/', '', self.context.sql_query))
+        db_version = (
+            get_value(form, self.context.namespace, "db_version") or "latest"
+        )
+        query = parse(
+            re.sub(
+                r"\/\*[\s\S]*?\*\/",
+                "",
+                self.context.sql_query.replace("DB_VERSION", db_version),
+            )
+        )
         collate = self.context.collate
         wheres_list = []
         data = {}
 
         if self.context.parameters:
-            for param in self.context.parameters:
-                # A param can have this structure table.param
-                # so we need to separate the table from param
-                field = param.split(".")
+            for param_expression in self.context.parameters:
+                # A param can have this structure table.param[op]
+                # so we need to separate the table and operation from param[op]
+                param = re.sub(
+                    r"\[(gt|gte|lt|lte|eq|ne|in|nin|like)\]",
+                    "",
+                    param_expression,
+                )
+                op = re.search(
+                    r"\b(gt|gte|lt|lte|eq|ne|in|nin|like)\b", param_expression
+                )
+                op = op.group() if op else "eq"
+                field = param_expression.split(".")
+
                 if len(field) > 1:
-                    field = field[1]
+                    field = ".".join(field[1:])
                 elif len(field) == 1:
                     field = field[0]
 
-                value = None
+                value = get_value(form, self.context.namespace, field)
 
-                if self.context.namespace:
-                    value = form.get(
-                        "{}.{}".format(self.context.namespace, field)
-                    )
-
-                if not value:
-                    value = form.get(field)
-
-                if isinstance(value, list):
+                if re.search(r"(eq|ne|like)", op) and isinstance(value, list):
                     or_wheres_list = [
                         {
-                            "eq": [
-                                get_param(param, collate),
-                                {"literal": str(item)},
+                            op: [
+                                get_param(param, value, op, collate),
+                                {
+                                    "literal": "%" + item + "%"
+                                    if op == "like"
+                                    else item
+                                },
                             ]
                         }
                         for item in value
@@ -106,9 +131,13 @@ class DataProviderForConnectors(object):
                 elif value:
                     wheres_list.append(
                         {
-                            "eq": [
-                                get_param(param, collate),
-                                {"literal": str(value)},
+                            op: [
+                                get_param(param, value, op, collate),
+                                {
+                                    "literal": "%" + value + "%"
+                                    if op == "like"
+                                    else value
+                                },
                             ]
                         }
                     )
