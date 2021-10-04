@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.5 - (2021-10-04)
+---------------------------
+* Change: Use '*' to delimit the table from the parameter [razvanMiu]
+
 1.5-dev0 - (unreleased)
 ---------------------------
 
