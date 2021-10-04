@@ -54,7 +54,7 @@ def get_value(form, namespace, field):
     """Get value from request form"""
     value = None
     if namespace:
-        value = form.get("{}.{}".format(namespace, field))
+        value = form.get("{}*{}".format(namespace, field))
     if not value:
         value = form.get(field)
     return value
@@ -91,7 +91,7 @@ class DataProviderForConnectors(object):
 
         if self.context.parameters:
             for param_expression in self.context.parameters:
-                # A param can have this structure table.param[op]
+                # A param can have this structure table*param[op]
                 # so we need to separate the table and operation from param[op]
                 param = re.sub(
                     r"\[(gt|gte|lt|lte|eq|ne|in|nin|like)\]",
@@ -102,10 +102,10 @@ class DataProviderForConnectors(object):
                     r"\b(gt|gte|lt|lte|eq|ne|in|nin|like)\b", param_expression
                 )
                 op = op.group() if op else "eq"
-                field = param_expression.split(".")
+                field = param_expression.split("*")
 
                 if len(field) > 1:
-                    field = ".".join(field[1:])
+                    field = "*".join(field[1:])
                 elif len(field) == 1:
                     field = field[0]
 
