@@ -109,7 +109,7 @@ class DataProviderForConnectors(object):
                 elif len(field) == 1:
                     field = field[0]
 
-                param = param.replace("*", ".")            
+                param = param.replace("*", ".")
                 value = get_value(form, self.context.namespace, field)
 
                 if re.search(r"(eq|ne|like)", op) and isinstance(value, list):
