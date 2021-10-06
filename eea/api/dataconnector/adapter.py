@@ -43,7 +43,7 @@ def has_required_parameters(request, context):
     return True
 
 
-def get_param(param, value, op, collate):
+def get_param(param, value, collate):
     """Get param with corresponding table and collate"""
     if collate and isinstance(value, str):
         return {"collate": [param, collate]}
@@ -91,8 +91,8 @@ class DataProviderForConnectors(object):
 
         if self.context.parameters:
             for param_expression in self.context.parameters:
-                # A param can have this structure table*param[op]
-                # so we need to separate the table and operation from param[op]
+                # A param can have this structure table*field[op]
+                # so we need to separate the table and operation from field[op]
                 param = re.sub(
                     r"\[(gt|gte|lt|lte|eq|ne|in|nin|like)\]",
                     "",
@@ -105,17 +105,18 @@ class DataProviderForConnectors(object):
                 field = param_expression.split("*")
 
                 if len(field) > 1:
-                    field = "*".join(field[1:])
+                    field = ".".join(field[1:])
                 elif len(field) == 1:
                     field = field[0]
 
+                param = param.replace("*", ".")
                 value = get_value(form, self.context.namespace, field)
 
                 if re.search(r"(eq|ne|like)", op) and isinstance(value, list):
                     or_wheres_list = [
                         {
                             op: [
-                                get_param(param, value, op, collate),
+                                get_param(param, value, collate),
                                 {
                                     "literal": "%" + item + "%"
                                     if op == "like"
@@ -132,7 +133,7 @@ class DataProviderForConnectors(object):
                     wheres_list.append(
                         {
                             op: [
-                                get_param(param, value, op, collate),
+                                get_param(param, value, collate),
                                 {
                                     "literal": "%" + value + "%"
                                     if op == "like"
