@@ -1,0 +1,35 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  i18n_domain="eea">
+
+  <browser:page
+    name="view"
+    for="eea.api.dataconnector.interfaces.IConnectorDataProvider"
+    permission="zope2.View"
+    template="pt/data_connector_view.pt"
+    />
+
+  <browser:page
+    name="provided_data"
+    for="eea.api.dataconnector.interfaces.IBasicDataProvider"
+    permission="zope2.View"
+    template="pt/provided_data.pt"
+    class=".dataprovider.DataProviderView"
+    />
+
+  <browser:page
+    name="download-provider-data"
+    for="eea.api.dataconnector.interfaces.IBasicDataProvider"
+    permission="zope2.View"
+    class=".dataprovider.DataProviderDownload"
+    />
+
+  <browser:page
+    name="view"
+    for="eea.api.dataconnector.interfaces.IDataVisualization"
+    permission="zope2.View"
+    template="pt/visualization_view.pt"
+    />    
+
+</configure>

@@ -1,0 +1,28 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="eea.dataconnectori">
+
+
+  <adapter name="connector-data" factory=".dataconnector.ConnectorData" />
+
+	<!-- TODO: this should be eea.dataconnector.interfaces.IBasicDataProvider -->
+  <plone:service
+    method="GET"
+    for="*"
+    factory=".dataconnector.ConnectorDataGet"
+    name="@connector-data"
+    permission="zope2.View"
+    />
+
+  <plone:service
+    method="POST"
+    for="*"
+    factory=".dataconnector.ConnectorDataPost"
+    name="@connector-data"
+    permission="zope2.View"
+    />
+
+</configure>

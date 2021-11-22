@@ -1,0 +1,11 @@
+<strong i18n:translate="text_data">Data:</strong>
+<div tal:define="data view/data">
+  <table tal:condition="data" class="table listing">
+    <tbody>
+      <tr tal:repeat="k data">
+        <th tal:content="k">Column label</th>
+        <td tal:repeat="val python: data[k]" tal:content="val">Value</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

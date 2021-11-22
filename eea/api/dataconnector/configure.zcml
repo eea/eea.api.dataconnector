@@ -9,6 +9,9 @@
   <adapter factory=".adapter.DataProviderForConnectors" />
 
   <include file="profiles.zcml" />
+  <include file="behavior.zcml" />
+  <include package=".api" />
+  <include package=".browser" />
   <include package=".upgrades" />
 
 </configure>
