@@ -1,15 +1,19 @@
 Changelog
 =========
 
+1.7 - (2021-11-22)
+---------------------------
+* Change: Moved dataconnector code from eea.restapi to here
+  [eugentripon refs #139888]
+
 1.6 - (2021-10-06)
 ---------------------------
+* Change: Fix history
+  [iulianpetchesi refs #139888]
 
 1.5 - (2021-10-04)
 ---------------------------
 * Change: Use '*' to delimit the table from the parameter [razvanMiu]
-
-1.5 - (2021-10-06)
----------------------------
 
 1.4 - (2021-06-28)
 ---------------------------
