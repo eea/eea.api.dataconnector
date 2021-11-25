@@ -3,6 +3,8 @@ Changelog
 
 1.8-dev0 - (unreleased)
 ---------------------------
+* Change: Modified behavior name and redefined some imports
+  [eugentripon refs #139888]
 
 1.7 - (2021-11-22)
 ---------------------------
