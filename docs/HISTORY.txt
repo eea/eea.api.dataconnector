@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.8 - (2021-11-25)
+---------------------------
+* Change: Modified behavior name and redefined some imports
+  [eugentripon refs #139888]
+
 1.7 - (2021-11-22)
 ---------------------------
 * Change: Moved dataconnector code from eea.restapi to here

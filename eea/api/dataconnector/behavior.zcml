@@ -32,7 +32,7 @@
       />
 
   <plone:behavior
-      name="eea.dataconnector.parameters"
+      name="eea.restapi.parameters"
       title="Parameters for data connections"
       description="Allow content to preset parameters for connector data"
       factory=".behavior.ConnectorDataParameters"
