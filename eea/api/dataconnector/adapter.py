@@ -11,7 +11,7 @@ from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 
-from eea.restapi.interfaces import IConnectorDataProvider, IDataProvider
+from eea.api.dataconnector.interfaces import IConnectorDataProvider, IDataProvider
 from eea.restapi.utils import timing
 
 logger = logging.getLogger(__name__)
