@@ -79,7 +79,6 @@ class DataProviderForFiles(object):
 
 class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
-
     visualization = DCFieldProperty(IDataVisualization["visualization"])
 
 

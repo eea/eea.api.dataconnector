@@ -15,6 +15,8 @@ from eea.api.dataconnector.interfaces import IConnectorDataProvider, \
     IDataProvider
 from eea.restapi.utils import timing
 
+from eea.api.dataconnector.queryparser import parseQuery
+
 logger = logging.getLogger(__name__)
 
 
@@ -73,91 +75,31 @@ class DataProviderForConnectors(object):
     @timing
     def _get_data(self):
         """_get_data."""
-        # query = urllib.parse.quote_plus(self.query)
-
-        form = self.request.form
-        db_version = (
-            get_value(form, self.context.namespace, "db_version") or "latest"
-        )
-        query = parse(
-            re.sub(
-                r"\/\*[\s\S]*?\*\/",
-                "",
-                self.context.sql_query.replace("DB_VERSION", db_version),
-            )
-        )
-        collate = self.context.collate
-        wheres_list = []
         data = {}
+        sql = parseQuery(self.context, self.request)
 
-        if self.context.parameters:
-            for param_expression in self.context.parameters:
-                # A param can have this structure table*field[op]
-                # so we need to separate the table and operation from field[op]
-                param = re.sub(
-                    r"\[(gt|gte|lt|lte|eq|ne|in|nin|like)\]",
-                    "",
-                    param_expression,
-                )
-                op = re.search(
-                    r"\b(gt|gte|lt|lte|eq|ne|in|nin|like)\b", param_expression
-                )
-                op = op.group() if op else "eq"
-                field = param_expression.split("*")
+        if not sql:
+            return {"results": []}
 
-                if len(field) > 1:
-                    field = ".".join(field[1:])
-                elif len(field) == 1:
-                    field = field[0]
+        query = sql.get('query')
+        conditions = sql.get('conditions')
 
-                param = param.replace("*", ".")
-                value = get_value(form, self.context.namespace, field)
-
-                if re.search(r"(eq|ne|like)", op) and isinstance(value, list):
-                    or_wheres_list = [
-                        {
-                            op: [
-                                get_param(param, value, collate),
-                                {
-                                    "literal": "%" + item + "%"
-                                    if op == "like"
-                                    else item
-                                },
-                            ]
-                        }
-                        for item in value
-                    ]
-                    or_wheres = build_where_statement(or_wheres_list, "or")
-                    if or_wheres:
-                        wheres_list.append(or_wheres)
-                elif value:
-                    wheres_list.append(
-                        {
-                            op: [
-                                get_param(param, value, collate),
-                                {
-                                    "literal": "%" + value + "%"
-                                    if op == "like"
-                                    else value
-                                },
-                            ]
-                        }
-                    )
-
-        wheres = build_where_statement(wheres_list, "and")
-
-        if "where" in query and wheres:
-            query["where"] = {"and": [query["where"], wheres]}
-        elif "where" not in query and wheres:
-            query["where"] = wheres
+        if "where" in query and conditions:
+            query["where"] = {"and": conditions + [query["where"]]}
+        elif "where" not in query and len(conditions) > 1:
+            query["where"] = {'and': conditions}
+        elif len(conditions) == 1:
+           query["where"] = conditions[0]
 
         data["query"] = sql_format(query)
 
-        if form.get("p"):
-            data["p"] = form.get("p")
+        print(conditions, data)
 
-        if form.get("nrOfHits"):
-            data["nrOfHits"] = form.get("nrOfHits")
+        # if form.get("p"):
+        #     data["p"] = form.get("p")
+
+        # if form.get("nrOfHits"):
+        #     data["nrOfHits"] = form.get("nrOfHits")
 
         try:
             req = requests.post(self.context.endpoint_url, data)
@@ -188,12 +130,10 @@ class DataProviderForConnectors(object):
         return res
 
     # TO DO: persistent caching, periodical refresh, etc
-    @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
+    # @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
     def _provided_data(self):
         """ provided data """
         if not self.context.sql_query:
-            return []
-        if not has_required_parameters(self.request, self.context):
             return []
         data = self._get_data()
 
