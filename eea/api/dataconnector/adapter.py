@@ -16,6 +16,7 @@ from eea.api.dataconnector.interfaces import IConnectorDataProvider, \
 from eea.restapi.utils import timing
 
 from eea.api.dataconnector.queryparser import parseQuery
+from eea.api.dataconnector.queryfilter import filteredData
 
 logger = logging.getLogger(__name__)
 
@@ -81,8 +82,10 @@ class DataProviderForConnectors(object):
         if not sql:
             return {"results": []}
 
-        query = sql.get('query')
         conditions = sql.get('conditions')
+        data_query = sql.get('data_query')
+        form = sql.get('form')
+        query = sql.get('query')
 
         if "where" in query and conditions:
             query["where"] = {"and": conditions + [query["where"]]}
@@ -93,41 +96,25 @@ class DataProviderForConnectors(object):
 
         data["query"] = sql_format(query)
 
-        print(conditions, data)
+        if form.get("p"):
+            data["p"] = form.get("p")
 
-        # if form.get("p"):
-        #     data["p"] = form.get("p")
-
-        # if form.get("nrOfHits"):
-        #     data["nrOfHits"] = form.get("nrOfHits")
+        if form.get("nrOfHits"):
+            data["nrOfHits"] = form.get("nrOfHits")
 
         try:
             req = requests.post(self.context.endpoint_url, data)
-            res = req.json()
+            data = req.json()
         except Exception:
             logger.exception("Error in requestion data")
-            res = {"results": []}
+            data = {"results": []}
 
-        if "errors" in res:
+        if "errors" in data:
             return {"results": []}
 
-        return res
+        # This will also change orientation
+        return filteredData(data['results'], data_query)
 
-    def change_orientation(self, data):
-        """ change orientation """
-        res = {}
-
-        if not data:
-            return res
-
-        keys = data[0].keys()
-
-        # TO DO: in-memory built, should optimize
-
-        for k in keys:
-            res[k] = [row[k] for row in data]
-
-        return res
 
     # TO DO: persistent caching, periodical refresh, etc
     # @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
@@ -135,9 +122,7 @@ class DataProviderForConnectors(object):
         """ provided data """
         if not self.context.sql_query:
             return []
-        data = self._get_data()
-
-        return self.change_orientation(data["results"])
+        return self._get_data()
 
     @property
     def provided_data(self):

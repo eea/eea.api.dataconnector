@@ -63,13 +63,16 @@ def parseQuery(context, request):
                 collate=collate)
         parser = resolve(function_path)
         condition = parser(row)
-        if type(condition) is list:
-            condition = {'and': condition}
-        conditions.append(condition)
+        if condition:
+            if type(condition) is list:
+                condition = {'and': condition}
+            conditions.append(condition)
 
     return {
         "query": sql_parsed,
         "conditions": conditions,
+        "form": form,
+        "data_query": _data_query
     }
 
 # Helpers
@@ -82,7 +85,7 @@ def mergeLists(list_1, list_2):
 
 def combine(str_1, str_2):
     if str_1 and str_2:
-        return str_1 + '.' + str_2
+        return '{}.{}'.format(str_1, str_2)
     return str_2
 
 def getParsedSQLQuery(context, db_version):
@@ -164,16 +167,14 @@ def getDataQuery(form):
 def _default(row, op = 'eq'):
     collate = row.collate
     index = combine(row.table, row.index)
+    if collate:
+        index = {'collate': {index, collate}}
     if type(row.values) is not list:
         if type(row.values) is str:
-            if collate:
-                index = {'collate': {index, collate}}
             return {op: [ index, {'literal': row.values}]}
         return {op: [ index, row.values ]}
     if len(row.values) == 1:
         if type(row.values[0]) is str:
-            if collate:
-                index = {'collate': {index, collate}}
             return {op: [ index, {'literal': row.values[0]}]}
         return {op: [ index, row.values[0] ]}
     else:
@@ -210,8 +211,7 @@ def _in(row):
     return _contains(row)
 
 def _nin(row):
-    index = combine(row.table, row.index)
-    return {'nin': [ index, row.values ]}
+    return _contains(row, 'nin')
 
 def _gt(row):
     return _default(row, 'gt')
@@ -230,9 +230,20 @@ def _lte(row):
 def _equal(row):
     return _default(row)
 
-def _contains(row):
+def _contains(row, op = 'in'):
+    collate = row.collate
     index = combine(row.table, row.index)
-    return {'in': [ index, row.values ]}
+    if collate:
+        index = {'collate': {index, collate}}
+    if row.values and type(row.values) is not list:
+        if type(row.values) is str:
+            return {op: [ index, {'literal': [row.values]}]}
+        return {op: [ index, [row.values] ]}
+    if len(row.values) >= 1:
+        if type(row.values[0]) is str:
+            return {op: [ index, {'literal': row.values}]}
+        return {op: [ index, row.values]}
+    return None
 
 def _all(row):
     return _default(row)
