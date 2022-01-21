@@ -73,14 +73,21 @@ class DataProviderForConnectors(object):
         self.context = context
         self.request = request
 
+    def _get_metadata(self):
+        """_get_metadata."""
+        return {
+            "readme": self.context.readme
+        }
+
     @timing
     def _get_data(self):
         """_get_data."""
         data = {}
+        metadata = self._get_metadata()
         sql = parseQuery(self.context, self.request)
 
         if not sql:
-            return {"results": []}
+            return {"results": [], "metadata": metadata}
 
         conditions = sql.get('conditions')
         data_query = sql.get('data_query')
@@ -107,13 +114,16 @@ class DataProviderForConnectors(object):
             data = req.json()
         except Exception:
             logger.exception("Error in requestion data")
-            data = {"results": []}
+            data = {"results": [], "metadata": metadata}
 
         if "errors" in data:
-            return {"results": []}
+            return {"results": [], "metadata": metadata}
 
         # This will also change orientation
-        return filteredData(data['results'], data_query)
+        return {
+            "results": filteredData(data['results'], data_query),
+            "metadata": metadata
+        }
 
 
     # TO DO: persistent caching, periodical refresh, etc

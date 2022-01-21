@@ -36,6 +36,7 @@ class DataConnector(MetadataBase):
         IDataConnector["required_parameters"]
     )
     collate = DCFieldProperty(IDataConnector["collate"])
+    readme = DCFieldProperty(IDataConnector["readme"])
 
 
 @implementer(IDataProvider)
