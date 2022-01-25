@@ -49,13 +49,6 @@ class IDataConnector(model.Schema):
         required=False,
         value_type=schema.TextLine(title="Parameter"),
     )
-    namespace = schema.TextLine(
-        title="Connector namespace",
-        description=u"Optional namespace string, use it in case data in "
-        "this connector is not uniform across the other datasets",
-        required=False,
-        default="",
-    )
     collate = schema.TextLine(
         title="Collate",
         description=u"Optional collate string, use it in case data has a "

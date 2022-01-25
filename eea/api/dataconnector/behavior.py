@@ -31,7 +31,6 @@ class DataConnector(MetadataBase):
     endpoint_url = DCFieldProperty(IDataConnector["endpoint_url"])
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
-    namespace = DCFieldProperty(IDataConnector["namespace"])
     required_parameters = DCFieldProperty(
         IDataConnector["required_parameters"]
     )

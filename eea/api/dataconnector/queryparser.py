@@ -25,9 +25,8 @@ def parseQuery(context, request):
     db_version = form.get('db_version') or 'latest'
     sql_parsed = getParsedSQLQuery(context, db_version)
     # Get context properties
-    parameters = context.parameters
+    parameters = getParameters(context.parameters)
     required_parameters = context.required_parameters
-    namespace = context.namespace
     collate = context.collate
     # Get indexes
     __data_query = []
@@ -35,15 +34,15 @@ def parseQuery(context, request):
 
     for row in _data_query:
         _index = row.get('i')
-        _namespace = row.get('ns')
         if not parameters:
             break
-        if namespace and namespace is not _namespace:
-            continue
         if _index not in parameters:
             continue
         __data_query.append(row)
         __indexes.append(_index)
+
+    print("===== indexes ======")
+    print(__indexes)
 
     # Check if required parameters exists in data_query
     if not hasRequiredParameters(required_parameters, __indexes):
@@ -53,7 +52,7 @@ def parseQuery(context, request):
         operator = row.get('o', None)
         index = row.get('i', None)
         value = row.get('v', None)
-        table = row.get('t', None)
+        table = parameters.get(index) if parameters else None
         function_path = operator
         if 'eea.api.dataconnector.queryparser' not in operator:
             function_path = reg["%s.operation" % operator].replace('plone.app.querystring', 'eea.api.dataconnector')
@@ -105,18 +104,35 @@ def hasRequiredParameters(required_parameters, parameters):
             return False
     return True
 
-def getValue(form, parameter, namespace):
+def getValue(form, parameter):
     """Get value from request form"""
     value = None
     field = parameter.get('i')
     op = parameter.get('o')
     op = op if op else ''
     composedParameter = field + op
-    if namespace:
-        value = form.get("{}|{}".format(namespace, composedParameter))
-    if not value:
-        value = form.get(composedParameter)
+    value = form.get(composedParameter)
     return value
+
+def getParameters(params_expression):
+    parameters = {}
+    table = None
+    param = None
+    if not params_expression:
+        return None
+    if len(params_expression) == 0:
+        return None
+    for row in params_expression:
+        expression = row.split('*')
+        if len(expression) == 1:
+            table = ''
+            param = row
+        elif len(expression) == 2:
+            table = expression[0]
+            param = expression[1]
+        if param:
+            parameters[param] = table
+    return parameters
 
 def getDataQuery(form):
     data = []
@@ -125,15 +141,11 @@ def getDataQuery(form):
         op =  re.search(
             r"\b(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\b", expression
         )
-        expression = re.sub(
+        index = re.sub(
             r"\[(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\]",
             "",
             expression,
-        ).split("::")
-        _expression = []
-        namespace = None
-        table = None
-
+        )
         if op:
             op = op.group()
         elif type(value) is list:
@@ -141,42 +153,43 @@ def getDataQuery(form):
         else:
             op = 'equal'
 
-        if len(expression) == 1:
-            index = expression[0]
-        elif len(expression) == 2:
-            _expression = expression[0].split('|')
-            index = expression[1]
-
-        if len(_expression) == 1:
-            table = _expression[0]
-        elif len(_expression) == 2:
-            namespace = _expression[0]
-            table = _expression[1]
-
         data.append({
             'i': index,
             'o': 'eea.api.dataconnector.queryparser._' + op,
-            'v': value,
-            'ns': namespace,
-            't': table or ''
+            'v': value
         })
     return data
+
+def getWhereStatement(row, op = 'eq'):
+    collate = row.collate
+    index = combine(row.table, row.index)
+    isList = type(row.values) is list
+    isString = False
+    value = None
+    if isList and len(row.values) == 1:
+        value = row.values[0]
+        if type(row.values[0]) is str:
+            isString = True
+    elif type(row.values) is str:
+        value = row.values
+        isString = True
+    else:
+        return None
+    if isString:
+        if collate:
+            return {op: [index, {'collate': [{'literal': value}, collate]}]}
+        return {op: [ index, {'literal': value}]}
+    else:
+        if collate:
+            return {op: [index, {'collate': [value, collate]}]}
+        return {op: [ index, value]}
 
 # Query operators
 
 def _default(row, op = 'eq'):
-    collate = row.collate
-    index = combine(row.table, row.index)
-    if collate:
-        index = {'collate': {index, collate}}
-    if type(row.values) is not list:
-        if type(row.values) is str:
-            return {op: [ index, {'literal': row.values}]}
-        return {op: [ index, row.values ]}
-    if len(row.values) == 1:
-        if type(row.values[0]) is str:
-            return {op: [ index, {'literal': row.values[0]}]}
-        return {op: [ index, row.values[0] ]}
+    where_statement = getWhereStatement(row, op)
+    if where_statement:
+        return where_statement
     else:
         return list(
             map(
@@ -231,19 +244,7 @@ def _equal(row):
     return _default(row)
 
 def _contains(row, op = 'in'):
-    collate = row.collate
-    index = combine(row.table, row.index)
-    if collate:
-        index = {'collate': {index, collate}}
-    if row.values and type(row.values) is not list:
-        if type(row.values) is str:
-            return {op: [ index, {'literal': [row.values]}]}
-        return {op: [ index, [row.values] ]}
-    if len(row.values) >= 1:
-        if type(row.values[0]) is str:
-            return {op: [ index, {'literal': row.values}]}
-        return {op: [ index, row.values]}
-    return None
+    return  getWhereStatement(row, op)
 
 def _all(row):
     return _default(row)

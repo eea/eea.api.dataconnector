@@ -21,49 +21,6 @@ from eea.api.dataconnector.queryfilter import filteredData
 logger = logging.getLogger(__name__)
 
 
-def build_where_statement(wheres, operator="and"):
-    """make where statement for moz_sql_parser"""
-    if wheres:
-        if len(wheres) == 1:
-            return wheres[0]
-        return {operator: wheres}
-    return False
-
-
-def has_required_parameters(request, context):
-    """Check if required_parameters exists in form"""
-
-    if not context.required_parameters:
-        return True
-
-    for param in context.required_parameters:
-        value = None
-        if context.namespace:
-            value = request.form.get("{}.{}".format(context.namespace, param))
-        if not value:
-            value = request.form.get(param)
-        if not value:
-            return False
-    return True
-
-
-def get_param(param, value, collate):
-    """Get param with corresponding table and collate"""
-    if collate and isinstance(value, str):
-        return {"collate": [param, collate]}
-    return param
-
-
-def get_value(form, namespace, field):
-    """Get value from request form"""
-    value = None
-    if namespace:
-        value = form.get("{}*{}".format(namespace, field))
-    if not value:
-        value = form.get(field)
-    return value
-
-
 @adapter(IConnectorDataProvider, IBrowserRequest)
 @implementer(IDataProvider)
 class DataProviderForConnectors(object):
@@ -102,6 +59,9 @@ class DataProviderForConnectors(object):
            query["where"] = conditions[0]
 
         data["query"] = sql_format(query)
+
+        print("===========================")
+        print(data["query"])
 
         if form.get("p"):
             data["p"] = form.get("p")
