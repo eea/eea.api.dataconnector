@@ -1,8 +1,13 @@
 Changelog
 =========
 
-2.0-dev0 - (unreleased)
+2.1-dev0 - (unreleased)
 ---------------------------
+
+2.0 - (2022-01-31)
+---------------------------
+* Change: Removed caching data in memcached for now
+  [razvanMiu]
 
 1.9 - (2022-01-31)
 ---------------------------
