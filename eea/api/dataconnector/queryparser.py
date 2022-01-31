@@ -1,8 +1,9 @@
+""" queryparser module """
 import re
+from collections import namedtuple
 from moz_sql_parser import parse
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
-from collections import namedtuple
 from zope.component import getUtility
 from zope.dottedname.resolve import resolve
 
@@ -128,8 +129,6 @@ def getParameters(params_expression):
     param = None
     if not params_expression:
         return None
-    if len(params_expression) == 0:
-        return None
     for row in params_expression:
         expression = row.split("*")
         if len(expression) == 1:
@@ -207,21 +206,18 @@ def _default(row, op="eq"):
     where_statement = getWhereStatement(row, op)
     if where_statement:
         return where_statement
-    else:
-        return list(
-            map(
-                lambda value: _default(
-                    Row(
-                        index=row.index,
-                        values=value,
-                        table=row.table,
-                        collate=row.collate,
-                    ),
-                    op,
-                ),
-                row.values,
-            )
+    return [
+        _default(
+            Row(
+                index=row.index,
+                values=value,
+                table=row.table,
+                collate=row.collate,
+            ),
+            op,
         )
+        for value in row.values
+    ]
 
 
 # From query string

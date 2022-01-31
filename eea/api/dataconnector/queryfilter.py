@@ -1,5 +1,6 @@
-from plone.registry.interfaces import IRegistry
+""" queryfilter module """
 from collections import namedtuple
+from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
 from zope.dottedname.resolve import resolve
 
@@ -9,10 +10,10 @@ Filter = namedtuple("Filter", ["index", "values"])
 def allow(filters, row, keys):
     """allow filter"""
     reg = getUtility(IRegistry)
-    for filter in filters:
-        operator = filter.get("o", None)
-        index = filter.get("i", None)
-        value = filter.get("v", None)
+    for _filter in filters:
+        operator = _filter.get("o", None)
+        index = _filter.get("i", None)
+        value = _filter.get("v", None)
         function_path = operator
         if index not in keys:
             continue
@@ -26,16 +27,16 @@ def allow(filters, row, keys):
                 "eea.api.dataconnector.queryparser",
                 "eea.api.dataconnector.queryfilter",
             )
-        filter = Filter(index=index, values=value)
+        _filter = Filter(index=index, values=value)
         filterFunc = resolve(function_path)
-        if not filterFunc(filter, row):
+        if not filterFunc(_filter, row):
             return False
     return True
 
 
 def filteredData(data, filters):
     """filter data based on form filters"""
-    if not len(data):
+    if not data:
         return {}
     results = {}
     keys = data[0].keys()
@@ -54,60 +55,60 @@ def filteredData(data, filters):
 # Filter operations
 
 
-def _eq(filter, row):
+def _eq(_filter, row):
     """equal"""
     # return _default(row)
     return True
 
 
-def _ne(filter, row):
+def _ne(_filter, row):
     """not equal"""
     # return _default(row, 'ne')
     return True
 
 
-def _like(filter, row):
+def _like(_filter, row):
     """like"""
     # return _default(row, 'like')
     return True
 
 
-def _not_like(filter, row):
+def _not_like(_filter, row):
     """not like"""
     # return _default(row, 'not_like')
     return True
 
 
-def _in(filter, row):
+def _in(_filter, row):
     """in"""
     # return _contains(filter, row)
     return True
 
 
-def _nin(filter, row):
+def _nin(_filter, row):
     """not in"""
     return True
 
 
-def _gt(filter, row):
+def _gt(_filter, row):
     """greater than"""
     # return _default(row, 'gt')
     return True
 
 
-def _gte(filter, row):
+def _gte(_filter, row):
     """greater than equal"""
     # return _default(row, 'gte')
     return True
 
 
-def _lt(filter, row):
+def _lt(_filter, row):
     """lower than"""
     # return _default(row, 'lt')
     return True
 
 
-def _lte(filter, row):
+def _lte(_filter, row):
     """lower than equal"""
     # return _default(row, 'lte')
     return True
@@ -116,126 +117,126 @@ def _lte(filter, row):
 # From data query
 
 
-def _equal(filter, row):
+def _equal(_filter, row):
     """equal"""
-    # return _default(filter, row)
+    # return _default(_filter, row)
     return True
 
 
-def _contains(filter, row):
+def _contains(_filter, row):
     """contains"""
-    if not filter.values:
+    if not _filter.values:
         return True
-    if isinstance(filter.values, list):
-        return row[filter.index] == filter.values
-    return row[filter.index] in filter.values
+    if isinstance(_filter.values, list):
+        return row[_filter.index] == _filter.values
+    return row[_filter.index] in _filter.values
 
 
-def _all(filter, row):
+def _all(_filter, row):
     """all"""
     # return _default(filter, row)
     return True
 
 
-def _intEqual(filter, row):
+def _intEqual(_filter, row):
     """int equal"""
-    # return _default(filter, row)
+    # return _default(_filter, row)
     return True
 
 
-def _isTrue(filter, row):
+def _isTrue(_filter, row):
     """boolean true"""
     # index = combine(row.table, row.index)
     return True
 
 
-def _isFalse(filter, row):
+def _isFalse(_filter, row):
     """boolean false"""
     # index = combine(row.table, row.index)
     return True
 
 
-# def _between(filter, row):
+# def _between(_filter, row):
 #     To be defined
 
 
-def _largerThan(filter, row):
+def _largerThan(_filter, row):
     """larger than"""
     # return _default(row, 'gt')
     return True
 
 
-def _intLargerThan(filter, row):
+def _intLargerThan(_filter, row):
     """int larger than"""
     # return _default(row, 'gt')
     return True
 
 
-def _lessThan(filter, row):
+def _lessThan(_filter, row):
     """less than"""
     # return _default(row, 'lt')
     return True
 
 
-def _intLessThan(filter, row):
+def _intLessThan(_filter, row):
     """int less than"""
     # return _default(row, 'lt')
     return True
 
 
-# def _currentUser(filter, row):
+# def _currentUser(_filter, row):
 #     To be defined
 
 
-# def _showInactive(filter, row):
+# def _showInactive(_filter, row):
 #     To be defined
 
 
-# def _lessThanRelativeDate(filter, row):
+# def _lessThanRelativeDate(_filter, row):
 #     To be defined
 
 
-# def _moreThanRelativeDate(filter, row):
+# def _moreThanRelativeDate(_filter, row):
 #     To be defined
 
 
-# def _betweenDates(filter, row):
+# def _betweenDates(_filter, row):
 #     To be defined
 
 
-# def _today(filter, row):
+# def _today(_filter, row):
 #     To be defined
 
 
-# def _afterToday(filter, row):
+# def _afterToday(_filter, row):
 #     To be defined
 
 
-# def _beforeToday(filter, row):
+# def _beforeToday(_filter, row):
 #     To be defined
 
 
-# def _beforeRelativeDate(filter, row):
+# def _beforeRelativeDate(_filter, row):
 #     To be defined
 
 
-# def _afterRelativeDate(filter, row):
+# def _afterRelativeDate(_filter, row):
 #     To be defined
 
 # def _pathByRoot(root, row):
 #     To be defined
 
 
-# def _absolutePath(filter, row):
+# def _absolutePath(_filter, row):
 #     To be defined
 
 
-# def _navigationPath(filter, row):
+# def _navigationPath(_filter, row):
 #     To be defined
 
-# def _relativePath(filter, row):
+# def _relativePath(_filter, row):
 #     To be defined
 
 
-# def _referenceIs(filter, row):
+# def _referenceIs(_filter, row):
 #     To be defined
