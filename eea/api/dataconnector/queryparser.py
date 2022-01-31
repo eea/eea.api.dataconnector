@@ -176,15 +176,22 @@ def getWhereStatement(row, op="eq"):
     """get where statement"""
     collate = row.collate
     index = combine(row.table, row.index)
-    isList = isinstance(row.values, list)
+    values = row.values
+    if op in ["in", "nin"] and isinstance(row.values, str):
+        values = row.values.split(",")
+    isList = isinstance(values, list)
     isString = False
     value = None
-    if isList and len(row.values) == 1:
-        value = row.values[0]
-        if isinstance(row.values[0], str):
+    if op in ["in", "nin"] and isList:
+        value = values
+        if isinstance(values[0], str):
             isString = True
-    elif isinstance(row.values, str):
-        value = row.values
+    elif isList and len(values) == 1:
+        value = values[0]
+        if isinstance(values[0], str):
+            isString = True
+    elif isinstance(values, str):
+        value = values
         isString = True
     else:
         return None

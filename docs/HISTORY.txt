@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.1 - (2022-01-31)
+---------------------------
+* Change: Patch #1
+  [razvanMiu]
+
 2.0 - (2022-01-31)
 ---------------------------
 * Change: Removed caching data in memcached for now
