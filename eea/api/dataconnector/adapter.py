@@ -4,7 +4,7 @@ import logging
 
 import requests
 from moz_sql_parser import format as sql_format
-from plone.memoize import ram
+# from plone.memoize import ram
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
@@ -81,7 +81,7 @@ class DataProviderForConnectors(object):
         }
 
     # TO DO: persistent caching, periodical refresh, etc
-    @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
+    # @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
     def _provided_data(self):
         """provided data"""
         if not self.context.sql_query:
