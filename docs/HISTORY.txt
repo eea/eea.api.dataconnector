@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.9 - (2022-01-31)
+---------------------------
+* Change: Improved connectors
+  [razvanMiu]
+
 1.8 - (2021-11-25)
 ---------------------------
 * Change: Modified behavior name and redefined some imports

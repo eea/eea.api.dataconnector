@@ -31,11 +31,11 @@ class DataConnector(MetadataBase):
     endpoint_url = DCFieldProperty(IDataConnector["endpoint_url"])
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
-    namespace = DCFieldProperty(IDataConnector["namespace"])
     required_parameters = DCFieldProperty(
         IDataConnector["required_parameters"]
     )
     collate = DCFieldProperty(IDataConnector["collate"])
+    readme = DCFieldProperty(IDataConnector["readme"])
 
 
 @implementer(IDataProvider)
@@ -79,7 +79,6 @@ class DataProviderForFiles(object):
 
 class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
-
     visualization = DCFieldProperty(IDataVisualization["visualization"])
 
 
