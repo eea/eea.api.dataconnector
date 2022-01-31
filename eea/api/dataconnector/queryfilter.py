@@ -127,7 +127,7 @@ def _contains(_filter, row):
     """contains"""
     if not _filter.values:
         return True
-    if isinstance(_filter.values, list):
+    if not isinstance(_filter.values, list):
         return row[_filter.index] == _filter.values
     return row[_filter.index] in _filter.values
 
