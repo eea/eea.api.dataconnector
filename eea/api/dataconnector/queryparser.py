@@ -10,6 +10,7 @@ Row = namedtuple("Row", ["index", "values", "table", "collate"])
 
 
 def parseQuery(context, request):
+    """parse query"""
     reg = getUtility(IRegistry)
     conditions = []
     form = request.form or {}
@@ -40,9 +41,6 @@ def parseQuery(context, request):
             continue
         __data_query.append(row)
         __indexes.append(_index)
-
-    print("===== indexes ======")
-    print(__indexes)
 
     # Check if required parameters exists in data_query
     if not hasRequiredParameters(required_parameters, __indexes):
@@ -76,6 +74,7 @@ def parseQuery(context, request):
 
 # Helpers
 def mergeLists(list_1, list_2):
+    """merge lists"""
     new_list = list_1
     for item in list_2:
         if item not in new_list:
@@ -84,12 +83,14 @@ def mergeLists(list_1, list_2):
 
 
 def combine(str_1, str_2):
+    """combine two strings as table.param"""
     if str_1 and str_2:
         return "{}.{}".format(str_1, str_2)
     return str_2
 
 
 def getParsedSQLQuery(context, db_version):
+    """get parsed sql query"""
     return parse(
         re.sub(
             r"\/\*[\s\S]*?\*\/",
@@ -100,6 +101,7 @@ def getParsedSQLQuery(context, db_version):
 
 
 def hasRequiredParameters(required_parameters, parameters):
+    """check if required_parameters are satisfied"""
     if not required_parameters:
         return True
     for param in required_parameters:
@@ -109,7 +111,7 @@ def hasRequiredParameters(required_parameters, parameters):
 
 
 def getValue(form, parameter):
-    """Get value from request form"""
+    """get value from request form"""
     value = None
     field = parameter.get("i")
     op = parameter.get("o")
@@ -120,6 +122,7 @@ def getValue(form, parameter):
 
 
 def getParameters(params_expression):
+    """get parameters"""
     parameters = {}
     table = None
     param = None
@@ -141,6 +144,7 @@ def getParameters(params_expression):
 
 
 def getDataQuery(form):
+    """get data query"""
     data = []
     for expression in form:
         value = form.get(expression)
@@ -170,6 +174,7 @@ def getDataQuery(form):
 
 
 def getWhereStatement(row, op="eq"):
+    """get where statement"""
     collate = row.collate
     index = combine(row.table, row.index)
     isList = type(row.values) is list
@@ -198,6 +203,7 @@ def getWhereStatement(row, op="eq"):
 
 
 def _default(row, op="eq"):
+    """defaupt where statement generator"""
     where_statement = getWhereStatement(row, op)
     if where_statement:
         return where_statement
@@ -222,42 +228,52 @@ def _default(row, op="eq"):
 
 
 def _eq(row):
+    """equal"""
     return _default(row)
 
 
 def _ne(row):
+    """not equal"""
     return _default(row, "ne")
 
 
 def _like(row):
+    """like"""
     return _default(row, "like")
 
 
 def _not_like(row):
+    """not like"""
     return _default(row, "not_like")
 
 
 def _in(row):
+    """in or contains"""
     return _contains(row)
 
 
 def _nin(row):
+    """not in"""
     return _contains(row, "nin")
 
 
 def _gt(row):
+    """greater than"""
     return _default(row, "gt")
 
 
 def _gte(row):
+    """greater than equal"""
     return _default(row, "gte")
 
 
 def _lt(row):
+    """lower than"""
     return _default(row, "lt")
 
 
 def _lte(row):
+    """lower than equal"""
     return _default(row, "lte")
 
 
@@ -265,27 +281,33 @@ def _lte(row):
 
 
 def _equal(row):
+    """equal"""
     return _default(row)
 
 
 def _contains(row, op="in"):
+    """in or contains"""
     return getWhereStatement(row, op)
 
 
 def _all(row):
+    """all"""
     return _default(row)
 
 
 def _intEqual(row):
+    """int equal"""
     return _default(row)
 
 
 def _isTrue(row):
+    """boolean true"""
     index = combine(row.table, row.index)
     return {"eq": [index, True]}
 
 
 def _isFalse(row):
+    """boolean false"""
     index = combine(row.table, row.index)
     return {"eq": [index, False]}
 
@@ -295,18 +317,22 @@ def _isFalse(row):
 
 
 def _largerThan(row):
+    """larger than"""
     return _default(row, "gt")
 
 
 def _intLargerThan(row):
+    """int larger than"""
     return _default(row, "gt")
 
 
 def _lessThan(row):
+    """less than"""
     return _default(row, "lt")
 
 
 def _intLessThan(row):
+    """int less than"""
     return _default(row, "lt")
 
 

@@ -10,10 +10,11 @@ from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
 
+
 @implementer(IExpandableElement)
 @adapter(IBasicDataProvider, Interface)
 class ConnectorData(object):
-    """ connector data """
+    """connector data"""
 
     def __init__(self, context, request):
         self.context = context
@@ -29,28 +30,27 @@ class ConnectorData(object):
         if not expand:
             return result
 
-        connector = getMultiAdapter(
-            (self.context, self.request), IDataProvider)
+        connector = getMultiAdapter((self.context, self.request), IDataProvider)
         result["connector-data"]["data"] = connector.provided_data
 
         return result
 
 
 class ConnectorDataGet(Service):
-    """ connector data - get """
+    """connector data - get"""
 
     def reply(self):
-        """ reply """
+        """reply"""
         data = ConnectorData(self.context, self.request)
 
         return data(expand=True)["connector-data"]
 
 
 class ConnectorDataPost(Service):
-    """ connector data - post """
+    """connector data - post"""
 
     def reply(self):
-        """ reply """
+        """reply"""
         result = ConnectorData(self.context, self.request)(expand=True)
 
         return result["connector-data"]

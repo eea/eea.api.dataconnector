@@ -7,6 +7,7 @@ Filter = namedtuple("Filter", ["index", "values"])
 
 
 def allow(filters, row, keys):
+    """allow filter"""
     reg = getUtility(IRegistry)
     for filter in filters:
         operator = filter.get("o", None)
@@ -33,6 +34,7 @@ def allow(filters, row, keys):
 
 
 def filteredData(data, filters):
+    """filter data based on form filters"""
     if not len(data):
         return {}
     results = {}
@@ -53,50 +55,60 @@ def filteredData(data, filters):
 
 
 def _eq(filter, row):
+    """equal filter"""
     # return _default(row)
     return True
 
 
 def _ne(filter, row):
+    """not equal filter"""
     # return _default(row, 'ne')
     return True
 
 
 def _like(filter, row):
+    """like filter"""
     # return _default(row, 'like')
     return True
 
 
 def _not_like(filter, row):
+    """not like filter"""
     # return _default(row, 'not_like')
     return True
 
 
 def _in(filter, row):
+    """in filter"""
     # return _contains(filter, row)
     return True
 
 
 def _nin(filter, row):
+    """not in filter"""
     return True
 
 
 def _gt(filter, row):
+    """greater than filter"""
     # return _default(row, 'gt')
     return True
 
 
 def _gte(filter, row):
+    """greater than equal filter"""
     # return _default(row, 'gte')
     return True
 
 
 def _lt(filter, row):
+    """lower than filter"""
     # return _default(row, 'lt')
     return True
 
 
 def _lte(filter, row):
+    """lower than equal filter"""
     # return _default(row, 'lte')
     return True
 
@@ -105,11 +117,13 @@ def _lte(filter, row):
 
 
 def _equal(filter, row):
+    """equal filter"""
     # return _default(filter, row)
     return True
 
 
 def _contains(filter, row):
+    """contains filter"""
     if not filter.values or len(filter.values) == 0:
         return True
     if type(filter.values) is not list:
@@ -118,21 +132,25 @@ def _contains(filter, row):
 
 
 def _all(filter, row):
+    """all filter"""
     # return _default(filter, row)
     return True
 
 
 def _intEqual(filter, row):
+    """int equal filter"""
     # return _default(filter, row)
     return True
 
 
 def _isTrue(filter, row):
+    """boolean true filter"""
     # index = combine(row.table, row.index)
     return True
 
 
 def _isFalse(filter, row):
+    """boolean false filter"""
     # index = combine(row.table, row.index)
     return True
 
@@ -142,21 +160,25 @@ def _isFalse(filter, row):
 
 
 def _largerThan(filter, row):
+    """larger than filter"""
     # return _default(row, 'gt')
     return True
 
 
 def _intLargerThan(filter, row):
+    """int larger than filter"""
     # return _default(row, 'gt')
     return True
 
 
 def _lessThan(filter, row):
+    """less than filter"""
     # return _default(row, 'lt')
     return True
 
 
 def _intLessThan(filter, row):
+    """int less than filter"""
     # return _default(row, 'lt')
     return True
 
