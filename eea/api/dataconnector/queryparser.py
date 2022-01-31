@@ -60,7 +60,7 @@ def parseQuery(context, request):
         parser = resolve(function_path)
         condition = parser(row)
         if condition:
-            if type(condition) is list:
+            if isinstance(condition, list):
                 condition = {"and": condition}
             conditions.append(condition)
 
@@ -158,7 +158,7 @@ def getDataQuery(form):
         )
         if op:
             op = op.group()
-        elif type(value) is list:
+        elif isinstance(value, list):
             op = "contains"
         else:
             op = "equal"
@@ -177,14 +177,14 @@ def getWhereStatement(row, op="eq"):
     """get where statement"""
     collate = row.collate
     index = combine(row.table, row.index)
-    isList = type(row.values) is list
+    isList = isinstance(row.values, list)
     isString = False
     value = None
     if isList and len(row.values) == 1:
         value = row.values[0]
-        if type(row.values[0]) is str:
+        if isinstance(row.values[0], str):
             isString = True
-    elif type(row.values) is str:
+    elif isinstance(row.values, str):
         value = row.values
         isString = True
     else:

@@ -30,7 +30,9 @@ class ConnectorData(object):
         if not expand:
             return result
 
-        connector = getMultiAdapter((self.context, self.request), IDataProvider)
+        connector = getMultiAdapter(
+            (self.context, self.request), IDataProvider
+        )
         result["connector-data"]["data"] = connector.provided_data
 
         return result
