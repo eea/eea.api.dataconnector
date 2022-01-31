@@ -2,17 +2,17 @@
 
 import logging
 
-import re
 import requests
 from moz_sql_parser import format as sql_format
-from moz_sql_parser import parse
 from plone.memoize import ram
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 
-from eea.api.dataconnector.interfaces import IConnectorDataProvider, \
-    IDataProvider
+from eea.api.dataconnector.interfaces import (
+    IConnectorDataProvider,
+    IDataProvider,
+)
 from eea.restapi.utils import timing
 
 from eea.api.dataconnector.queryparser import parseQuery
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 @adapter(IConnectorDataProvider, IBrowserRequest)
 @implementer(IDataProvider)
 class DataProviderForConnectors(object):
-    """ data provider for connectors """
+    """data provider for connectors"""
 
     def __init__(self, context, request):
         self.context = context
@@ -32,9 +32,7 @@ class DataProviderForConnectors(object):
 
     def _get_metadata(self):
         """_get_metadata."""
-        return {
-            "readme": self.context.readme
-        }
+        return {"readme": self.context.readme}
 
     @timing
     def _get_data(self):
@@ -46,22 +44,19 @@ class DataProviderForConnectors(object):
         if not sql:
             return {"results": [], "metadata": metadata}
 
-        conditions = sql.get('conditions')
-        data_query = sql.get('data_query')
-        form = sql.get('form')
-        query = sql.get('query')
+        conditions = sql.get("conditions")
+        data_query = sql.get("data_query")
+        form = sql.get("form")
+        query = sql.get("query")
 
         if "where" in query and conditions:
             query["where"] = {"and": conditions + [query["where"]]}
         elif "where" not in query and len(conditions) > 1:
-            query["where"] = {'and': conditions}
+            query["where"] = {"and": conditions}
         elif len(conditions) == 1:
-           query["where"] = conditions[0]
+            query["where"] = conditions[0]
 
         data["query"] = sql_format(query)
-
-        print("===========================")
-        print(data["query"])
 
         if form.get("p"):
             data["p"] = form.get("p")
@@ -81,20 +76,19 @@ class DataProviderForConnectors(object):
 
         # This will also change orientation
         return {
-            "results": filteredData(data['results'], data_query),
-            "metadata": metadata
+            "results": filteredData(data["results"], data_query),
+            "metadata": metadata,
         }
 
-
     # TO DO: persistent caching, periodical refresh, etc
-    # @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
+    @ram.cache(lambda func, self: (self.context.modified(), self.request.form))
     def _provided_data(self):
-        """ provided data """
+        """provided data"""
         if not self.context.sql_query:
             return []
         return self._get_data()
 
     @property
     def provided_data(self):
-        """ provided data """
+        """provided data"""
         return self._provided_data()
