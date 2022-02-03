@@ -1,8 +1,10 @@
 Changelog
 =========
 
-2.2-dev0 - (unreleased)
+2.2 - (2022-02-03)
 ---------------------------
+* Change: Filter csv by data_query
+  [razvanMiu]
 
 2.1 - (2022-01-31)
 ---------------------------
