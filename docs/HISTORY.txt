@@ -1,6 +1,9 @@
 Changelog
 =========
 
+2.3-dev0 - (unreleased)
+---------------------------
+
 2.2 - (2022-02-03)
 ---------------------------
 * Change: Filter csv by data_query
