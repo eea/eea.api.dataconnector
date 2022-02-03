@@ -1,7 +1,6 @@
 """ behavior module """
 import csv
 import logging
-from collections import defaultdict
 from io import StringIO
 from plone.app.dexterity.behaviors.metadata import DCFieldProperty
 from plone.app.dexterity.behaviors.metadata import MetadataBase
@@ -10,6 +9,8 @@ from plone.rfc822.interfaces import IPrimaryFieldInfo
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+from eea.api.dataconnector.queryparser import computeDataQuery
+from eea.api.dataconnector.queryfilter import filteredData
 from .interfaces import IConnectorDataParameters
 from .interfaces import IDataConnector
 from .interfaces import IDataProvider
@@ -49,7 +50,7 @@ class DataProviderForFiles(object):
 
     @property
     def provided_data(self):
-        """ provided data """
+        """provided data"""
         field = IPrimaryFieldInfo(self.context)
 
         if not field.value:
@@ -68,17 +69,24 @@ class DataProviderForFiles(object):
             return []
 
         keys = rows[0]
-        res = defaultdict(list)
+        data = []
 
-        for (i, k) in enumerate(keys):
-            for row in rows[1:]:
-                res[k].append(row[i])
+        for index, row in enumerate(rows[1:]):
+            data.append({})
+            for (i, k) in enumerate(keys):
+                data[index][k] = row[i]
 
-        return res
+        data_query = computeDataQuery(self.request)
+
+        return {
+            "results": filteredData(data, data_query),
+            "metadata": {},
+        }
 
 
 class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
+
     visualization = DCFieldProperty(IDataVisualization["visualization"])
 
 
