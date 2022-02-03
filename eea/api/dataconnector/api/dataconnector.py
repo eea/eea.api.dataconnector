@@ -43,9 +43,9 @@ class ConnectorDataGet(Service):
 
     def reply(self):
         """reply"""
-        data = ConnectorData(self.context, self.request)
+        result = ConnectorData(self.context, self.request)(expand=True)
 
-        return data(expand=True)["connector-data"]
+        return result["connector-data"]
 
 
 class ConnectorDataPost(Service):

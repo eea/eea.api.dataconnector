@@ -172,6 +172,20 @@ def getDataQuery(form):
     return data
 
 
+def computeDataQuery(request):
+    """compute data_query"""
+    form = request.form or {}
+    body_form = json_body(request).get("form") or {}
+    data_query = json_body(request).get("data_query") or []
+    # Update form with body form
+    form.update(body_form)
+    # Compute data_query from form
+    form_data_query = getDataQuery(form)
+    # Merge queries
+    _data_query = mergeLists(data_query, form_data_query)
+    return _data_query
+
+
 def getWhereStatement(row, op="eq"):
     """get where statement"""
     collate = row.collate
