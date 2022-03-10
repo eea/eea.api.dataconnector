@@ -208,14 +208,12 @@ def getWhereStatement(row, op="eq"):
         value = values
         isString = True
     else:
-        return None
+        value = values
     if isString:
         if collate:
             return {op: [index, {"collate": [{"literal": value}, collate]}]}
         return {op: [index, {"literal": value}]}
     else:
-        if collate:
-            return {op: [index, {"collate": [value, collate]}]}
         return {op: [index, value]}
 
 
