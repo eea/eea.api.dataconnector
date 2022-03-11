@@ -3,7 +3,7 @@ Changelog
 
 2.3 - (2022-03-10)
 ---------------------------
-* Change: WIP
+* Change: Fix edge case for parsing query
   [razvanMiu]
 
 2.2 - (2022-02-03)
