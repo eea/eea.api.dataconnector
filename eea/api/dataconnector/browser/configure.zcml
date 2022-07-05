@@ -1,6 +1,7 @@
 <configure
   xmlns="http://namespaces.zope.org/zope"
   xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:plone="http://namespaces.plone.org/plone"
   i18n_domain="eea">
 
   <browser:page
@@ -30,6 +31,9 @@
     for="eea.api.dataconnector.interfaces.IDataVisualization"
     permission="zope2.View"
     template="pt/visualization_view.pt"
-    />    
+    />
+  
+  <subscriber factory=".blocks.PlotlyChartSerializeTransformer"
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"/>
 
 </configure>

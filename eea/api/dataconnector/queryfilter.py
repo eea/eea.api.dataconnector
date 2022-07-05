@@ -36,6 +36,7 @@ def allow(filters, row, keys):
 
 def filteredData(data, filters):
     """filter data based on form filters"""
+
     if not data:
         return {}
     results = {}
@@ -119,6 +120,7 @@ def _lte(_filter, row):
 
 def _equal(_filter, row):
     """equal"""
+    # TODO
     # return _default(_filter, row)
     return True
 
@@ -134,6 +136,7 @@ def _contains(_filter, row):
 
 def _all(_filter, row):
     """all"""
+    # TODO
     # return _default(filter, row)
     return True
 
