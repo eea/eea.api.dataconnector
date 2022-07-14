@@ -11,6 +11,8 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class PlotlyChartSerializeTransformer(object):
+    """Plotly chart serializer"""
+
     order = 100
     block_type = "plotly_chart"
 
@@ -18,12 +20,12 @@ class PlotlyChartSerializeTransformer(object):
         self.context = context
         self.request = request
 
-    def transform(self, value):
-        # if value.get("visualization", {}).get("provider_url"):
-        #     value["visualization"]["provider_url"] = self.url_to_path(
-        #         value["visualization"]["provider_url"]
-        #     )
-        return value
+    # def transform(self, value):
+    #     # if value.get("visualization", {}).get("provider_url"):
+    #     #     value["visualization"]["provider_url"] = self.url_to_path(
+    #     #         value["visualization"]["provider_url"]
+    #     #     )
+    #     return value
 
     def __call__(self, value):
         if value.get("use_live_data", True):
@@ -47,4 +49,4 @@ class PlotlyChartSerializeTransformer(object):
                     ] = []
             value["visualization"]["chartData"]["data"] = newData
 
-        return self.transform(value)
+        return value

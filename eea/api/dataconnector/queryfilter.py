@@ -119,8 +119,7 @@ def _lte(_filter, row):
 
 
 def _equal(_filter, row):
-    """equal"""
-    # TODO
+    """equal TO DO"""
     # return _default(_filter, row)
     return True
 
@@ -135,8 +134,7 @@ def _contains(_filter, row):
 
 
 def _all(_filter, row):
-    """all"""
-    # TODO
+    """all TO DO"""
     # return _default(filter, row)
     return True
 
