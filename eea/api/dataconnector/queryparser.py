@@ -213,8 +213,9 @@ def getWhereStatement(row, op="eq"):
         if collate:
             return {op: [index, {"collate": [{"literal": value}, collate]}]}
         return {op: [index, {"literal": value}]}
-    else:
+    elif op in ["in", "nin"]:
         return {op: [index, value]}
+    return None
 
 
 # Query operators

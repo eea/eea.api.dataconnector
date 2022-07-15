@@ -119,9 +119,12 @@ def _lte(_filter, row):
 
 
 def _equal(_filter, row):
-    """equal TO DO"""
-    # return _default(_filter, row)
-    return True
+    """equal"""
+    if not _filter.values:
+        return True
+    if not isinstance(_filter.values, list):
+        return row[_filter.index] == _filter.values
+    return row[_filter.index] in _filter.values
 
 
 def _contains(_filter, row):
@@ -135,8 +138,16 @@ def _contains(_filter, row):
 
 def _all(_filter, row):
     """all TO DO"""
-    # return _default(filter, row)
-    return True
+    if not _filter.values:
+        return True
+    if not isinstance(_filter.values, list):
+        return row[_filter.index] == _filter.values
+    ok = True
+    for value in _filter.values:
+        if row[_filter.index] != value:
+            ok = False
+            break
+    return ok
 
 
 def _intEqual(_filter, row):
