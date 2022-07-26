@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.5 - (2022-07-26)
+---------------------------
+* Change: Set default value for data_query
+  [razvanMiu]
+
 2.4 - (2022-06-22)
 ---------------------------
 * Change: Remove python version requirement

@@ -111,11 +111,8 @@ class IConnectorDataParameters(model.Schema):
     data_query = schema.List(
         title="Data query parameters",
         description="Define the data query parameters",
-        # value_type=schema.Dict(
-        #     value_type=schema.Object(title=u"Value", schema=NotGiven),
-        #     key_type=schema.TextLine(title=u"Key")
-        # ),
         required=False,
         missing_value=[],
+        default=[]
     )
     form.widget("data_query", QueryStringFieldWidget)
