@@ -52,9 +52,6 @@
       />
 
 
-  <dummy
-
-
   <plone:behavior
       name="eea.dataconnector.map_visualization"
       title="Map view behavior"
