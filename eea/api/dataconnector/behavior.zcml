@@ -51,8 +51,12 @@
       marker=".interfaces.IDataVisualization"
       />
 
+
+  <dummy
+
+
   <plone:behavior
-      name="eea.dataconnector.map_view"
+      name="eea.dataconnector.map_visualization"
       title="Map view behavior"
       description="Allows creating an ArcGis map view."
       factory=".behavior.MapViewVisualization"

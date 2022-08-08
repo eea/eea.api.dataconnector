@@ -8,6 +8,8 @@
 
   <adapter factory=".adapter.DataProviderForConnectors" />
 
+<dummy
+
   <include file="profiles.zcml" />
   <include file="behavior.zcml" />
   <include package=".api" />
