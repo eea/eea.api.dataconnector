@@ -97,6 +97,18 @@ class IDataVisualization(model.Schema):
     )
 
 
+MAP_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
+
+
+@provider(IFormFieldProvider)
+class IMapVisualization(model.Schema):
+    """An ArcGis Map view"""
+
+    map_view = JSONField(
+        title="ArcGis map view", required=False, default={}, schema=MAP_VIEW_SCHEMA
+    )
+
+
 @provider(IFormFieldProvider)
 class IConnectorDataParameters(model.Schema):
     """Allow content to preset parameters for connector data"""

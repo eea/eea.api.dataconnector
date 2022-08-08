@@ -30,6 +30,13 @@
     for="eea.api.dataconnector.interfaces.IDataVisualization"
     permission="zope2.View"
     template="pt/visualization_view.pt"
-    />    
+    />
+
+  <browser:page
+    name="view"
+    for="eea.api.dataconnector.interfaces.IMapVisualization"
+    permission="zope2.View"
+    template="pt/arcgis_map_view.pt"
+    /> 
 
 </configure>

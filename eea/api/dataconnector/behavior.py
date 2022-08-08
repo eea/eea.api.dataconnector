@@ -15,6 +15,7 @@ from .interfaces import IConnectorDataParameters
 from .interfaces import IDataConnector
 from .interfaces import IDataProvider
 from .interfaces import IDataVisualization
+from .interfaces import IMapVisualization
 from .interfaces import IFileDataProvider
 
 
@@ -88,6 +89,12 @@ class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
 
     visualization = DCFieldProperty(IDataVisualization["visualization"])
+
+
+class MapViewVisualization(MetadataBase):
+    """Standard ArcGis Map View adaptor"""
+
+    map_view = DCFieldProperty(IMapVisualization["map_view"])
 
 
 class ConnectorDataParameters(MetadataBase):
