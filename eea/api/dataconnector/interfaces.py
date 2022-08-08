@@ -102,10 +102,10 @@ MAP_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
 
 @provider(IFormFieldProvider)
 class IMapVisualization(model.Schema):
-    """An ArcGis Map view"""
+    """An ArcGIS Map view"""
 
-    map_view = JSONField(
-        title="Map View (ArcGis)", required=False, default={}, schema=MAP_VIEW_SCHEMA
+    map_editor_widget = JSONField(
+        title="Map Widget(ArcGIS)", required=False, default={}, schema=MAP_VIEW_SCHEMA
     )
 
 

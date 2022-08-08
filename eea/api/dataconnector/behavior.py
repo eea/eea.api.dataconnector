@@ -92,9 +92,9 @@ class DataVisualization(MetadataBase):
 
 
 class MapViewVisualization(MetadataBase):
-    """Standard ArcGis Map View adaptor"""
+    """Standard ArcGIS Map View adaptor"""
 
-    map_view = DCFieldProperty(IMapVisualization["map_view"])
+    map_editor_widget = DCFieldProperty(IMapVisualization["map_editor_widget"])
 
 
 class ConnectorDataParameters(MetadataBase):
