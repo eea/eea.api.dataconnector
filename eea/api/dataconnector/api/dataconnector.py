@@ -9,6 +9,9 @@ from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.component import queryMultiAdapter
+from plone.restapi.interfaces import ISerializeToJson
+
 
 
 @implementer(IExpandableElement)
@@ -65,7 +68,7 @@ class MapVisualizationGet(Service):
         """reply"""
 
         res = {
-            "@id": self.context.absolute_url() + "#map_visualization",
+            "@id": self.context.absolute_url(),
             "map_visualization": {},
         }
 
@@ -80,7 +83,7 @@ class MapVisualizationGet(Service):
 
         ser = serializer(version=self.request.get("version"))
         res["map_visualization"] = {
-            "data": ser["map_visualization"],
+            "data": ser["map_visualization_data"],
         }
 
         return res
