@@ -56,3 +56,31 @@ class ConnectorDataPost(Service):
         result = ConnectorData(self.context, self.request)(expand=True)
 
         return result["connector-data"]
+
+
+class MapVisualizationGet(Service):
+    """Get map visualization data"""
+
+    def reply(self):
+        """reply"""
+
+        res = {
+            "@id": self.context.absolute_url() + "#map_visualization",
+            "map_visualization": {},
+        }
+
+        serializer = queryMultiAdapter(
+            (self.context, self.request), ISerializeToJson
+        )
+
+        if serializer is None:
+            self.request.response.setStatus(501)
+
+            return dict(error=dict(message="No serializer available."))
+
+        ser = serializer(version=self.request.get("version"))
+        res["map_visualization"] = {
+            "data": ser["map_visualization"],
+        }
+
+        return res
