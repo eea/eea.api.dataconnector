@@ -105,9 +105,9 @@ class IMapVisualization(model.Schema):
     """An ArcGIS Map view"""
 
     map_visualization_data = JSONField(
-        title="Map Widget(ArcGIS)", 
-        required=False, 
-        default={}, 
+        title="Map Widget(ArcGIS)",
+        required=False,
+        default={},
         schema=MAP_VIEW_SCHEMA
     )
 
