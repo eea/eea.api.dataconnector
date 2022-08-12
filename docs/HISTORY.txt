@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.7 - (2022-08-12)
+---------------------------
+* Change: Develop
+  [andreiggr]
+
 2.6 - (2022-08-12)
 ---------------------------
 * Change: Arcgis Map Visualization Content-type
