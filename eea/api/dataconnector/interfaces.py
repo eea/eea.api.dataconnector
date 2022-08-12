@@ -1,5 +1,4 @@
 """Module where all interfaces, events and exceptions live."""
-
 import json
 from plone.app.z3cform.widget import QueryStringFieldWidget
 from plone.autoform import directives as form

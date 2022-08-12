@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
-
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from plone.restapi.interfaces import IExpandableElement
