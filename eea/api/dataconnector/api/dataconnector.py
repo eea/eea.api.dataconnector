@@ -12,7 +12,6 @@ from zope.interface import Interface
 from zope.component import queryMultiAdapter
 
 
-
 @implementer(IExpandableElement)
 @adapter(IBasicDataProvider, Interface)
 class ConnectorData(object):
