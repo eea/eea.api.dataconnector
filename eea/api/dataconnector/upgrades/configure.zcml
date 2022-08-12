@@ -5,33 +5,22 @@
 
   <genericsetup:upgradeSteps
     source="*"
-    destination="2.0"
+    destination="1.0"
     profile="eea.api.dataconnector:default">
 
     <genericsetup:upgradeDepends
        title="Import all steps from eea.api.dataconnector default profile"
        import_profile="eea.api.dataconnector:default"
       />
-
-
   </genericsetup:upgradeSteps>
 
-  <genericsetup:registerProfile
-       name="upgrade_2"
-       title="eea.api.dataconnector"
-       directory="2"
-       description="Installs the map_visualization type."
-       for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
-       provides="Products.GenericSetup.interfaces.EXTENSION"
-       />
-
-   <genericsetup:upgradeStep
-     title="Import map_visualization type profile"
-     description=""
-     source="1.0"
-     destination="2.0"
-     handler=".to2.run_upgrade"
-     profile="eea.api.dataconnector:default"
-     />
+  <genericsetup:upgradeStep
+    title="Import map_visualization type profile"
+    description=""
+    source="*"
+    destination="3.0"
+    handler=".to2.run_upgrade"
+    profile="eea.api.dataconnector:default"
+    />
 
 </configure>

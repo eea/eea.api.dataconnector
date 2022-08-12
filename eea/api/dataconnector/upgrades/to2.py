@@ -7,7 +7,7 @@ def run_upgrade(setup_context):
     """
 
     setup_context.runImportStepFromProfile(
-        "profile-eea.api.dataconnector:upgrade_2",
+        "profile-eea.api.dataconnector:default",
         "typeinfo",
         run_dependencies=False,
         purge_old=False,
