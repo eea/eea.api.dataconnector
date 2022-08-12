@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
-
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from plone.restapi.interfaces import IExpandableElement
+from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service
 from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.component import queryMultiAdapter
 
 
 @implementer(IExpandableElement)
@@ -56,3 +57,31 @@ class ConnectorDataPost(Service):
         result = ConnectorData(self.context, self.request)(expand=True)
 
         return result["connector-data"]
+
+
+class MapVisualizationGet(Service):
+    """Get map visualization data"""
+
+    def reply(self):
+        """reply"""
+
+        res = {
+            "@id": self.context.absolute_url(),
+            "map_visualization": {},
+        }
+
+        serializer = queryMultiAdapter(
+            (self.context, self.request), ISerializeToJson
+        )
+
+        if serializer is None:
+            self.request.response.setStatus(501)
+
+            return dict(error=dict(message="No serializer available."))
+
+        ser = serializer(version=self.request.get("version"))
+        res["map_visualization"] = {
+            "data": ser["map_visualization_data"],
+        }
+
+        return res
