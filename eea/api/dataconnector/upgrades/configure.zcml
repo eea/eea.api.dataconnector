@@ -12,7 +12,15 @@
        title="Import all steps from eea.api.dataconnector default profile"
        import_profile="eea.api.dataconnector:default"
       />
-
   </genericsetup:upgradeSteps>
+
+  <genericsetup:upgradeStep
+    title="Import map_visualization type profile"
+    description=""
+    source="*"
+    destination="3.0"
+    handler=".to2.run_upgrade"
+    profile="eea.api.dataconnector:default"
+    />
 
 </configure>
