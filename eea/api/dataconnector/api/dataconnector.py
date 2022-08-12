@@ -4,13 +4,13 @@
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from plone.restapi.interfaces import IExpandableElement
+from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service
 from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import queryMultiAdapter
-from plone.restapi.interfaces import ISerializeToJson
 
 
 

@@ -94,7 +94,8 @@ class DataVisualization(MetadataBase):
 class MapViewVisualization(MetadataBase):
     """Standard ArcGIS Map View adaptor"""
 
-    map_visualization_data = DCFieldProperty(IMapVisualization["map_visualization_data"])
+    map_visualization_data = DCFieldProperty(IMapVisualization[
+        "map_visualization_data"])
 
 
 class ConnectorDataParameters(MetadataBase):
