@@ -51,4 +51,15 @@
       marker=".interfaces.IDataVisualization"
       />
 
+
+  <plone:behavior
+      name="eea.dataconnector.map_visualization"
+      title="Map view behavior"
+      description="Allows creating an ArcGis map view."
+      factory=".behavior.MapViewVisualization"
+      provides=".interfaces.IMapVisualization"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      marker=".interfaces.IMapVisualization"
+      />
+
 </configure>

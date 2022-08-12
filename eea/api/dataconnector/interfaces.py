@@ -1,5 +1,4 @@
 """Module where all interfaces, events and exceptions live."""
-
 import json
 from plone.app.z3cform.widget import QueryStringFieldWidget
 from plone.autoform import directives as form
@@ -94,6 +93,21 @@ class IDataVisualization(model.Schema):
 
     visualization = JSONField(
         title="Visualization", required=False, default={}, schema=VIZ_SCHEMA
+    )
+
+
+MAP_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
+
+
+@provider(IFormFieldProvider)
+class IMapVisualization(model.Schema):
+    """An ArcGIS Map view"""
+
+    map_visualization_data = JSONField(
+        title="Map Widget(ArcGIS)",
+        required=False,
+        default={},
+        schema=MAP_VIEW_SCHEMA
     )
 
 
