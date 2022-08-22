@@ -15,8 +15,8 @@ def parseQuery(context, request):
     reg = getUtility(IRegistry)
     conditions = []
     form = request.form or {}
-    body_form = json_body(request).get("form") or {}
-    data_query = json_body(request).get("data_query") or []
+    body_form = json_body(request).get("form", {})
+    data_query = json_body(request).get("data_query", [])
     # Update form with body form
     form.update(body_form)
     # Compute data_query from form
@@ -26,6 +26,8 @@ def parseQuery(context, request):
     # Parse sql query
     db_version = form.get("db_version") or "latest"
     sql_parsed = getParsedSQLQuery(context, db_version)
+    # Get extra conditions
+    extra_conditions = form.get("extra_conditions", [])
     # Get context properties
     parameters = getParameters(context.parameters)
     required_parameters = context.required_parameters
@@ -64,6 +66,7 @@ def parseQuery(context, request):
             if isinstance(condition, list):
                 condition = {"and": condition}
             conditions.append(condition)
+    conditions += extra_conditions
 
     return {
         "query": sql_parsed,
@@ -226,18 +229,20 @@ def _default(row, op="eq"):
     where_statement = getWhereStatement(row, op)
     if where_statement:
         return where_statement
-    return [
-        _default(
-            Row(
-                index=row.index,
-                values=value,
-                table=row.table,
-                collate=row.collate,
-            ),
-            op,
-        )
-        for value in row.values
-    ]
+    if isinstance(row.values, list):
+        return [
+            _default(
+                Row(
+                    index=row.index,
+                    values=value,
+                    table=row.table,
+                    collate=row.collate,
+                ),
+                op,
+            )
+            for value in row.values
+        ]
+    return where_statement
 
 
 # From query string
