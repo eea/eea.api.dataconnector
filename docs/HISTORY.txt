@@ -1,6 +1,9 @@
 Changelog
 =========
 
+3.0-dev0 - (unreleased)
+---------------------------
+
 2.9 - (2022-09-16)
 ---------------------------
 * Change: Don't use collate for 'in' and 'nin' sql operations
