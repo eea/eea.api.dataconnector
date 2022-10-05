@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.0 - (2022-10-05)
+---------------------------
+* Change: Fix query parser
+  [razvanMiu]
+
 2.9 - (2022-09-16)
 ---------------------------
 * Change: Don't use collate for 'in' and 'nin' sql operations

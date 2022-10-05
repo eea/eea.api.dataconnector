@@ -216,9 +216,7 @@ def getWhereStatement(row, op="eq"):
         if collate and op not in ["in", "nin"]:
             return {op: [index, {"collate": [{"literal": value}, collate]}]}
         return {op: [index, {"literal": value}]}
-    elif op in ["in", "nin"]:
-        return {op: [index, value]}
-    return None
+    return {op: [index, value]}
 
 
 # Query operators
