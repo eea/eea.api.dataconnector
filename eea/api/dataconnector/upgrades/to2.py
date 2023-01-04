@@ -1,10 +1,8 @@
-
-''' upgrade to 2.0 '''
+""" upgrade to 2.0 """
 
 
 def run_upgrade(setup_context):
-    """ run upgrade to 2.0
-    """
+    """run upgrade to 2.0"""
 
     setup_context.runImportStepFromProfile(
         "profile-eea.api.dataconnector:default",
