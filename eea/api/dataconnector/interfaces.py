@@ -43,14 +43,14 @@ class IDataConnector(model.Schema):
     )
     required_parameters = schema.List(
         title="Required query parameters",
-        description=u"Provider doesn't send data if the reuqired parameter is "
+        description="Provider doesn't send data if the reuqired parameter is "
         "not set",
         required=False,
         value_type=schema.TextLine(title="Parameter"),
     )
     collate = schema.TextLine(
         title="Collate",
-        description=u"Optional collate string, use it in case data has a "
+        description="Optional collate string, use it in case data has a "
         "different encoding then utf-8",
         required=False,
         default="",
@@ -104,10 +104,19 @@ class IMapVisualization(model.Schema):
     """An ArcGIS Map view"""
 
     map_visualization_data = JSONField(
-        title="Map Widget(ArcGIS)",
-        required=False,
-        default={},
-        schema=MAP_VIEW_SCHEMA
+        title="Map Widget(ArcGIS)", required=False, default={}, schema=MAP_VIEW_SCHEMA
+    )
+
+
+TABLEAU_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
+
+
+@provider(IFormFieldProvider)
+class ITableauVisualization(model.Schema):
+    """Tableau view"""
+
+    tableau_visualization_data = JSONField(
+        title="Tableau Widget", required=False, default={}, schema=TABLEAU_VIEW_SCHEMA
     )
 
 
@@ -127,6 +136,6 @@ class IConnectorDataParameters(model.Schema):
         description="Define the data query parameters",
         required=False,
         missing_value=[],
-        default=[]
+        default=[],
     )
     form.widget("data_query", QueryStringFieldWidget)

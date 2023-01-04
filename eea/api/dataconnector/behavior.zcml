@@ -62,4 +62,14 @@
       marker=".interfaces.IMapVisualization"
       />
 
+  <plone:behavior
+      name="eea.dataconnector.tableau_visualization"
+      title="Tableau view behavior"
+      description="Allows creating an Tableau visualization"
+      factory=".behavior.TableauViewVisualization"
+      provides=".interfaces.ITableauVisualization"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      marker=".interfaces.ITableauVisualization"
+      />
+
 </configure>
