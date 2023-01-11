@@ -1,4 +1,4 @@
-''' data provider '''
+""" data provider """
 from io import BytesIO
 import xlsxwriter
 from eea.api.dataconnector.interfaces import IDataProvider
@@ -9,7 +9,7 @@ class DataProviderView(BrowserView):
     """Basic view for the DataConnector"""
 
     def data(self):
-        ''' return data from data provider '''
+        """return data from data provider"""
         dataprovider = IDataProvider(self.context)
 
         return dataprovider.provided_data
@@ -19,11 +19,11 @@ class DataProviderDownload(BrowserView):
     """Basic view for the DataConnector"""
 
     def data_to_xls(self, data):
-        ''' convert data to xls '''
+        """convert data to xls"""
         out = BytesIO()
-        workbook = xlsxwriter.Workbook(out, {'in_memory': True})
+        workbook = xlsxwriter.Workbook(out, {"in_memory": True})
 
-        worksheet = workbook.add_worksheet('Data')
+        worksheet = workbook.add_worksheet("Data")
 
         headers = data.keys()
 
@@ -48,18 +48,18 @@ class DataProviderDownload(BrowserView):
         return self.download(data)
 
     def download(self, data):
-        ''' download '''
+        """download"""
         xlsio = self.data_to_xls(data)
         sh = self.request.response.setHeader
 
         sh(
-            'Content-Type',
-            'application/vnd.openxmlformats-officedocument.'
-            'spreadsheetml.sheet',
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet",
         )
         sh(
-            'Content-Disposition',
-            'attachment; filename=%s.xlsx' % self.context.getId(),
+            "Content-Disposition",
+            "attachment; filename=%s.xlsx" % self.context.getId(),
         )
 
         return xlsio.read()
