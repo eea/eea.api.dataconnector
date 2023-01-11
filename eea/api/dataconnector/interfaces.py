@@ -104,7 +104,10 @@ class IMapVisualization(model.Schema):
     """An ArcGIS Map view"""
 
     map_visualization_data = JSONField(
-        title="Map Widget(ArcGIS)", required=False, default={}, schema=MAP_VIEW_SCHEMA
+        title="Map Widget(ArcGIS)",
+        required=False,
+        default={},
+        schema=MAP_VIEW_SCHEMA,
     )
 
 
@@ -116,7 +119,10 @@ class ITableauVisualization(model.Schema):
     """Tableau view"""
 
     tableau_visualization_data = JSONField(
-        title="Tableau Widget", required=False, default={}, schema=TABLEAU_VIEW_SCHEMA
+        title="Tableau Widget",
+        required=False,
+        default={},
+        schema=TABLEAU_VIEW_SCHEMA,
     )
 
 

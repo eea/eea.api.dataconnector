@@ -150,7 +150,9 @@ def getDataQuery(form):
     data = []
     for expression in form:
         value = form.get(expression)
-        op = re.search(r"\b(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\b", expression)
+        op = re.search(
+            r"\b(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\b", expression
+        )
         index = re.sub(
             r"\[(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\]",
             "",
