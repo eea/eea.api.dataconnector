@@ -16,6 +16,7 @@ from .interfaces import IDataConnector
 from .interfaces import IDataProvider
 from .interfaces import IDataVisualization
 from .interfaces import IMapVisualization
+from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
 
 
@@ -94,8 +95,17 @@ class DataVisualization(MetadataBase):
 class MapViewVisualization(MetadataBase):
     """Standard ArcGIS Map View adaptor"""
 
-    map_visualization_data = DCFieldProperty(IMapVisualization[
-        "map_visualization_data"])
+    map_visualization_data = DCFieldProperty(
+        IMapVisualization["map_visualization_data"]
+    )
+
+
+class TableauViewVisualization(MetadataBase):
+    """Standard Tableau View adaptor"""
+
+    tableau_visualization_data = DCFieldProperty(
+        ITableauVisualization["tableau_visualization_data"]
+    )
 
 
 class ConnectorDataParameters(MetadataBase):

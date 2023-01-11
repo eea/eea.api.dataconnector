@@ -41,6 +41,12 @@
     template="pt/arcgis_map_view.pt"
     /> 
 
+  <browser:page
+    name="view"
+    for="eea.api.dataconnector.interfaces.ITableauVisualization"
+    permission="zope2.View"
+    template="pt/tableau_view.pt"
+    /> 
   
   <subscriber factory=".blocks.PlotlyChartSerializeTransformer"
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"/>
