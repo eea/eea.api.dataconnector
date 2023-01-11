@@ -3,8 +3,12 @@ Changelog
 
 3.1 - (2022-11-28)
 ---------------------------
-* Change: fix: add missing file
+* Bug fix: add missing file
+  [erral]
+* Feature: registered "Tableau visualization" content-type and behavior.
   [razvanMiu]
+* Feature: registered "Discodata Connector" and "Visualization" content-types.
+  [alecghica refs #153056]
 
 3.0 - (2022-10-05)
 ---------------------------
