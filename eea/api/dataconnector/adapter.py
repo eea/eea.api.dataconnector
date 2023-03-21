@@ -1,21 +1,17 @@
-""" behavior module """
+""" behavior module
+"""
 
 import logging
-
 import requests
 from moz_sql_parser import format as sql_format
-
-# from plone.memoize import ram
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
-
 from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IDataProvider,
 )
-from eea.restapi.utils import timing
-
+from eea.api.dataconnector.utils import timing
 from eea.api.dataconnector.queryparser import parseQuery
 from eea.api.dataconnector.queryfilter import filteredData
 

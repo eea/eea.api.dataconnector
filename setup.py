@@ -1,4 +1,4 @@
-""" eea.restapi.dataconnector Installer
+""" eea.api.dataconnector Installer
 """
 import os
 from os.path import join
@@ -12,7 +12,7 @@ VERSION = open(join(*PATH)).read().strip()
 setup(
     name=NAME,
     version=VERSION,
-    description="eea.restapi dataconnector integration for Plone",
+    description="eea.api.dataconnector integration for Plone",
     long_description_content_type="text/x-rst",
     long_description=(
         open("README.rst").read() +
