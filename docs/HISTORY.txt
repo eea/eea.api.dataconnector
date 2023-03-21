@@ -1,6 +1,9 @@
 Changelog
 =========
 
+3.4-dev0 - (unreleased)
+---------------------------
+
 3.3 - (2023-03-21)
 ---------------------------
 * Change: Removed the dependency to eea.restapi
