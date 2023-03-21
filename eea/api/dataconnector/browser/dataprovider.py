@@ -1,4 +1,6 @@
-""" data provider """
+""" data provider
+"""
+
 from io import BytesIO
 import xlsxwriter
 from eea.api.dataconnector.interfaces import IDataProvider
@@ -16,7 +18,8 @@ class DataProviderView(BrowserView):
 
 
 class DataProviderDownload(BrowserView):
-    """Basic view for the DataConnector"""
+    """ Basic view for the DataConnector
+    """
 
     def data_to_xls(self, data):
         """convert data to xls"""
