@@ -45,6 +45,7 @@ setup(
         "setuptools",
         # -*- Extra requirements: -*-
         "moz-sql-parser",
+        "XlsxWriter",
     ],
     extras_require={
         "test": [
