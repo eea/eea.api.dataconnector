@@ -34,9 +34,7 @@ class DataConnector(MetadataBase):
     endpoint_url = DCFieldProperty(IDataConnector["endpoint_url"])
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
-    required_parameters = DCFieldProperty(
-        IDataConnector["required_parameters"]
-    )
+    required_parameters = DCFieldProperty(IDataConnector["required_parameters"])
     collate = DCFieldProperty(IDataConnector["collate"])
     readme = DCFieldProperty(IDataConnector["readme"])
 

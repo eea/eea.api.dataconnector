@@ -38,9 +38,7 @@ class VisualizationGet(Service):
             "visualization": {},
         }
 
-        serializer = queryMultiAdapter(
-            (self.context, self.request), ISerializeToJson
-        )
+        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
 
         if serializer is None:
             self.request.response.setStatus(501)
@@ -66,9 +64,7 @@ class VisualizationLayoutGet(Service):
             "@id": self.context.absolute_url() + "#visualization-layout",
         }
 
-        serializer = queryMultiAdapter(
-            (self.context, self.request), ISerializeToJson
-        )
+        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
 
         if serializer is None:
             self.request.response.setStatus(501)
@@ -81,9 +77,7 @@ class VisualizationLayoutGet(Service):
             return res
 
         res["visualization"] = {
-            "chartData": getVisualizationLayout(
-                ser["visualization"].get("chartData")
-            ),
+            "chartData": getVisualizationLayout(ser["visualization"].get("chartData")),
             "provider_url": ser["visualization"].get("provider_url"),
         }
 

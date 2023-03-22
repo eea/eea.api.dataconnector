@@ -52,6 +52,4 @@ class EEAFixture(PloneSandboxLayer):
 
 
 EEAFIXTURE = EEAFixture()
-FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(EEAFIXTURE,), name="EEAslate:Functional"
-)
+FUNCTIONAL_TESTING = FunctionalTesting(bases=(EEAFIXTURE,), name="EEAslate:Functional")
