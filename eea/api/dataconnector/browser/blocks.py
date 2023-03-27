@@ -30,7 +30,9 @@ class PlotlyChartSerializeTransformer(object):
     def __call__(self, value):
         if value.get("use_live_data", True):
             newData = (
-                value.get("visualization", {}).get("chartData", {}).get("data", None)
+                value.get("visualization", {})
+                .get("chartData", {})
+                .get("data", None)
             )
             if not newData:
                 return value
@@ -42,7 +44,9 @@ class PlotlyChartSerializeTransformer(object):
                 if not trace.get("transforms"):
                     continue
                 for transformIndex, _ in enumerate(trace.get("transforms")):
-                    newData[traceIndex]["transforms"][transformIndex]["target"] = []
+                    newData[traceIndex]["transforms"][transformIndex][
+                        "target"
+                    ] = []
             value["visualization"]["chartData"]["data"] = newData
 
         return value

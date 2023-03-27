@@ -24,14 +24,18 @@ class ConnectorData(object):
     def __call__(self, expand=False):
         result = {
             "connector-data": {
-                "@id": "{}/@connector-data".format(self.context.absolute_url())
+                "@id": "{}/@connector-data".format(
+                    self.context.absolute_url()
+                )
             }
         }
 
         if not expand:
             return result
 
-        connector = getMultiAdapter((self.context, self.request), IDataProvider)
+        connector = getMultiAdapter(
+            (self.context, self.request), IDataProvider
+        )
         result["connector-data"]["data"] = connector.provided_data
 
         return result
@@ -68,7 +72,9 @@ class MapVisualizationGet(Service):
             "map_visualization": {},
         }
 
-        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
+        serializer = queryMultiAdapter(
+            (self.context, self.request), ISerializeToJson
+        )
 
         if serializer is None:
             self.request.response.setStatus(501)

@@ -56,7 +56,8 @@ class DataProviderDownload(BrowserView):
 
         sh(
             "Content-Type",
-            "application/vnd.openxmlformats-officedocument." "spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet",
         )
         sh(
             "Content-Disposition",
