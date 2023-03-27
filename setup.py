@@ -15,9 +15,9 @@ setup(
     description="eea.api.dataconnector integration for Plone",
     long_description_content_type="text/x-rst",
     long_description=(
-        open("README.rst").read()
-        + "\n"
-        + open(os.path.join("docs", "HISTORY.txt")).read()
+        open("README.rst").read() + 
+        "\n" + 
+        open(os.path.join("docs", "HISTORY.txt")).read()
     ),
     classifiers=[
         "Environment :: Web Environment",
