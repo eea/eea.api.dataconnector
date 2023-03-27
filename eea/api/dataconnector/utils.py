@@ -9,17 +9,21 @@ logger = logging.getLogger(__name__)
 
 
 def timing(f):
-    """ timing
-    """
+    """timing"""
+
     @wraps(f)
     def wrap(*args, **kw):
-        """ wrap
-        """
+        """wrap"""
         ts = time()
         result = f(*args, **kw)
         te = time()
-        logger.warning('func:%r args:[%r, %r] took: %2.4f sec',
-                       f.__name__, args, kw, te - ts)
+        logger.warning(
+            "func:%r args:[%r, %r] took: %2.4f sec",
+            f.__name__,
+            args,
+            kw,
+            te - ts,
+        )
 
         return result
 

@@ -24,7 +24,9 @@ class ConnectorData(object):
     def __call__(self, expand=False):
         result = {
             "connector-data": {
-                "@id": "{}/@connector-data".format(self.context.absolute_url())
+                "@id": "{}/@connector-data".format(
+                    self.context.absolute_url()
+                )
             }
         }
 
