@@ -3,6 +3,8 @@ Changelog
 
 3.5-dev0 - (unreleased)
 ---------------------------
+* Change: Change deprecated moz-sql-parser dependency to mo-sql-parsing
+  [iulianpetchesi #250426]
 
 3.4 - (2023-03-21)
 ---------------------------

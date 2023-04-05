@@ -3,7 +3,7 @@
 
 import logging
 import requests
-from moz_sql_parser import format as sql_format
+from mo_sql_parsing import format as sql_format
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest

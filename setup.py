@@ -44,7 +44,7 @@ setup(
     install_requires=[
         "setuptools",
         # -*- Extra requirements: -*-
-        "moz-sql-parser",
+        "mo-sql-parsing",
         "XlsxWriter",
     ],
     extras_require={
