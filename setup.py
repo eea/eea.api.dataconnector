@@ -46,6 +46,7 @@ setup(
         # -*- Extra requirements: -*-
         "mo-sql-parsing",
         "XlsxWriter",
+        "collective.folderishtypes",
     ],
     extras_require={
         "test": [
