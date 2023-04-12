@@ -18,8 +18,7 @@ class DataProviderView(BrowserView):
 
 
 class DataProviderDownload(BrowserView):
-    """ Basic view for the DataConnector
-    """
+    """Basic view for the DataConnector"""
 
     def data_to_xls(self, data):
         """convert data to xls"""
