@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.5 - (2023-04-06)
+4.0 - (2023-04-06)
 ---------------------------
 * Change: Change deprecated moz-sql-parser dependency to mo-sql-parsing
   [iulianpetchesi #250426]
