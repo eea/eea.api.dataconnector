@@ -3,6 +3,8 @@ Changelog
 
 4.1-dev0 - (unreleased)
 ---------------------------
+* Change: Use SQLServer parser for queries
+  [iulianpetchesi #250426]
 
 4.0 - (2023-04-06)
 ---------------------------
