@@ -1,7 +1,7 @@
 """ queryparser module """
 import re
 from collections import namedtuple
-from mo_sql_parsing import parse
+from mo_sql_parsing import parse_sqlserver as parse
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from zope.component import getUtility
