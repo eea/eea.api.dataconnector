@@ -1,7 +1,7 @@
 Changelog
 =========
 
-4.3-dev0 - (unreleased)
+4.3 - (2023-04-26)
 ---------------------------
 * Fix: fixed profile import for the File content type
   [alecghica refs #250426]
