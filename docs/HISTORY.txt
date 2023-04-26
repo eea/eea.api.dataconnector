@@ -3,21 +3,23 @@ Changelog
 
 4.3-dev0 - (unreleased)
 ---------------------------
+* Fix: fixed profile import for the File content type
+  [alecghica refs #250426]
 
 4.2 - (2023-04-25)
 ---------------------------
-* Change: Develop
-  [andreiggr]
+* Change: added needed behaviour to the File content type
+  [andreiggr refs #250426]
 
 4.1 - (2023-04-19)
 ---------------------------
 * Change: Use SQLServer parser for queries
-  [iulianpetchesi #250426]
+  [iulianpetchesi refs #250426]
 
 4.0 - (2023-04-06)
 ---------------------------
 * Change: Change deprecated moz-sql-parser dependency to mo-sql-parsing
-  [iulianpetchesi #250426]
+  [iulianpetchesi refs #250426]
 
 3.4 - (2023-03-21)
 ---------------------------
