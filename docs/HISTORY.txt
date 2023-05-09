@@ -1,6 +1,11 @@
 Changelog
 =========
 
+4.4 - (2023-05-09)
+---------------------------
+* Change: add eea core metadata to visualization response
+  [razvanMiu]
+
 4.3 - (2023-04-26)
 ---------------------------
 * Fix: fixed profile import for the File content type
