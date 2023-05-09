@@ -96,7 +96,6 @@ class VisualizationLayoutGet(Service):
             "visualization": {
                 "chartData": chartData,
                 "provider_url": provider_url,
-                "provider_url": visualization.get("provider_url"),
                 "publisher": ser.get("publisher"),
                 "geo_coverage": ser.get("geo_coverage"),
                 "temporal_coverage": ser.get("temporal_coverage"),
