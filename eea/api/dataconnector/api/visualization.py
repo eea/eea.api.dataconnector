@@ -33,11 +33,6 @@ class VisualizationGet(Service):
     def reply(self):
         """reply"""
 
-        res = {
-            "@id": self.context.absolute_url() + "#visualization",
-            "visualization": {},
-        }
-
         serializer = queryMultiAdapter(
             (self.context, self.request), ISerializeToJson
         )
@@ -48,9 +43,26 @@ class VisualizationGet(Service):
             return dict(error=dict(message="No serializer available."))
 
         ser = serializer(version=self.request.get("version"))
-        res["visualization"] = {
-            "chartData": ser["visualization"]["chartData"],
-            "provider_url": ser["visualization"]["provider_url"],
+
+        visualization = ser.get("visualization", {})
+        chartData = visualization.get("chartData", {})
+        provider_url = chartData.get("provider_url")
+
+        del chartData["provider_url"]
+
+        res = {
+            "@id": self.context.absolute_url() + "/@visualization",
+            "visualization": {
+                "chartData": chartData,
+                "provider_url": provider_url,
+                "publisher": ser.get("publisher"),
+                "geo_coverage": ser.get("geo_coverage"),
+                "temporal_coverage": ser.get("temporal_coverage"),
+                "other_organisations": ser.get("other_organisations"),
+                "data_provenance": ser.get("data_provenance"),
+            }
+            if visualization
+            else None,
         }
 
         return res
@@ -62,10 +74,6 @@ class VisualizationLayoutGet(Service):
     def reply(self):
         """reply"""
 
-        res = {
-            "@id": self.context.absolute_url() + "#visualization-layout",
-        }
-
         serializer = queryMultiAdapter(
             (self.context, self.request), ISerializeToJson
         )
@@ -77,14 +85,26 @@ class VisualizationLayoutGet(Service):
 
         ser = serializer(version=self.request.get("version"))
 
-        if not ser["visualization"]:
-            return res
+        visualization = ser.get("visualization", {})
+        chartData = getVisualizationLayout(visualization.get("chartData", {}))
+        provider_url = chartData.get("provider_url")
 
-        res["visualization"] = {
-            "chartData": getVisualizationLayout(
-                ser["visualization"].get("chartData")
-            ),
-            "provider_url": ser["visualization"].get("provider_url"),
+        del chartData["provider_url"]
+
+        res = {
+            "@id": self.context.absolute_url() + "/@visualization-layout",
+            "visualization": {
+                "chartData": chartData,
+                "provider_url": provider_url,
+                "provider_url": visualization.get("provider_url"),
+                "publisher": ser.get("publisher"),
+                "geo_coverage": ser.get("geo_coverage"),
+                "temporal_coverage": ser.get("temporal_coverage"),
+                "other_organisations": ser.get("other_organisations"),
+                "data_provenance": ser.get("data_provenance"),
+            }
+            if visualization
+            else None,
         }
 
         return res
