@@ -1,6 +1,9 @@
 Changelog
 =========
 
+4.5-dev0 - (unreleased)
+---------------------------
+
 4.4 - (2023-05-09)
 ---------------------------
 * Change: add eea core metadata to visualization response
