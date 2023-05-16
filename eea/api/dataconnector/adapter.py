@@ -5,12 +5,12 @@ import logging
 import requests
 from mo_sql_parsing import format as sql_format
 from zope.component import adapter
-from plone.restapi.types.interfaces import IJsonSchemaProvider
-from plone.restapi.types.adapters import DefaultJsonSchemaProvider
-from zope.schema.interfaces import IField
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IBrowserRequest
+from plone.restapi.types.interfaces import IJsonSchemaProvider
+from plone.restapi.types.adapters import DefaultJsonSchemaProvider
+from zope.schema.interfaces import IField
 from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IDataProvider,
@@ -93,10 +93,12 @@ class DataProviderForConnectors(object):
         """provided data"""
         return self._provided_data()
 
+
 @adapter(IField, Interface, Interface)
 @implementer(IJsonSchemaProvider)
 class DataQueryJsonSchemaProvider(DefaultJsonSchemaProvider):
+    """Schema provider for DataQuery"""
 
     def get_type(self):
-        print("Get type: array")
+        """ return type of object """
         return "array"
