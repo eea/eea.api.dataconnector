@@ -143,6 +143,6 @@ class IConnectorDataParameters(model.Schema):
         value_type=schema.Dict(value_type=schema.Field(),
                                key_type=schema.TextLine()),
         required=False,
-        missing_value="",
+        missing_value=[],
         )
     form.widget("data_query", QueryStringFieldWidget)
