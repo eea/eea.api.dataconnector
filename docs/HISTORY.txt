@@ -1,6 +1,11 @@
 Changelog
 =========
 
+4.5 - (2023-05-15)
+---------------------------
+* Bug: updated schema definition
+  [alecghica refs #252894]
+
 4.4 - (2023-05-09)
 ---------------------------
 * Change: add eea core metadata to visualization response
