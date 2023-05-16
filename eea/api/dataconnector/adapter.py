@@ -7,10 +7,10 @@ from mo_sql_parsing import format as sql_format
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.schema.interfaces import IField
 from zope.publisher.interfaces.browser import IBrowserRequest
 from plone.restapi.types.interfaces import IJsonSchemaProvider
 from plone.restapi.types.adapters import DefaultJsonSchemaProvider
-from zope.schema.interfaces import IField
 from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IDataProvider,
