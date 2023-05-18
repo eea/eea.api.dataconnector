@@ -1,6 +1,11 @@
 Changelog
 =========
 
+4.6 - (2023-05-18)
+---------------------------
+* Bug: updated schema definition with default value
+  [alecghica refs #252894]
+
 4.5 - (2023-05-15)
 ---------------------------
 * Bug: updated schema definition

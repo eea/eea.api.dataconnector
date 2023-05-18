@@ -144,5 +144,6 @@ class IConnectorDataParameters(model.Schema):
                                key_type=schema.TextLine()),
         required=False,
         missing_value=[],
+        default=[],
         )
     form.widget("data_query", QueryStringFieldWidget)
