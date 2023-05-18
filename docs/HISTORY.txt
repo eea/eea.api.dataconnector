@@ -3,6 +3,8 @@ Changelog
 
 4.6-dev0 - (unreleased)
 ---------------------------
+* Bug: updated schema definition with default value
+  [alecghica refs #252894]
 
 4.5 - (2023-05-15)
 ---------------------------
