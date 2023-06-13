@@ -103,8 +103,8 @@ class MapViewVisualization(MetadataBase):
 class TableauViewVisualization(MetadataBase):
     """Standard Tableau View adaptor"""
 
-    tableau_visualization_data = DCFieldProperty(
-        ITableauVisualization["tableau_visualization_data"]
+    tableau_visualization = DCFieldProperty(
+        ITableauVisualization["tableau_visualization"]
     )
 
 
