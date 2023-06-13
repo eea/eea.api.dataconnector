@@ -1,7 +1,7 @@
 Changelog
 =========
 
-4.7 - (2023-06-13)
+5.0 - (2023-06-13)
 ---------------------------
 * Change: refact: change field name for tableau visualization
   [razvanMiu]
