@@ -118,7 +118,7 @@ TABLEAU_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
 class ITableauVisualization(model.Schema):
     """Tableau view"""
 
-    tableau_visualization_data = JSONField(
+    tableau_visualization = JSONField(
         title="Tableau Widget",
         required=False,
         default={},

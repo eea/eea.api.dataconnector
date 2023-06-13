@@ -1,6 +1,11 @@
 Changelog
 =========
 
+5.0 - (2023-06-13)
+---------------------------
+* Change: refact: change field name for tableau visualization
+  [razvanMiu]
+
 4.6 - (2023-05-18)
 ---------------------------
 * Bug: updated schema definition with default value
