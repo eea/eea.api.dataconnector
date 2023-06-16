@@ -1,6 +1,11 @@
 Changelog
 =========
 
+5.1 - (2023-06-16)
+---------------------------
+* Change: feat: include data_provenance with map viz data
+  [razvanMiu]
+
 5.0 - (2023-06-13)
 ---------------------------
 * Change: refact: change field name for tableau visualization
