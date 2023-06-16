@@ -84,6 +84,7 @@ class MapVisualizationGet(Service):
         ser = serializer(version=self.request.get("version"))
         res["map_visualization"] = {
             "data": ser["map_visualization_data"],
+            "data_provenance": ser["data_provenance"],
         }
 
         return res
