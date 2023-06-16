@@ -1,6 +1,9 @@
 Changelog
 =========
 
+5.2-dev0 - (unreleased)
+---------------------------
+
 5.1 - (2023-06-16)
 ---------------------------
 * Change: feat: include data_provenance with map viz data
