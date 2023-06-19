@@ -89,6 +89,7 @@ class MapVisualizationGet(Service):
 
         return res
 
+
 class TableauVisualizationGet(Service):
     """Get tableau visualization data"""
 
