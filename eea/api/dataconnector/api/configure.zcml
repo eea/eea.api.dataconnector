@@ -44,6 +44,14 @@
   <plone:service
     method="GET"
     for="*"
+    factory=".dataconnector.TableauVisualizationGet"
+    name="@tableau-visualization"
+    permission="zope2.View"
+    />
+
+  <plone:service
+    method="GET"
+    for="*"
     factory=".visualization.VisualizationLayoutGet"
     name="@visualization-layout"
     permission="zope2.View"

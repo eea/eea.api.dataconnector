@@ -88,3 +88,31 @@ class MapVisualizationGet(Service):
         }
 
         return res
+
+class TableauVisualizationGet(Service):
+    """Get tableau visualization data"""
+
+    def reply(self):
+        """reply"""
+
+        res = {
+            "@id": self.context.absolute_url(),
+            "tableau_visualization": {},
+        }
+
+        serializer = queryMultiAdapter(
+            (self.context, self.request), ISerializeToJson
+        )
+
+        if serializer is None:
+            self.request.response.setStatus(501)
+
+            return dict(error=dict(message="No serializer available."))
+
+        ser = serializer(version=self.request.get("version"))
+        res["tableau_visualization"] = {
+            "data": ser["tableau_visualization"],
+            "data_provenance": ser["data_provenance"],
+        }
+
+        return res
