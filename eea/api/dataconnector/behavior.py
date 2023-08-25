@@ -18,7 +18,7 @@ from .interfaces import IDataVisualization
 from .interfaces import IMapVisualization
 from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
-
+from .interfaces import IElasticConnector
 
 logger = logging.getLogger(__name__)
 
@@ -114,3 +114,8 @@ class ConnectorDataParameters(MetadataBase):
     # data_parameters = DCFieldProperty(
     #     IConnectorDataParameters['data_parameters'])
     data_query = DCFieldProperty(IConnectorDataParameters["data_query"])
+
+class ElasticConnectorWidget(MetadataBase):
+    """Build csv data from ES data"""
+
+    elastic_csv_widget = DCFieldProperty(IElasticConnector["elastic_csv_widget"])
