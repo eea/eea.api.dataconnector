@@ -145,10 +145,14 @@ class IConnectorDataParameters(model.Schema):
         required=False,
         missing_value=[],
         default=[],
-        )
+    )
     form.widget("data_query", QueryStringFieldWidget)
 
-ELASTIC_CONNECTOR_WIDGET_SCHEMA = json.dumps({"type": "object", "properties": {}})
+
+ELASTIC_CONNECTOR_WIDGET_SCHEMA = json.dumps(
+    {"type": "object", "properties": {}}
+)
+
 
 @provider(IFormFieldProvider)
 class IElasticConnector(model.Schema):
