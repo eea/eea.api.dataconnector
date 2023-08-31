@@ -1,8 +1,10 @@
 Changelog
 =========
 
-5.3-dev0 - (unreleased)
+5.3 - (2023-08-31)
 ---------------------------
+* Change: Add ElasticConnector CT
+  [andreiggr]
 
 5.2 - (2023-06-19)
 ---------------------------
