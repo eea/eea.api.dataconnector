@@ -115,7 +115,10 @@ class ConnectorDataParameters(MetadataBase):
     #     IConnectorDataParameters['data_parameters'])
     data_query = DCFieldProperty(IConnectorDataParameters["data_query"])
 
+
 class ElasticConnectorWidget(MetadataBase):
     """Build csv data from ES data"""
 
-    elastic_csv_widget = DCFieldProperty(IElasticConnector["elastic_csv_widget"])
+    elastic_csv_widget = DCFieldProperty(
+        IElasticConnector["elastic_csv_widget"]
+    )
