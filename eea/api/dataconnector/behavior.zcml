@@ -72,4 +72,14 @@
       marker=".interfaces.ITableauVisualization"
       />
 
+  <plone:behavior
+      name="eea.dataconnector.elastic_csv_widget"
+      title="Elastic to CSV behavior"
+      description="Inserts a widget that constructs CSV data from ES"
+      factory=".behavior.ElasticConnectorWidget"
+      provides=".interfaces.IElasticConnector"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      marker=".interfaces.IElasticConnector"
+      />
+
 </configure>

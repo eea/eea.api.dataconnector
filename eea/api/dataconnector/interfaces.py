@@ -145,5 +145,22 @@ class IConnectorDataParameters(model.Schema):
         required=False,
         missing_value=[],
         default=[],
-        )
+    )
     form.widget("data_query", QueryStringFieldWidget)
+
+
+ELASTIC_CONNECTOR_WIDGET_SCHEMA = json.dumps(
+    {"type": "object", "properties": {}}
+)
+
+
+@provider(IFormFieldProvider)
+class IElasticConnector(model.Schema):
+    """An Elastic search to CSV data builder widget"""
+
+    elastic_csv_widget = JSONField(
+        title="Elastic CSV widget",
+        required=False,
+        default={},
+        schema=ELASTIC_CONNECTOR_WIDGET_SCHEMA,
+    )
