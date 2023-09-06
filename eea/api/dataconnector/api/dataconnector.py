@@ -2,6 +2,7 @@
 """ dataconnector """
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
+from eea.api.dataconnector.interfaces import IElasticDataProvider
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service

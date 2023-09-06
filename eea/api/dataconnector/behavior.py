@@ -86,6 +86,31 @@ class DataProviderForFiles(object):
         }
 
 
+@implementer(IDataProvider)
+@adapter(IElasticConnector, IBrowserRequest)
+class DataProviderForElasticCSVWidget(object):
+    """Behavior implementation for content types with elastic_csv_widget field"""
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    @property
+    def provided_data(self):
+        """provided data"""
+
+        widget = getattr(self.context, 'elastic_csv_widget', None)
+
+        data = getattr(widget, 'tableData', {}) if widget else {}
+
+        print('==========pretty data', data)
+
+        return {
+            "results": data,
+            "metadata": {},  # Add metadata if needed
+        }
+
+
 class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
 
