@@ -89,7 +89,7 @@ class DataProviderForFiles(object):
 @implementer(IDataProvider)
 @adapter(IElasticConnector, IBrowserRequest)
 class DataProviderForElasticCSVWidget(object):
-    """Behavior implementation for content types with elastic_csv_widget field"""
+    """Behavior implementation for CT with elastic_csv_widget field"""
 
     def __init__(self, context, request):
         self.context = context

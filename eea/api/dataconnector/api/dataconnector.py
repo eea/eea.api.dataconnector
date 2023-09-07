@@ -63,7 +63,8 @@ class ElasticConnectorData(object):
         if not expand:
             return result
 
-        result["connector-data"]["data"] = self.context.elastic_csv_widget.tableData
+        result["connector-data"][
+            "data"] = self.context.elastic_csv_widget.tableData
 
         return result
 
@@ -76,7 +77,8 @@ class ConnectorDataGet(Service):
 
         # Check if the context provides the IElasticConnector interface
         if IElasticConnector.providedBy(self.context):
-            result = ElasticConnectorData(self.context, self.request)(expand=True)
+            result = ElasticConnectorData(
+                self.context, self.request)(expand=True)
         else:
             result = ConnectorData(self.context, self.request)(expand=True)
 
