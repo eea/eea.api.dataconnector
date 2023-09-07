@@ -6,7 +6,10 @@
     i18n_domain="eea.dataconnectori">
 
 
-  <adapter name="connector-data" factory=".dataconnector.ConnectorData" />
+<adapter factory=".dataconnector.ConnectorData" 
+         for="eea.api.dataconnector.interfaces.IBasicDataProvider zope.publisher.interfaces.browser.IBrowserRequest" />
+<adapter factory=".dataconnector.ElasticConnectorData" 
+         for="eea.api.dataconnector.interfaces.IElasticDataProvider zope.publisher.interfaces.browser.IBrowserRequest" />
 
 	<!-- TODO: this should be eea.dataconnector.interfaces.IBasicDataProvider -->
   <plone:service

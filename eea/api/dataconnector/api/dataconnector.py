@@ -2,6 +2,8 @@
 """ dataconnector """
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
+from eea.api.dataconnector.interfaces import IElasticDataProvider
+from eea.api.dataconnector.interfaces import IElasticConnector
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service
@@ -41,12 +43,45 @@ class ConnectorData(object):
         return result
 
 
+@implementer(IExpandableElement)
+@adapter(IElasticDataProvider, Interface)
+class ElasticConnectorData(object):
+    """ Elastic connector data """
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, expand=False):
+        result = {
+            "connector-data": {
+                "@id": "{}/@connector-data".format(
+                    self.context.absolute_url()
+                )
+            }
+        }
+
+        if not expand:
+            return result
+
+        result["connector-data"][
+            "data"] = self.context.elastic_csv_widget.tableData
+
+        return result
+
+
 class ConnectorDataGet(Service):
     """connector data - get"""
 
     def reply(self):
         """reply"""
-        result = ConnectorData(self.context, self.request)(expand=True)
+
+        # Check if the context provides the IElasticConnector interface
+        if IElasticConnector.providedBy(self.context):
+            result = ElasticConnectorData(
+                self.context, self.request)(expand=True)
+        else:
+            result = ConnectorData(self.context, self.request)(expand=True)
 
         return result["connector-data"]
 

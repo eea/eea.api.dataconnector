@@ -76,6 +76,12 @@ class IDataProvider(IBasicDataProvider):
     provided_data = Attribute("Data made available by this data provider")
 
 
+class IElasticDataProvider(IBasicDataProvider):
+    """An export of data for remote purposes"""
+
+    provided_data = Attribute("Data made available by this data provider")
+
+
 class IFileDataProvider(IBasicDataProvider):
     """Marker interface for objects that provide data to visualizations"""
 

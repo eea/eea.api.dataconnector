@@ -10,6 +10,7 @@
   <interface interface=".interfaces.IFileDataProvider" />
 
   <adapter factory=".behavior.DataProviderForFiles" />
+  <adapter factory=".behavior.DataProviderForElasticCSVWidget" />
 
   <plone:behavior
       name="discodata.connector"
@@ -30,6 +31,18 @@
       for="plone.dexterity.interfaces.IDexterityContent"
       marker=".interfaces.IFileDataProvider"
       />
+
+
+  <plone:behavior
+      name="elastic.connector"
+      title="Data provider for Elastic Connector"
+      description="Allows EC to provide remote data"
+      factory=".behavior.DataProviderForElasticCSVWidget"
+      provides=".interfaces.IElasticDataProvider"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      marker=".interfaces.IElasticDataProvider"
+      />
+
 
   <plone:behavior
       name="eea.restapi.parameters"

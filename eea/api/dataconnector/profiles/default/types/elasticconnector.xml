@@ -23,6 +23,7 @@
     <element value="plone.dublincore"/>
     <element value="plone.namefromtitle"/>
     <element value="eea.dataconnector.elastic_csv_widget"/>
+    <element value="elastic.connector"/>
   </property>
   <property name="schema"></property>
   <property name="model_source">
