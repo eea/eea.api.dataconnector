@@ -101,9 +101,7 @@ class DataProviderForElasticCSVWidget(object):
 
         widget = getattr(self.context, 'elastic_csv_widget', None)
 
-        data = getattr(widget, 'tableData', {}) if widget else {}
-
-        print('==========pretty data', data)
+        data = widget['tableData'] if widget else {}
 
         return {
             "results": data,

@@ -10,6 +10,7 @@
   <interface interface=".interfaces.IFileDataProvider" />
 
   <adapter factory=".behavior.DataProviderForFiles" />
+  <adapter factory=".behavior.DataProviderForElasticCSVWidget" />
 
   <plone:behavior
       name="discodata.connector"
