@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
+# eea imports
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from eea.api.dataconnector.interfaces import IElasticDataProvider
+
+# plone imports
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.interfaces import ISerializeToJson
-from zope.component.interfaces import ComponentLookupError
 from plone.restapi.services import Service
+
+# zope imports
 from zope.component import adapter
 from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
+from zope.component.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.component import queryMultiAdapter
 
 
 @implementer(IExpandableElement)
