@@ -76,14 +76,14 @@ class ConnectorDataGet(Service):
     def reply(self):
         """reply"""
 
-        # Check if the context provides the IElasticConnector interface
-        if IElasticConnector.providedBy(self.context):
-            result = ElasticConnectorData(
-                self.context, self.request)(expand=True)
-        else:
-            result = ConnectorData(self.context, self.request)(expand=True)
-
-        return result["connector-data"]
+        try:
+            connector = getMultiAdapter(
+                (self.context, self.request), IExpandableElement
+            )
+            result = connector(expand=True)
+            return result["connector-data"]
+        except ComponentLookupError:
+            raise ValueError("No suitable connector found for the context.")
 
 
 class ConnectorDataPost(Service):
