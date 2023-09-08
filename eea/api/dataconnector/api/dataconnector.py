@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
+# eea imports
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from eea.api.dataconnector.interfaces import IElasticDataProvider
-from eea.api.dataconnector.interfaces import IElasticConnector
+
+# plone imports
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service
+
+# zope imports
 from zope.component import adapter
 from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
+from zope.component.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.component import queryMultiAdapter
 
 
 @implementer(IExpandableElement)
@@ -76,14 +81,14 @@ class ConnectorDataGet(Service):
     def reply(self):
         """reply"""
 
-        # Check if the context provides the IElasticConnector interface
-        if IElasticConnector.providedBy(self.context):
-            result = ElasticConnectorData(
-                self.context, self.request)(expand=True)
-        else:
-            result = ConnectorData(self.context, self.request)(expand=True)
-
-        return result["connector-data"]
+        try:
+            connector = getMultiAdapter(
+                (self.context, self.request), IExpandableElement
+            )
+            result = connector(expand=True)
+            return result["connector-data"]
+        except ComponentLookupError:
+            raise ValueError("No suitable connector found for the context.")
 
 
 class ConnectorDataPost(Service):
