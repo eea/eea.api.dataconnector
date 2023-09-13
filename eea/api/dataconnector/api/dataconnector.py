@@ -131,8 +131,8 @@ class ElasticConnectorData(object):
         return table
 
     def _build_table_from_aggs(self, data, fieldName):
-        valuesColumn = f"{fieldName}_values"
-        countColumn = f"{fieldName}_count"
+        valuesColumn = "{fieldName}_values"
+        countColumn = "{fieldName}_count"
 
         table = {
             valuesColumn: [],
