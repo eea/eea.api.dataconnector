@@ -86,6 +86,17 @@ class ElasticConnectorData(object):
         return result
 
     def _fetch_from_elasticsearch(self, url, payload, formValue):
+        """
+        Fetch data from Elasticsearch.
+
+        Args:
+        - url: The Elasticsearch endpoint URL.
+        - payload: The payload to send with the request.
+        - formValue: The form values.
+
+        Returns:
+        A dictionary containing the table data.
+        """
         headers = {
             'Content-Type': 'application/json',
         }
@@ -99,13 +110,23 @@ class ElasticConnectorData(object):
             return table_data
 
         except requests.RequestException as e:
-            print("Error fetching data from Elasticsearch: {e}")
+            print(f"Error fetching data from Elasticsearch: {e}")
             if response:
-                print("Response status code: {response.status_code}")
-                print("Response content: {response.text}")
-            return {}
+                print(f"Response status code: {response.status_code}")
+                print(f"Response content: {response.text}")
+                return {}
 
     def _process_es_response(self, es_data, formValue):
+        """
+        Process the Elasticsearch response.
+
+        Args:
+        - es_data: The data returned from Elasticsearch.
+        - formValue: The form values.
+
+        Returns:
+        A dictionary containing the processed data.
+        """
         use_aggs = formValue.get('use_aggs', False)
         agg_field = formValue.get('agg_field')
         fields = formValue.get('fields', [])
@@ -123,6 +144,16 @@ class ElasticConnectorData(object):
         return {}
 
     def _build_table_from_fields(self, items, fields):
+        """
+        Build a table from fields.
+
+        Args:
+        - items: The items to process.
+        - fields: The fields to include in the table.
+
+        Returns:
+        A dictionary containing the table data.
+        """
         table = {}
         for fieldObj in fields:
             fieldName = fieldObj.get('field')
@@ -131,6 +162,16 @@ class ElasticConnectorData(object):
         return table
 
     def _build_table_from_aggs(self, data, fieldName):
+        """
+        Build a table from aggregations.
+
+        Args:
+        - data: The data to process.
+        - fieldName: The field name to use for aggregations.
+
+        Returns:
+        A dictionary containing the table data.
+        """
         valuesColumn = "{fieldName}_values"
         countColumn = "{fieldName}_count"
 
