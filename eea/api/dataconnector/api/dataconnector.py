@@ -99,10 +99,10 @@ class ElasticConnectorData(object):
             return table_data
 
         except requests.RequestException as e:
-            print(f"Error fetching data from Elasticsearch: {e}")
+            print("Error fetching data from Elasticsearch: {e}")
             if response:
-                print(f"Response status code: {response.status_code}")
-                print(f"Response content: {response.text}")
+                print("Response status code: {response.status_code}")
+                print("Response content: {response.text}")
             return {}
 
     def _process_es_response(self, es_data, formValue):
@@ -152,7 +152,7 @@ class ConnectorDataGet(Service):
     def reply(self):
         """reply"""
         try:
-            # using the getMultiAdapter to switch 
+            # using the getMultiAdapter to switch
             # between the 2 IExpandableElements
             connector = getMultiAdapter(
                 (self.context, self.request), IExpandableElement
@@ -169,7 +169,7 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        # using the getMultiAdapter to switch between 
+        # using the getMultiAdapter to switch between
         # the 2 IExpandableElements
         result = getMultiAdapter(
             (self.context, self.request), IExpandableElement
