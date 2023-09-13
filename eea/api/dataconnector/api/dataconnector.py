@@ -67,9 +67,6 @@ class ElasticConnectorData(object):
             }
         }
 
-        if not expand:
-            return result
-
         widgetData = getattr(self.context, 'elastic_csv_widget', {})
         formValue = widgetData.get('formValue', {})
         reqConfig = widgetData.get('elasticQueryConfig', {})
@@ -155,11 +152,11 @@ class ConnectorDataGet(Service):
     def reply(self):
         """reply"""
         try:
+            # using the getMultiAdapter to switch between the 2 IExpandableElement
             connector = getMultiAdapter(
                 (self.context, self.request), IExpandableElement
             )
             result = connector(expand=True)
-            print('============result in condataget', result)
 
             return result["connector-data"]
         except ComponentLookupError:
@@ -171,7 +168,11 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        result = ConnectorData(self.context, self.request)(expand=True)
+        # using the getMultiAdapter to switch between the 2 IExpandableElement
+
+        result = getMultiAdapter(
+            (self.context, self.request), IExpandableElement
+        )(expand=True)
 
         return result["connector-data"]
 
