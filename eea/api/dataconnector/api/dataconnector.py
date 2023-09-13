@@ -152,7 +152,8 @@ class ConnectorDataGet(Service):
     def reply(self):
         """reply"""
         try:
-            # using the getMultiAdapter to switch between the 2 IExpandableElement
+            # using the getMultiAdapter to switch 
+            # between the 2 IExpandableElements
             connector = getMultiAdapter(
                 (self.context, self.request), IExpandableElement
             )
@@ -168,8 +169,8 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        # using the getMultiAdapter to switch between the 2 IExpandableElement
-
+        # using the getMultiAdapter to switch between 
+        # the 2 IExpandableElements
         result = getMultiAdapter(
             (self.context, self.request), IExpandableElement
         )(expand=True)
