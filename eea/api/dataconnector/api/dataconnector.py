@@ -68,8 +68,9 @@ class ElasticConnectorData(object):
             }
         }
 
-        formData = getattr(self.context, 'elastic_csv_widget', {})
-        reqConfig = formData.get('elasticQueryConfig', {})
+        widgetData = getattr(self.context, 'elastic_csv_widget', {})
+        formValue = widgetData.get('formValue', {})
+        reqConfig = widgetData.get('elasticQueryConfig', {})
         es_endpoint = reqConfig.get('es_endpoint')
         payloadConfig = reqConfig.get('payloadConfig')
 
@@ -77,37 +78,39 @@ class ElasticConnectorData(object):
             return {"results": [], "metadata": {}}
 
         # Fetch data from Elasticsearch
-        table_data = self._fetch_from_elasticsearch(es_endpoint, payloadConfig)
+        table_data = self._fetch_from_elasticsearch(
+            es_endpoint, payloadConfig, formValue)
 
         result["connector-data"]["data"] = table_data
 
-        print('Table data', table_data)
 
         return result
 
-    def _fetch_from_elasticsearch(self, url, payload):
+    def _fetch_from_elasticsearch(self, url, payload, formValue):
         headers = {
             'Content-Type': 'application/json',
         }
         try:
-            print('the endpoint=================>', url)
             response = requests.post(
-                url, payload, headers)
+                url, json=payload, headers=headers)
             response.raise_for_status()
 
             es_data = response.json()
-            print('the data=================>', es_data)
-            table_data = self._process_es_response(es_data)
+            table_data = self._process_es_response(es_data, formValue)
             return table_data
 
         except requests.RequestException as e:
             print(f"Error fetching data from Elasticsearch: {e}")
+            if response:
+                print(f"Response status code: {response.status_code}")
+                print(f"Response content: {response.text}")
             return {}
 
-    def _process_es_response(self, es_data, formData):
-        use_aggs = formData.get('use_aggs', False)
-        agg_field = formData.get('agg_field')
-        fields = formData.get('fields', [])
+    def _process_es_response(self, es_data, formValue):
+        use_aggs = formValue.get('use_aggs', False)
+        agg_field = formValue.get('agg_field')
+        fields = formValue.get('fields', [])
+
 
         if use_aggs and agg_field:
             aggBuckets = es_data.get('aggregations', {}).get(
