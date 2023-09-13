@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
 # eea imports
+import logging
 import requests
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
@@ -19,7 +20,6 @@ from zope.component.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
 
-import logging
 
 logging.basicConfig(level=logging.ERROR)  # This will log only errors and above
 logger = logging.getLogger(__name__)
