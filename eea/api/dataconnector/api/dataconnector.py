@@ -96,6 +96,7 @@ class ElasticConnectorData(object):
             response.raise_for_status()
 
             es_data = response.json()
+            print('the data=================>', es_data)
             table_data = self._process_es_response(es_data)
             return table_data
 
