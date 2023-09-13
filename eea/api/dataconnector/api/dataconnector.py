@@ -19,6 +19,11 @@ from zope.component.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
 
+import logging
+
+logging.basicConfig(level=logging.ERROR)  # This will log only errors and above
+logger = logging.getLogger(__name__)
+
 
 @implementer(IExpandableElement)
 @adapter(IBasicDataProvider, Interface)
