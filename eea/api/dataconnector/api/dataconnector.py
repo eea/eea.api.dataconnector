@@ -18,7 +18,6 @@ from zope.component import queryMultiAdapter
 from zope.component.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.interface import providedBy
 
 
 @implementer(IExpandableElement)
@@ -68,6 +67,9 @@ class ElasticConnectorData(object):
             }
         }
 
+        if not expand:
+            return result
+
         widgetData = getattr(self.context, 'elastic_csv_widget', {})
         formValue = widgetData.get('formValue', {})
         reqConfig = widgetData.get('elasticQueryConfig', {})
@@ -81,8 +83,8 @@ class ElasticConnectorData(object):
         table_data = self._fetch_from_elasticsearch(
             es_endpoint, payloadConfig, formValue)
 
-        result["connector-data"]["data"] = table_data
-
+        result["connector-data"]["data"] = {"results": table_data,
+                                            "metadata": {"readme": ""}}
 
         return result
 
@@ -110,7 +112,6 @@ class ElasticConnectorData(object):
         use_aggs = formValue.get('use_aggs', False)
         agg_field = formValue.get('agg_field')
         fields = formValue.get('fields', [])
-
 
         if use_aggs and agg_field:
             aggBuckets = es_data.get('aggregations', {}).get(
@@ -158,6 +159,7 @@ class ConnectorDataGet(Service):
                 (self.context, self.request), IExpandableElement
             )
             result = connector(expand=True)
+            print('============result in condataget', result)
 
             return result["connector-data"]
         except ComponentLookupError:
