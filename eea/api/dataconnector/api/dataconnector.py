@@ -110,10 +110,10 @@ class ElasticConnectorData(object):
             return table_data
 
         except requests.RequestException as e:
-            print(f"Error fetching data from Elasticsearch: {e}")
+            print("Error fetching data from Elasticsearch: {}".format(e))
             if response:
-                print(f"Response status code: {response.status_code}")
-                print(f"Response content: {response.text}")
+                print("Response status code: {}".format(response.status_code))
+                print("Response content: {}".format(response.text))
                 return {}
 
     def _process_es_response(self, es_data, formValue):
