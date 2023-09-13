@@ -67,6 +67,7 @@ class DataProviderForConnectors(object):
 
         try:
             req = requests.post(self.context.endpoint_url, data)
+            print('======================LES DATA LOOK', data)
             data = req.json()
         except Exception:
             logger.exception("Error in requestion data")

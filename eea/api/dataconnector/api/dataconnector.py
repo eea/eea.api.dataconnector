@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
 # eea imports
+import requests
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from eea.api.dataconnector.interfaces import IElasticDataProvider
@@ -17,6 +18,7 @@ from zope.component import queryMultiAdapter
 from zope.component.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.interface import providedBy
 
 
 @implementer(IExpandableElement)
@@ -66,13 +68,80 @@ class ElasticConnectorData(object):
             }
         }
 
-        if not expand:
-            return result
+        formData = getattr(self.context, 'elastic_csv_widget', {})
+        reqConfig = formData.get('elasticQueryConfig', {})
+        es_endpoint = reqConfig.get('es_endpoint')
+        payloadConfig = reqConfig.get('payloadConfig')
 
-        result["connector-data"][
-            "data"] = self.context.elastic_csv_widget.tableData
+        if not es_endpoint or not payloadConfig:
+            return {"results": [], "metadata": {}}
+
+        # Fetch data from Elasticsearch
+        table_data = self._fetch_from_elasticsearch(es_endpoint, payloadConfig)
+
+        result["connector-data"]["data"] = table_data
+
+        print('Table data', table_data)
 
         return result
+
+    def _fetch_from_elasticsearch(self, url, payload):
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        try:
+            print('the endpoint=================>', url)
+            response = requests.post(
+                url, payload, headers)
+            response.raise_for_status()
+
+            es_data = response.json()
+            table_data = self._process_es_response(es_data)
+            return table_data
+
+        except requests.RequestException as e:
+            print(f"Error fetching data from Elasticsearch: {e}")
+            return {}
+
+    def _process_es_response(self, es_data, formData):
+        use_aggs = formData.get('use_aggs', False)
+        agg_field = formData.get('agg_field')
+        fields = formData.get('fields', [])
+
+        if use_aggs and agg_field:
+            aggBuckets = es_data.get('aggregations', {}).get(
+                agg_field, {}).get('buckets', [])
+            if aggBuckets:
+                return self._build_table_from_aggs(aggBuckets, agg_field)
+        else:
+            hits = es_data.get('hits', {}).get('hits', [])
+            if hits and fields:
+                return self._build_table_from_fields(hits, fields)
+
+        return {}
+
+    def _build_table_from_fields(self, items, fields):
+        table = {}
+        for fieldObj in fields:
+            fieldName = fieldObj.get('field')
+            table[fieldName] = [item.get('_source', {}).get(fieldName)
+                                for item in items]
+        return table
+
+    def _build_table_from_aggs(self, data, fieldName):
+        valuesColumn = f"{fieldName}_values"
+        countColumn = f"{fieldName}_count"
+
+        table = {
+            valuesColumn: [],
+            countColumn: [],
+        }
+
+        for bucket in data:
+            table[valuesColumn].append(bucket.get('key'))
+            table[countColumn].append(bucket.get('doc_count'))
+
+        return table
 
 
 class ConnectorDataGet(Service):
@@ -80,12 +149,12 @@ class ConnectorDataGet(Service):
 
     def reply(self):
         """reply"""
-
         try:
             connector = getMultiAdapter(
                 (self.context, self.request), IExpandableElement
             )
             result = connector(expand=True)
+
             return result["connector-data"]
         except ComponentLookupError:
             raise ValueError("No suitable connector found for the context.")
