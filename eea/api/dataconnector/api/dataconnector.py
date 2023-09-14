@@ -177,8 +177,8 @@ class ElasticConnectorData(object):
         Returns:
         A dictionary containing the table data.
         """
-        valuesColumn = f"{fieldName}_values"
-        countColumn = f"{fieldName}_count"
+        valuesColumn = "{}_values".format(fieldName)
+        countColumn = "{}_count".format(fieldName)
 
         table = {
             valuesColumn: [],
