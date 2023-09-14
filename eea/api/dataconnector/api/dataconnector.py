@@ -201,8 +201,9 @@ class ConnectorDataGet(Service):
             # using the getMultiAdapter to switch
             # between the 2 IExpandableElements
             connector = getMultiAdapter(
-                (self.context, self.request), IExpandableElement
+                (self.context, self.request), name="connector-data"
             )
+
             result = connector(expand=True)
 
             return result["connector-data"]
@@ -217,9 +218,11 @@ class ConnectorDataPost(Service):
         """reply"""
         # using the getMultiAdapter to switch between
         # the 2 IExpandableElements
-        result = getMultiAdapter(
-            (self.context, self.request), IExpandableElement
-        )(expand=True)
+        connector = getMultiAdapter(
+            (self.context, self.request), name="connector-data"
+        )
+
+        result = connector(expand=True)
 
         return result["connector-data"]
 

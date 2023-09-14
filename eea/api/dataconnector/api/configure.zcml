@@ -9,6 +9,7 @@
     <adapter
         factory=".dataconnector.ConnectorData"
         provides="plone.restapi.interfaces.IExpandableElement"
+        name="connector-data"
         for="eea.api.dataconnector.interfaces.IBasicDataProvider
              zope.interface.Interface"
     />
@@ -17,6 +18,7 @@
     <adapter
         factory=".dataconnector.ElasticConnectorData"
         provides="plone.restapi.interfaces.IExpandableElement"
+        name="connector-data"
         for="eea.api.dataconnector.interfaces.IElasticDataProvider
              zope.interface.Interface"
     />
