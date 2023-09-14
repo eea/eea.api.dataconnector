@@ -163,7 +163,7 @@ class ElasticConnectorData(object):
         for field_obj in fields:
             field_name = field_obj.get('field')
             table[field_name] = [item.get('_source', {}).get(field_name)
-                                for item in items]
+                                 for item in items]
         return table
 
     def _build_table_from_aggs(self, data, field_name):
