@@ -72,32 +72,32 @@ class ElasticConnectorData(object):
             }
         }
 
-        widgetData = getattr(self.context, 'elastic_csv_widget', {})
-        formValue = widgetData.get('formValue', {})
-        reqConfig = widgetData.get('elasticQueryConfig', {})
-        es_endpoint = reqConfig.get('es_endpoint')
-        payloadConfig = reqConfig.get('payloadConfig')
+        widget_data = getattr(self.context, 'elastic_csv_widget', {})
+        form_value = widget_data.get('formValue', {})
+        req_config = widget_data.get('elasticQueryConfig', {})
+        es_endpoint = req_config.get('es_endpoint')
+        payload_config = req_config.get('payloadConfig')
 
-        if not es_endpoint or not payloadConfig:
+        if not es_endpoint or not payload_config:
             return {"results": [], "metadata": {}}
 
         # Fetch data from Elasticsearch
         table_data = self._fetch_from_elasticsearch(
-            es_endpoint, payloadConfig, formValue)
+            es_endpoint, payload_config, form_value)
 
         result["connector-data"]["data"] = {"results": table_data,
                                             "metadata": {"readme": ""}}
 
         return result
 
-    def _fetch_from_elasticsearch(self, url, payload, formValue):
+    def _fetch_from_elasticsearch(self, url, payload, form_value):
         """
         Fetch data from Elasticsearch.
 
         Args:
         - url: The Elasticsearch endpoint URL.
         - payload: The payload to send with the request.
-        - formValue: The form values.
+        - form_value: The form values.
 
         Returns:
         A dictionary containing the table data.
@@ -111,7 +111,7 @@ class ElasticConnectorData(object):
             response.raise_for_status()
 
             es_data = response.json()
-            table_data = self._process_es_response(es_data, formValue)
+            table_data = self._process_es_response(es_data, form_value)
             return table_data
 
         except requests.RequestException as e:
@@ -121,26 +121,26 @@ class ElasticConnectorData(object):
                 logger.error("Response content: %s", response.text)
             return {}
 
-    def _process_es_response(self, es_data, formValue):
+    def _process_es_response(self, es_data, form_value):
         """
         Process the Elasticsearch response.
 
         Args:
         - es_data: The data returned from Elasticsearch.
-        - formValue: The form values.
+        - form_value: The form values.
 
         Returns:
         A dictionary containing the processed data.
         """
-        use_aggs = formValue.get('use_aggs', False)
-        agg_field = formValue.get('agg_field')
-        fields = formValue.get('fields', [])
+        use_aggs = form_value.get('use_aggs', False)
+        agg_field = form_value.get('agg_field')
+        fields = form_value.get('fields', [])
 
         if use_aggs and agg_field:
-            aggBuckets = es_data.get('aggregations', {}).get(
+            agg_buckets = es_data.get('aggregations', {}).get(
                 agg_field, {}).get('buckets', [])
-            if aggBuckets:
-                return self._build_table_from_aggs(aggBuckets, agg_field)
+            if agg_buckets:
+                return self._build_table_from_aggs(agg_buckets, agg_field)
         else:
             hits = es_data.get('hits', {}).get('hits', [])
             if hits and fields:
@@ -160,34 +160,34 @@ class ElasticConnectorData(object):
         A dictionary containing the table data.
         """
         table = {}
-        for fieldObj in fields:
-            fieldName = fieldObj.get('field')
-            table[fieldName] = [item.get('_source', {}).get(fieldName)
+        for field_obj in fields:
+            field_name = field_obj.get('field')
+            table[field_name] = [item.get('_source', {}).get(field_name)
                                 for item in items]
         return table
 
-    def _build_table_from_aggs(self, data, fieldName):
+    def _build_table_from_aggs(self, data, field_name):
         """
         Build a table from aggregations.
 
         Args:
         - data: The data to process.
-        - fieldName: The field name to use for aggregations.
+        - field_name: The field name to use for aggregations.
 
         Returns:
         A dictionary containing the table data.
         """
-        valuesColumn = "{}_values".format(fieldName)
-        countColumn = "{}_count".format(fieldName)
+        values_column = "{}_values".format(field_name)
+        count_column = "{}_count".format(field_name)
 
         table = {
-            valuesColumn: [],
-            countColumn: [],
+            values_column: [],
+            count_column: [],
         }
 
         for bucket in data:
-            table[valuesColumn].append(bucket.get('key'))
-            table[countColumn].append(bucket.get('doc_count'))
+            table[values_column].append(bucket.get('key'))
+            table[count_column].append(bucket.get('doc_count'))
 
         return table
 
