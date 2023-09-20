@@ -18,7 +18,7 @@ from .interfaces import IDataVisualization
 from .interfaces import IMapVisualization
 from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
-
+from .interfaces import IElasticConnector
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +86,29 @@ class DataProviderForFiles(object):
         }
 
 
+@implementer(IDataProvider)
+@adapter(IElasticConnector, IBrowserRequest)
+class DataProviderForElasticCSVWidget(object):
+    """Behavior implementation for CT with elastic_csv_widget field"""
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    @property
+    def provided_data(self):
+        """provided data"""
+
+        widget = getattr(self.context, 'elastic_csv_widget', None)
+
+        data = widget['tableData'] if widget else {}
+
+        return {
+            "results": data,
+            "metadata": {},  # Add metadata if needed
+        }
+
+
 class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
 
@@ -114,3 +137,11 @@ class ConnectorDataParameters(MetadataBase):
     # data_parameters = DCFieldProperty(
     #     IConnectorDataParameters['data_parameters'])
     data_query = DCFieldProperty(IConnectorDataParameters["data_query"])
+
+
+class ElasticConnectorWidget(MetadataBase):
+    """Build csv data from ES data"""
+
+    elastic_csv_widget = DCFieldProperty(
+        IElasticConnector["elastic_csv_widget"]
+    )
