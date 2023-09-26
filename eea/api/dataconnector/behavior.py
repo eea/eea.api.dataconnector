@@ -148,10 +148,10 @@ class ElasticConnectorWidget(MetadataBase):
         IElasticConnector["elastic_csv_widget"]
     )
 
+
 class FigureNoteField(MetadataBase):
     """Insert Figure Note field"""
 
     figure_note = DCFieldProperty(
         IFigureNote["figure_note"]
     )
-
