@@ -30,7 +30,6 @@
   <element value="plone.versioning"/>
   <element value="plone.tableofcontents"/>
   <element value="plone.locking"/>
-  
   <element
      value="Products.CMFPlone.interfaces.constrains.ISelectableConstrainTypes"/>
   <element value="eea.restapi.visualization"/>
