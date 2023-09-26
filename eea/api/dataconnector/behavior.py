@@ -19,6 +19,8 @@ from .interfaces import IMapVisualization
 from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
 from .interfaces import IElasticConnector
+from .interfaces import IFigureNote
+
 
 logger = logging.getLogger(__name__)
 
@@ -145,3 +147,11 @@ class ElasticConnectorWidget(MetadataBase):
     elastic_csv_widget = DCFieldProperty(
         IElasticConnector["elastic_csv_widget"]
     )
+
+class FigureNoteField(MetadataBase):
+    """Insert Figure Note field"""
+
+    figure_note = DCFieldProperty(
+        IFigureNote["figure_note"]
+    )
+
