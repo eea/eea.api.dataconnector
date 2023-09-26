@@ -178,9 +178,7 @@ class IFigureNote(model.Schema):
     """FigureNote Slate widget field"""
 
     figure_note = SlateJSONField(
-        title=_("Figure Note"),
-        description=_(
-            "Metadata field for visualization content-types"
-        ),
+        title="Figure Note",
+        description="Metadata field for visualization content-types",
         required=False,
     )
