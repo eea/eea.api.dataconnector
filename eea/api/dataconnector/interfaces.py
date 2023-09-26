@@ -122,7 +122,7 @@ TABLEAU_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
 
 
 @provider(IFormFieldProvider)
-class ITableauVisualizatison(model.Schema):
+class ITableauVisualization(model.Schema):
     """Tableau view"""
 
     tableau_visualization = JSONField(
