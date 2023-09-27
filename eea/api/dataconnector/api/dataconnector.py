@@ -105,15 +105,8 @@ class ElasticConnectorData(object):
         headers = {
             'Content-Type': 'application/json',
         }
-<<<<<<< Updated upstream
-        response = None
-=======
-        response = None  # init response var
+        response = {}
 
-        print('===================url iz', url)
-        print('===================payload', payload)
-
->>>>>>> Stashed changes
         try:
             response = requests.post(
                 url, json=payload, headers=headers)
@@ -177,16 +170,16 @@ class ElasticConnectorData(object):
                                  for item in items]
         return table
 
-    def _build_table_from_aggs(self, data, field_name):
+    def _build_table_from_aggs(self, data, field_obj):
         """
         Build a table from aggregations.
 
         Args:
         - data: The data to process.
-        - field_name: The field name to use for aggregations.
+        - field_obj: The field object containing field details.
 
         Returns:
-        A dictionary containing the table data.
+            A dictionary containing the table data.
         """
         field_name = field_obj.get('field')
         field_label = field_obj.get('title', field_name) + ' '
