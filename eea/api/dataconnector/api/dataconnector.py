@@ -105,6 +105,8 @@ class ElasticConnectorData(object):
         headers = {
             'Content-Type': 'application/json',
         }
+        response = {}
+
         try:
             response = requests.post(
                 url, json=payload, headers=headers)
@@ -133,20 +135,23 @@ class ElasticConnectorData(object):
         A dictionary containing the processed data.
         """
         use_aggs = form_value.get('use_aggs', False)
-        agg_field = form_value.get('agg_field')
+        agg_fields = form_value.get('agg_fields')
         fields = form_value.get('fields', [])
 
-        if use_aggs and agg_field:
-            agg_buckets = es_data.get('aggregations', {}).get(
-                agg_field, {}).get('buckets', [])
-            if agg_buckets:
-                return self._build_table_from_aggs(agg_buckets, agg_field)
+        table = {}
+        if use_aggs:
+            for agg_field in agg_fields:
+                agg_data = es_data.get('aggregations', {}).get(
+                    agg_field['field'], {}).get('buckets', [])
+                if agg_data:
+                    table.update(self._build_table_from_aggs(
+                        agg_data, agg_field))
         else:
             hits = es_data.get('hits', {}).get('hits', [])
             if hits and fields:
-                return self._build_table_from_fields(hits, fields)
+                table.update(self._build_table_from_fields(hits, fields))
 
-        return {}
+        return table
 
     def _build_table_from_fields(self, items, fields):
         """
@@ -166,19 +171,22 @@ class ElasticConnectorData(object):
                                  for item in items]
         return table
 
-    def _build_table_from_aggs(self, data, field_name):
+    def _build_table_from_aggs(self, data, field_obj):
         """
         Build a table from aggregations.
 
         Args:
         - data: The data to process.
-        - field_name: The field name to use for aggregations.
+        - field_obj: The field object containing field details.
 
         Returns:
-        A dictionary containing the table data.
+            A dictionary containing the table data.
         """
-        values_column = "{}_values".format(field_name)
-        count_column = "{}_count".format(field_name)
+        field_name = field_obj.get('field')
+        field_label = field_obj.get('title', field_name) + ' '
+
+        values_column = "{}values".format(field_label)
+        count_column = "{}count".format(field_label)
 
         table = {
             values_column: [],
