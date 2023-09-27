@@ -32,5 +32,17 @@
     profile="eea.api.dataconnector:default"
     />
 
+  <genericsetup:upgradeSteps
+    source="4.0"
+    destination="5.0"
+    profile="eea.api.dataconnector:default">
+
+    <genericsetup:upgradeDepends
+      title="Enable behavior Figure Note"
+      import_profile="eea.api.dataconnector:upgrade_50"
+      />
+  </genericsetup:upgradeSteps>
+
+
 
 </configure>

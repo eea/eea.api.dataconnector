@@ -33,6 +33,7 @@
   <element
      value="Products.CMFPlone.interfaces.constrains.ISelectableConstrainTypes"/>
   <element value="eea.dataconnector.map_visualization"/>
+  <element value="eea.dataconnector.figure_note"/>
  </property>
  <property name="schema"></property>
  <property name="model_source"></property>

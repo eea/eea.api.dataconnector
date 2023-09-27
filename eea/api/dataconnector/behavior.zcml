@@ -95,4 +95,14 @@
       marker=".interfaces.IElasticConnector"
       />
 
+  <plone:behavior
+      name="eea.dataconnector.figure_note"
+      title="Figure Note"
+      description="Inserts a widget that constructs CSV data from ES"
+      factory=".behavior.FigureNoteField"
+      provides=".interfaces.IFigureNote"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      marker=".interfaces.IFigureNote"
+      />
+
 </configure>

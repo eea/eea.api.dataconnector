@@ -10,6 +10,7 @@ from zope.interface import Interface
 from zope.interface import Attribute
 from zope.interface import provider
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from eea.schema.slate.field import SlateJSONField
 
 
 class IEeaRestapiDataconnector(IDefaultBrowserLayer):
@@ -169,4 +170,15 @@ class IElasticConnector(model.Schema):
         required=False,
         default={},
         schema=ELASTIC_CONNECTOR_WIDGET_SCHEMA,
+    )
+
+
+@provider(IFormFieldProvider)
+class IFigureNote(model.Schema):
+    """FigureNote Slate widget field"""
+
+    figure_note = SlateJSONField(
+        title="Figure Note",
+        description="Metadata field for visualization content-types",
+        required=False,
     )
