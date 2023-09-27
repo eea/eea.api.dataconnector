@@ -32,5 +32,15 @@
     profile="eea.api.dataconnector:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Import new behavior Figure note for visualizations"
+    description=""
+    source="*"
+    destination="5.0"
+    handler=".to5.run_upgrade"
+    profile="eea.api.dataconnector:default"
+    />
+
+
 
 </configure>
