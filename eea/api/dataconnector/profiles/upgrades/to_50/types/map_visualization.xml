@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<object name="visualization">
+  <property name="behaviors" purge="False">
+    <element value="eea.dataconnector.figure_note"/>
+  </property>
+</object>

@@ -34,6 +34,7 @@
      value="Products.CMFPlone.interfaces.constrains.ISelectableConstrainTypes"/>
   <element value="eea.restapi.visualization"/>
   <element value="eea.dataconnector.visualization"/>
+  <element value="eea.dataconnector.figure_note"/>
   <element value="eea.coremetadata.behavior"/>
   </property>
  <property name="schema"></property>

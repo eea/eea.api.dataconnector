@@ -12,6 +12,7 @@ class HiddenProfiles(object):
         """Hide uninstall profile from site-creation and quickinstaller."""
         return [
             "eea.api.dataconnector:uninstall",
+            "eea.api.dataconnector:upgrade_50",
         ]
 
 

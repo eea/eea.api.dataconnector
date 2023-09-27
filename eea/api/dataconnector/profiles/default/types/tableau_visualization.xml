@@ -30,6 +30,7 @@
   <element value="plone.versioning"/>
   <element value="plone.tableofcontents"/>
   <element value="plone.locking"/>
+  <element value="eea.dataconnector.figure_note"/>
   <element
      value="Products.CMFPlone.interfaces.constrains.ISelectableConstrainTypes"/>
   <element value="eea.dataconnector.tableau_visualization"/>
