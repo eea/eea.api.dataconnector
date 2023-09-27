@@ -105,6 +105,7 @@ class ElasticConnectorData(object):
         headers = {
             'Content-Type': 'application/json',
         }
+        response = None
         try:
             response = requests.post(
                 url, json=payload, headers=headers)
