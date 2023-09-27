@@ -144,7 +144,8 @@ class ElasticConnectorData(object):
                 agg_data = es_data.get('aggregations', {}).get(
                     agg_field['field'], {}).get('buckets', [])
                 if agg_data:
-                    table.update(self._build_table_from_aggs(agg_data, agg_field))
+                    table.update(self._build_table_from_aggs(
+                        agg_data, agg_field))
         else:
             hits = es_data.get('hits', {}).get('hits', [])
             if hits and fields:
