@@ -1,6 +1,11 @@
 Changelog
 =========
 
+6.1 - (2023-09-28)
+---------------------------
+* Change: Make figure note available for embed blocks
+  [andreiggr]
+
 6.0 - (2023-09-27)
 ---------------------------
 * Change: Add Figure Note behavior

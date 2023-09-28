@@ -45,6 +45,7 @@ class VisualizationGet(Service):
         ser = serializer(version=self.request.get("version"))
 
         visualization = ser.get("visualization", {})
+        figure_note = ser.get("figure_note", {})
         chartData = visualization.get("chartData", {})
         provider_url = chartData.get("provider_url")
 
@@ -60,6 +61,7 @@ class VisualizationGet(Service):
                 "temporal_coverage": ser.get("temporal_coverage"),
                 "other_organisations": ser.get("other_organisations"),
                 "data_provenance": ser.get("data_provenance"),
+                "figure_note": figure_note
             }
             if visualization
             else None,
@@ -86,6 +88,7 @@ class VisualizationLayoutGet(Service):
         ser = serializer(version=self.request.get("version"))
 
         visualization = ser.get("visualization", {})
+        figure_note = ser.get("figure_note", {})
         chartData = getVisualizationLayout(visualization.get("chartData", {}))
         provider_url = chartData.get("provider_url")
 
@@ -101,6 +104,8 @@ class VisualizationLayoutGet(Service):
                 "temporal_coverage": ser.get("temporal_coverage"),
                 "other_organisations": ser.get("other_organisations"),
                 "data_provenance": ser.get("data_provenance"),
+                "figure_note": figure_note
+
             }
             if visualization
             else None,

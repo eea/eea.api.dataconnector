@@ -250,9 +250,12 @@ class MapVisualizationGet(Service):
             return dict(error=dict(message="No serializer available."))
 
         ser = serializer(version=self.request.get("version"))
+        figure_note = ser.get("figure_note", {})
         res["map_visualization"] = {
             "data": ser["map_visualization_data"],
             "data_provenance": ser["data_provenance"],
+            "figure_note": figure_note,
+
         }
 
         return res
@@ -279,9 +282,12 @@ class TableauVisualizationGet(Service):
             return dict(error=dict(message="No serializer available."))
 
         ser = serializer(version=self.request.get("version"))
+        figure_note = ser.get("figure_note", {})
+
         res["tableau_visualization"] = {
             "data": ser["tableau_visualization"],
             "data_provenance": ser["data_provenance"],
+            "figure_note": figure_note,
         }
 
         return res
