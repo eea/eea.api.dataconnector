@@ -1,6 +1,9 @@
 Changelog
 =========
 
+6.2-dev0 - (unreleased)
+---------------------------
+
 6.1 - (2023-09-28)
 ---------------------------
 * Change: Make figure note available for embed blocks
