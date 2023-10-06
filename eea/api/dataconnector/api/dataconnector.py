@@ -143,7 +143,8 @@ class ElasticConnectorData(object):
                     .get("buckets", [])
                 )
                 if agg_data:
-                    table.update(self._build_table_from_aggs(agg_data, agg_field))
+                    table.update(self._build_table_from_aggs(
+                        agg_data, agg_field))
         else:
             hits = es_data.get("hits", {}).get("hits", [])
             if hits and fields:
@@ -181,8 +182,8 @@ class ElasticConnectorData(object):
         Returns:
             A dictionary containing the table data.
         """
-        field_name = field_obj.get('field')
-        field_label = field_obj.get('title', field_name) + ' '
+        field_name = field_obj.get("field")
+        field_label = field_obj.get("title", field_name) + " "
 
         values_column = "{}values".format(field_label)
         count_column = "{}total".format(field_label)
@@ -193,31 +194,34 @@ class ElasticConnectorData(object):
         }
 
         for bucket in data:
-            table[values_column].append(bucket.get('key'))
-            table[count_column].append(bucket.get('doc_count'))
+            table[values_column].append(bucket.get("key"))
+            table[count_column].append(bucket.get("doc_count"))
 
             # Handle second-level aggregation if specified
-            second_level_agg = field_obj.get('secondLevelAgg')
+            second_level_agg = field_obj.get("secondLevelAgg")
             if second_level_agg:
-                sub_buckets = bucket.get(second_level_agg, {}).get('buckets', [])
+                sub_buckets = bucket.get(
+                    second_level_agg, {}).get("buckets", [])
                 for sub_bucket in sub_buckets:
-                    sub_key = sub_bucket.get('key')
-                    
-                    # If this subBucket's key hasn't been seen before, create a new column for it
+                    sub_key = sub_bucket.get("key")
+
+                    # If this subBucket's key hasn't been seen before
+                    #  create a new column for it
                     if sub_key not in table:
                         table[sub_key] = [0] * (len(table[values_column]) - 1)
 
                     # Add the doc_count to the appropriate column
-                    table[sub_key].append(sub_bucket.get('doc_count'))
+                    table[sub_key].append(sub_bucket.get("doc_count"))
 
-                # Ensure all columns have the same length after each push to the table
+                # Ensure all columns have the same length after each push to
+                # the table
                 # Filling in zeroes where necessary
                 max_col_length = max(len(col) for col in table.values())
                 for col_key, col in table.items():
                     if len(col) < max_col_length:
                         table[col_key].extend([0] * (max_col_length - len(col)))
-
         return table
+
 
 class ConnectorDataGet(Service):
     """connector data - get"""
@@ -240,7 +244,8 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        connector = getMultiAdapter((self.context, self.request), name="connector-data")
+        connector = getMultiAdapter(
+            (self.context, self.request), name="connector-data")
         result = connector(expand=True)
 
         return result["connector-data"]
@@ -257,7 +262,8 @@ class MapVisualizationGet(Service):
             "map_visualization": {},
         }
 
-        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
+        serializer = queryMultiAdapter(
+            (self.context, self.request), ISerializeToJson)
 
         if serializer is None:
             self.request.response.setStatus(501)
@@ -286,7 +292,8 @@ class TableauVisualizationGet(Service):
             "tableau_visualization": {},
         }
 
-        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
+        serializer = queryMultiAdapter(
+            (self.context, self.request), ISerializeToJson)
 
         if serializer is None:
             self.request.response.setStatus(501)
