@@ -44,7 +44,8 @@ class ConnectorData(object):
         if not expand:
             return result
 
-        connector = getMultiAdapter((self.context, self.request), IDataProvider)
+        connector = getMultiAdapter(
+            (self.context, self.request), IDataProvider)
         result["connector-data"]["data"] = connector.provided_data
 
         return result
@@ -219,7 +220,8 @@ class ElasticConnectorData(object):
                 max_col_length = max(len(col) for col in table.values())
                 for col_key, col in table.items():
                     if len(col) < max_col_length:
-                        table[col_key].extend([0] * (max_col_length - len(col)))
+                        table[col_key].extend([0] * (
+                            max_col_length - len(col)))
         return table
 
 
