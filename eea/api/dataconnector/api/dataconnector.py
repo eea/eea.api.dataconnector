@@ -37,18 +37,14 @@ class ConnectorData(object):
     def __call__(self, expand=False):
         result = {
             "connector-data": {
-                "@id": "{}/@connector-data".format(
-                    self.context.absolute_url()
-                )
+                "@id": "{}/@connector-data".format(self.context.absolute_url())
             }
         }
 
         if not expand:
             return result
 
-        connector = getMultiAdapter(
-            (self.context, self.request), IDataProvider
-        )
+        connector = getMultiAdapter((self.context, self.request), IDataProvider)
         result["connector-data"]["data"] = connector.provided_data
 
         return result
@@ -57,7 +53,7 @@ class ConnectorData(object):
 @implementer(IExpandableElement)
 @adapter(IElasticDataProvider, Interface)
 class ElasticConnectorData(object):
-    """ Elastic connector data """
+    """Elastic connector data"""
 
     def __init__(self, context, request):
         self.context = context
@@ -66,27 +62,28 @@ class ElasticConnectorData(object):
     def __call__(self, expand=False):
         result = {
             "connector-data": {
-                "@id": "{}/@connector-data".format(
-                    self.context.absolute_url()
-                )
+                "@id": "{}/@connector-data".format(self.context.absolute_url())
             }
         }
 
-        widget_data = getattr(self.context, 'elastic_csv_widget', {})
-        form_value = widget_data.get('formValue', {})
-        req_config = widget_data.get('elasticQueryConfig', {})
-        es_endpoint = req_config.get('es_endpoint')
-        payload_config = req_config.get('payloadConfig')
+        widget_data = getattr(self.context, "elastic_csv_widget", {})
+        form_value = widget_data.get("formValue", {})
+        req_config = widget_data.get("elasticQueryConfig", {})
+        es_endpoint = req_config.get("es_endpoint")
+        payload_config = req_config.get("payloadConfig")
 
         if not es_endpoint or not payload_config:
             return {"results": [], "metadata": {}}
 
         # Fetch data from Elasticsearch
         table_data = self._fetch_from_elasticsearch(
-            es_endpoint, payload_config, form_value)
+            es_endpoint, payload_config, form_value
+        )
 
-        result["connector-data"]["data"] = {"results": table_data,
-                                            "metadata": {"readme": ""}}
+        result["connector-data"]["data"] = {
+            "results": table_data,
+            "metadata": {"readme": ""},
+        }
 
         return result
 
@@ -103,13 +100,12 @@ class ElasticConnectorData(object):
         A dictionary containing the table data.
         """
         headers = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         }
         response = {}
 
         try:
-            response = requests.post(
-                url, json=payload, headers=headers)
+            response = requests.post(url, json=payload, headers=headers)
             response.raise_for_status()
 
             es_data = response.json()
@@ -134,20 +130,22 @@ class ElasticConnectorData(object):
         Returns:
         A dictionary containing the processed data.
         """
-        use_aggs = form_value.get('use_aggs', False)
-        agg_fields = form_value.get('agg_fields')
-        fields = form_value.get('fields', [])
+        use_aggs = form_value.get("use_aggs", False)
+        agg_fields = form_value.get("agg_fields")
+        fields = form_value.get("fields", [])
 
         table = {}
         if use_aggs:
             for agg_field in agg_fields:
-                agg_data = es_data.get('aggregations', {}).get(
-                    agg_field['field'], {}).get('buckets', [])
+                agg_data = (
+                    es_data.get("aggregations", {})
+                    .get(agg_field["field"], {})
+                    .get("buckets", [])
+                )
                 if agg_data:
-                    table.update(self._build_table_from_aggs(
-                        agg_data, agg_field))
+                    table.update(self._build_table_from_aggs(agg_data, agg_field))
         else:
-            hits = es_data.get('hits', {}).get('hits', [])
+            hits = es_data.get("hits", {}).get("hits", [])
             if hits and fields:
                 table.update(self._build_table_from_fields(hits, fields))
 
@@ -166,9 +164,10 @@ class ElasticConnectorData(object):
         """
         table = {}
         for field_obj in fields:
-            field_name = field_obj.get('field')
-            table[field_name] = [item.get('_source', {}).get(field_name)
-                                 for item in items]
+            field_name = field_obj.get("field")
+            table[field_name] = [
+                item.get("_source", {}).get(field_name) for item in items
+            ]
         return table
 
     def _build_table_from_aggs(self, data, field_obj):
@@ -186,7 +185,7 @@ class ElasticConnectorData(object):
         field_label = field_obj.get('title', field_name) + ' '
 
         values_column = "{}values".format(field_label)
-        count_column = "{}count".format(field_label)
+        count_column = "{}total".format(field_label)
 
         table = {
             values_column: [],
@@ -197,8 +196,28 @@ class ElasticConnectorData(object):
             table[values_column].append(bucket.get('key'))
             table[count_column].append(bucket.get('doc_count'))
 
-        return table
+            # Handle second-level aggregation if specified
+            second_level_agg = field_obj.get('secondLevelAgg')
+            if second_level_agg:
+                sub_buckets = bucket.get(second_level_agg, {}).get('buckets', [])
+                for sub_bucket in sub_buckets:
+                    sub_key = sub_bucket.get('key')
+                    
+                    # If this subBucket's key hasn't been seen before, create a new column for it
+                    if sub_key not in table:
+                        table[sub_key] = [0] * (len(table[values_column]) - 1)
 
+                    # Add the doc_count to the appropriate column
+                    table[sub_key].append(sub_bucket.get('doc_count'))
+
+                # Ensure all columns have the same length after each push to the table
+                # Filling in zeroes where necessary
+                max_col_length = max(len(col) for col in table.values())
+                for col_key, col in table.items():
+                    if len(col) < max_col_length:
+                        table[col_key].extend([0] * (max_col_length - len(col)))
+
+        return table
 
 class ConnectorDataGet(Service):
     """connector data - get"""
@@ -221,9 +240,7 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        connector = getMultiAdapter(
-            (self.context, self.request), name="connector-data"
-        )
+        connector = getMultiAdapter((self.context, self.request), name="connector-data")
         result = connector(expand=True)
 
         return result["connector-data"]
@@ -240,9 +257,7 @@ class MapVisualizationGet(Service):
             "map_visualization": {},
         }
 
-        serializer = queryMultiAdapter(
-            (self.context, self.request), ISerializeToJson
-        )
+        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
 
         if serializer is None:
             self.request.response.setStatus(501)
@@ -255,7 +270,6 @@ class MapVisualizationGet(Service):
             "data": ser["map_visualization_data"],
             "data_provenance": ser["data_provenance"],
             "figure_note": figure_note,
-
         }
 
         return res
@@ -272,9 +286,7 @@ class TableauVisualizationGet(Service):
             "tableau_visualization": {},
         }
 
-        serializer = queryMultiAdapter(
-            (self.context, self.request), ISerializeToJson
-        )
+        serializer = queryMultiAdapter((self.context, self.request), ISerializeToJson)
 
         if serializer is None:
             self.request.response.setStatus(501)
