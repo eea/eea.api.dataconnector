@@ -54,6 +54,8 @@ class VisualizationGet(Service):
         res = {
             "@id": self.context.absolute_url() + "/@visualization",
             "visualization": {
+                "@id": ser.get("@id"),
+                "title": ser.get("title"),
                 "chartData": chartData,
                 "provider_url": provider_url,
                 "publisher": ser.get("publisher"),
@@ -75,7 +77,6 @@ class VisualizationLayoutGet(Service):
 
     def reply(self):
         """reply"""
-
         serializer = queryMultiAdapter(
             (self.context, self.request), ISerializeToJson
         )
@@ -97,6 +98,8 @@ class VisualizationLayoutGet(Service):
         res = {
             "@id": self.context.absolute_url() + "/@visualization-layout",
             "visualization": {
+                "@id": ser.get("@id"),
+                "title": ser.get("title"),
                 "chartData": chartData,
                 "provider_url": provider_url,
                 "publisher": ser.get("publisher"),

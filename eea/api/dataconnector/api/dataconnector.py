@@ -275,6 +275,8 @@ class MapVisualizationGet(Service):
         ser = serializer(version=self.request.get("version"))
         figure_note = ser.get("figure_note", {})
         res["map_visualization"] = {
+            "@id": ser.get("@id"),
+            "title": ser.get("title"),
             "data": ser["map_visualization_data"],
             "data_provenance": ser["data_provenance"],
             "figure_note": figure_note,
@@ -306,6 +308,8 @@ class TableauVisualizationGet(Service):
         figure_note = ser.get("figure_note", {})
 
         res["tableau_visualization"] = {
+            "@id": ser.get("@id"),
+            "title": ser.get("title"),
             "data": ser["tableau_visualization"],
             "data_provenance": ser["data_provenance"],
             "figure_note": figure_note,
