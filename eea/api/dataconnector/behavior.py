@@ -61,7 +61,7 @@ class DataProviderForFiles(object):
             return []
 
         text = field.value.data
-        f = StringIO(text.decode("utf-8"))
+        f = StringIO(text.decode("utf-8-sig"))
         try:
             reader = csv.reader(f)
         except Exception:
