@@ -55,6 +55,16 @@
       />
 
   <plone:behavior
+      name="eea.xwz.maps"
+      title="Maps"
+      description="Allows adding a maps embed."
+      factory=".behavior.Maps"
+      provides=".interfaces.IMaps"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      marker=".interfaces.IMaps"
+      />
+
+  <plone:behavior
       name="eea.dataconnector.visualization"
       title="Visualization behavior"
       description="Allows creating a visualization."
@@ -63,7 +73,6 @@
       for="plone.dexterity.interfaces.IDexterityContent"
       marker=".interfaces.IDataVisualization"
       />
-
 
   <plone:behavior
       name="eea.dataconnector.map_visualization"

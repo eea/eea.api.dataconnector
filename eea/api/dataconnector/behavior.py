@@ -15,6 +15,7 @@ from .interfaces import IConnectorDataParameters
 from .interfaces import IDataConnector
 from .interfaces import IDataProvider
 from .interfaces import IDataVisualization
+from .interfaces import IMaps
 from .interfaces import IMapVisualization
 from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
@@ -115,6 +116,11 @@ class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
 
     visualization = DCFieldProperty(IDataVisualization["visualization"])
+
+class Maps(MetadataBase):
+    """Standard Fise Metadata adaptor"""
+
+    maps = DCFieldProperty(IMaps["maps"])
 
 
 class MapViewVisualization(MetadataBase):
