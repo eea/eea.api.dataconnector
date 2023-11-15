@@ -22,7 +22,6 @@ class VisualizationGet(Service):
 
         serializer = serializer(version=self.request.get("version"))
 
-
         res = {
             "@id": self.context.absolute_url() + "/@visualization",
             "visualization": getVisualization(
@@ -49,7 +48,6 @@ class VisualizationLayoutGet(Service):
             return dict(error=dict(message="No serializer available."))
 
         serializer = serializer(version=self.request.get("version"))
-
 
         res = {
             "@id": self.context.absolute_url() + "/@visualization",

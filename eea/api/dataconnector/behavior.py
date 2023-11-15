@@ -117,6 +117,7 @@ class DataVisualization(MetadataBase):
 
     visualization = DCFieldProperty(IDataVisualization["visualization"])
 
+
 class Maps(MetadataBase):
     """Standard Fise Metadata adaptor"""
 

@@ -15,8 +15,8 @@ from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 
 
-def getUid(context, link, retry = True):
-    if not link: 
+def getUid(context, link, retry=True):
+    if not link:
         return link
     match = RESOLVEUID_RE.match(link)
     if match is None:
@@ -26,6 +26,7 @@ def getUid(context, link, retry = True):
     else:
         uid, suffix = match.groups()
         return uid
+
 
 def getMetadata(serializer):
     return {
@@ -38,6 +39,7 @@ def getMetadata(serializer):
         "data_provenance": serializer.get("data_provenance"),
         "figure_note": serializer.get("figure_note"),
     }
+
 
 def getVisualizationLayout(chartData):
     """Get visualization layout with no data"""
@@ -61,7 +63,7 @@ def getVisualizationLayout(chartData):
     return chartData
 
 
-def getVisualization(serializer, layout = True):
+def getVisualization(serializer, layout=True):
     visualization = serializer.get("visualization", {})
     chartData = visualization.get("chartData", {})
     provider_url = chartData.get("provider_url")
@@ -72,7 +74,7 @@ def getVisualization(serializer, layout = True):
     if (chartData):
         del chartData["provider_url"]
 
-    if not(visualization):
+    if not (visualization):
         return None
 
     return {
@@ -106,17 +108,18 @@ class EmbedVisualizationSerializationTransformer(object):
             doc_serializer = doc_serializer(version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
             return {
-                **value, # this is a spread operator - for js devs
+                **value,  # this is a spread operator - for js devs
                 "visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('visualization'),
                     **getVisualization(
                         serializer=doc_serializer,
-                        layout=(False if not(use_live_data) else True)
+                        layout=(False if not (use_live_data) else True)
                     ),
                 }
             }
         return value
+
 
 @implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
@@ -134,7 +137,8 @@ class EmbedVisualizationDeserializationTransformer(object):
         if value.get('vis_url'):
             value['vis_url'] = path2uid(context=self.context, link=value['vis_url'])
         return value
-    
+
+
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedMapsSerializationTransformer(object):
@@ -166,8 +170,6 @@ class EmbedMapsSerializationTransformer(object):
                 }
             }
         return value
-    
-
 
 
 @implementer(IBlockFieldSerializationTransformer)

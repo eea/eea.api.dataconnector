@@ -90,7 +90,9 @@ class IFileDataProvider(IBasicDataProvider):
 class IConnectorDataProvider(IBasicDataProvider):
     """Marker interface for objects that provide data to visualizations"""
 
+
 SCHEMA = json.dumps({"type": "object", "properties": {}})
+
 
 @provider(IFormFieldProvider)
 class IMaps(model.Schema):
@@ -99,6 +101,7 @@ class IMaps(model.Schema):
     maps = JSONField(
         title="Maps", required=False, default={}, schema=SCHEMA
     )
+
 
 VIZ_SCHEMA = json.dumps({"type": "object", "properties": {}})
 
