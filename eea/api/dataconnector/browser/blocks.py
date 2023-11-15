@@ -109,7 +109,7 @@ class EmbedVisualizationSerializationTransformer(object):
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
             return {
-                **value,  # this is a spread operator - for js devs
+                **value,
                 "visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('visualization'),
