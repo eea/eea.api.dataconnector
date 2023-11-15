@@ -105,7 +105,8 @@ class EmbedVisualizationSerializationTransformer(object):
             ISerializeToJson
         ) if doc else None
         if (doc_serializer):
-            doc_serializer = doc_serializer(version=self.request.get("version"))
+            doc_serializer = doc_serializer(
+                version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
             return {
                 **value,  # this is a spread operator - for js devs
@@ -135,7 +136,8 @@ class EmbedVisualizationDeserializationTransformer(object):
 
     def __call__(self, value):
         if value.get('vis_url'):
-            value['vis_url'] = path2uid(context=self.context, link=value['vis_url'])
+            value['vis_url'] = path2uid(
+                context=self.context, link=value['vis_url'])
         return value
 
 
@@ -161,7 +163,8 @@ class EmbedMapsSerializationTransformer(object):
             ISerializeToJson
         ) if doc else None
         if (doc_serializer):
-            doc_serializer = doc_serializer(version=self.request.get("version"))
+            doc_serializer = doc_serializer(
+                version=self.request.get("version"))
             return {
                 **value,
                 "maps": {
