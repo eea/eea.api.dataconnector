@@ -55,9 +55,9 @@
       />
 
   <plone:behavior
-      name="eea.xwz.maps"
+      name="eea.dataconnector.maps"
       title="Maps"
-      description="Allows adding a maps embed."
+      description="Allows adding an embeded map."
       factory=".behavior.Maps"
       provides=".interfaces.IMaps"
       for="plone.dexterity.interfaces.IDexterityContent"
