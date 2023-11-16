@@ -109,11 +109,11 @@ class EmbedVisualizationSerializationTransformer(object):
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
             return {
-                **value,
+                ...value,
                 "visualization": {
-                    **getMetadata(doc_serializer),
-                    **doc_serializer.get('visualization'),
-                    **getVisualization(
+                    ...getMetadata(doc_serializer),
+                    ...doc_serializer.get('visualization'),
+                    ...getVisualization(
                         serializer=doc_serializer,
                         layout=(False if not (use_live_data) else True)
                     ),
@@ -166,10 +166,10 @@ class EmbedMapsSerializationTransformer(object):
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             return {
-                **value,
+                ...value,
                 "maps": {
-                    **getMetadata(doc_serializer),
-                    **doc_serializer.get('maps'),
+                    ...getMetadata(doc_serializer),
+                    ...doc_serializer.get('maps'),
                 }
             }
         return value
