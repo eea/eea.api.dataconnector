@@ -138,10 +138,10 @@ def getVisualization(serializer, layout=True):
     if layout:
         chartData = getVisualizationLayout(chartData)
 
-    if (chartData):
+    if chartData:
         del chartData["provider_url"]
 
-    if not (visualization):
+    if not visualization:
         return None
 
     return {
@@ -171,7 +171,7 @@ class EmbedVisualizationSerializationTransformer:
             (doc, self.request),
             ISerializeToJson
         ) if doc else None
-        if (doc_serializer):
+        if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
@@ -229,7 +229,7 @@ class EmbedMapsSerializationTransformer:
             (doc, self.request),
             ISerializeToJson
         ) if doc else None
-        if (doc_serializer):
+        if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             return {
