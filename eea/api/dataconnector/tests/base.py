@@ -18,9 +18,11 @@ class EEAFixture(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         """Setup Zope"""
         import eea.api.dataconnector
+        import eea.schema.slate
         import plone.restapi
 
         self.loadZCML(package=plone.restapi)
+        self.loadZCML(package=eea.schema.slate)
         self.loadZCML(package=eea.api.dataconnector)
 
         z2.installProduct(app, "plone.restapi")

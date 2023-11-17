@@ -78,6 +78,7 @@ setup(
         "mo-sql-parsing",
         "XlsxWriter",
         "collective.folderishtypes",
+        "eea.schema.slate",
     ],
     extras_require={
         "test": [
