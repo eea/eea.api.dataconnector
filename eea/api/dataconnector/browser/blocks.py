@@ -44,9 +44,9 @@ def getUid(context, link, retry=True):
         if not retry:
             return link
         return getUid(context, path2uid(context=context, link=link), False)
-    else:
-        uid, suffix = match.groups()
-        return uid
+
+    uid, _ = match.groups()
+    return uid
 
 
 def getMetadata(serializer):
