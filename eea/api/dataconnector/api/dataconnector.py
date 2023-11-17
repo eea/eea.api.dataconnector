@@ -28,9 +28,21 @@ numeric_log_level = getattr(logging, log_level, None)
 if not isinstance(numeric_log_level, int):
     raise ValueError(f"Invalid log level: {log_level}")
 
-# This will log only errors and above
-logging.basicConfig(level=numeric_log_level)
+# Create a logger and set its level
 logger = logging.getLogger(__name__)
+logger.setLevel(numeric_log_level)
+
+# Create a console handler and set its level
+handler = logging.StreamHandler()
+handler.setLevel(numeric_log_level)
+
+# Create a formatter and add it to the handler
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# Add the handler to the logger
+logger.addHandler(handler)
 
 
 @implementer(IExpandableElement)
