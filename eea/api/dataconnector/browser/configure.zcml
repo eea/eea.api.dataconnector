@@ -46,10 +46,24 @@
     for="eea.api.dataconnector.interfaces.ITableauVisualization"
     permission="zope2.View"
     template="pt/tableau_view.pt"
-    /> 
+    />
+
+  <!--  Serializations -->
+  <subscriber 
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
+    factory=".blocks.EmbedVisualizationSerializationTransformer" />
+
+  <subscriber 
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
+    factory=".blocks.EmbedMapsSerializationTransformer" />
   
-  <subscriber factory=".blocks.PlotlyChartSerializeTransformer"
-    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"/>
+  <subscriber 
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer" 
+    factory=".blocks.PlotlyChartSerializationTransformer" />
 
-
+  <!--  Deserializations -->
+  <subscriber
+      provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
+      factory=".blocks.EmbedVisualizationDeserializationTransformer" />
+  
 </configure>

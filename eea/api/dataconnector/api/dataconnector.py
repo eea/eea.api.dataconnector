@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
-# eea imports
 import logging
+import os
 import requests
+# eea imports
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from eea.api.dataconnector.interfaces import IElasticDataProvider
@@ -20,14 +21,33 @@ from zope.interface.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
 
+# Set the default logging level to ERROR
+log_level = os.environ.get('LOG_LEVEL', 'ERROR')
+numeric_log_level = getattr(logging, log_level, None)
 
-logging.basicConfig(level=logging.ERROR)  # This will log only errors and above
+if not isinstance(numeric_log_level, int):
+    raise ValueError(f"Invalid log level: {log_level}")
+
+# Create a logger and set its level
 logger = logging.getLogger(__name__)
+logger.setLevel(numeric_log_level)
+
+# Create a console handler and set its level
+handler = logging.StreamHandler()
+handler.setLevel(numeric_log_level)
+
+# Create a formatter and add it to the handler
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# Add the handler to the logger
+logger.addHandler(handler)
 
 
 @implementer(IExpandableElement)
 @adapter(IBasicDataProvider, Interface)
-class ConnectorData(object):
+class ConnectorData:
     """connector data"""
 
     def __init__(self, context, request):
@@ -53,7 +73,7 @@ class ConnectorData(object):
 
 @implementer(IExpandableElement)
 @adapter(IElasticDataProvider, Interface)
-class ElasticConnectorData(object):
+class ElasticConnectorData:
     """Elastic connector data"""
 
     def __init__(self, context, request):
@@ -219,8 +239,8 @@ class ElasticConnectorData(object):
                 # Filling in zeroes where necessary
                 max_col_length = max(len(col) for col in table.values())
                 for col_key, col in table.items():
-                    if len(col) < max_col_length:
-                        table[col_key].extend([0] * (
+                    if col_key in table and len(col) < max_col_length:
+                        col.extend([0] * (
                             max_col_length - len(col)))
         return table
 
@@ -237,8 +257,9 @@ class ConnectorDataGet(Service):
             result = connector(expand=True)
 
             return result["connector-data"]
-        except ComponentLookupError:
-            raise ValueError("No suitable connector found for the context.")
+        except ComponentLookupError as ex:
+            raise ValueError(
+                "No suitable connector found for the context.") from ex
 
 
 class ConnectorDataPost(Service):

@@ -91,6 +91,18 @@ class IConnectorDataProvider(IBasicDataProvider):
     """Marker interface for objects that provide data to visualizations"""
 
 
+EMBED_MAP_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
+
+
+@provider(IFormFieldProvider)
+class IMaps(model.Schema):
+    """An maps view"""
+
+    maps = JSONField(
+        title="Maps", required=False, default={}, schema=EMBED_MAP_VIEW_SCHEMA
+    )
+
+
 VIZ_SCHEMA = json.dumps({"type": "object", "properties": {}})
 
 

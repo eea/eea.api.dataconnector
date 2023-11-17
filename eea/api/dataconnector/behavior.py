@@ -15,6 +15,7 @@ from .interfaces import IConnectorDataParameters
 from .interfaces import IDataConnector
 from .interfaces import IDataProvider
 from .interfaces import IDataVisualization
+from .interfaces import IMaps
 from .interfaces import IMapVisualization
 from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
@@ -45,7 +46,7 @@ class DataConnector(MetadataBase):
 
 @implementer(IDataProvider)
 @adapter(IFileDataProvider, IBrowserRequest)
-class DataProviderForFiles(object):
+class DataProviderForFiles:
     """Behavior implementation for content types with a File primary field"""
 
     def __init__(self, context, request):
@@ -61,7 +62,7 @@ class DataProviderForFiles(object):
             return []
 
         text = field.value.data
-        f = StringIO(text.decode("utf-8"))
+        f = StringIO(text.decode("utf-8-sig"))
         try:
             reader = csv.reader(f)
         except Exception:
@@ -90,7 +91,7 @@ class DataProviderForFiles(object):
 
 @implementer(IDataProvider)
 @adapter(IElasticConnector, IBrowserRequest)
-class DataProviderForElasticCSVWidget(object):
+class DataProviderForElasticCSVWidget:
     """Behavior implementation for CT with elastic_csv_widget field"""
 
     def __init__(self, context, request):
@@ -117,6 +118,12 @@ class DataVisualization(MetadataBase):
     visualization = DCFieldProperty(IDataVisualization["visualization"])
 
 
+class Maps(MetadataBase):
+    """Standard Fise Metadata adaptor"""
+
+    maps = DCFieldProperty(IMaps["maps"])
+
+
 class MapViewVisualization(MetadataBase):
     """Standard ArcGIS Map View adaptor"""
 
@@ -136,8 +143,6 @@ class TableauViewVisualization(MetadataBase):
 class ConnectorDataParameters(MetadataBase):
     """Provide predefined connector data for parameters"""
 
-    # data_parameters = DCFieldProperty(
-    #     IConnectorDataParameters['data_parameters'])
     data_query = DCFieldProperty(IConnectorDataParameters["data_query"])
 
 
