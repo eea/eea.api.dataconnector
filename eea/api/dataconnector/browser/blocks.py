@@ -182,7 +182,7 @@ class EmbedVisualizationSerializationTransformer:
                     **doc_serializer.get('visualization'),
                     **getVisualization(
                         serializer=doc_serializer,
-                        layout=(False if not (use_live_data) else True)
+                        layout=(not use_live_data)
                     ),
                 }
             }
