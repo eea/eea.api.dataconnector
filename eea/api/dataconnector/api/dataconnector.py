@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 @implementer(IExpandableElement)
 @adapter(IBasicDataProvider, Interface)
-class ConnectorData(object):
+class ConnectorData:
     """connector data"""
 
     def __init__(self, context, request):
@@ -53,7 +53,7 @@ class ConnectorData(object):
 
 @implementer(IExpandableElement)
 @adapter(IElasticDataProvider, Interface)
-class ElasticConnectorData(object):
+class ElasticConnectorData:
     """Elastic connector data"""
 
     def __init__(self, context, request):
@@ -219,8 +219,8 @@ class ElasticConnectorData(object):
                 # Filling in zeroes where necessary
                 max_col_length = max(len(col) for col in table.values())
                 for col_key, col in table.items():
-                    if len(col) < max_col_length:
-                        table[col_key].extend([0] * (
+                    if col_key in table and len(col) < max_col_length:
+                        col.extend([0] * (
                             max_col_length - len(col)))
         return table
 
@@ -237,8 +237,9 @@ class ConnectorDataGet(Service):
             result = connector(expand=True)
 
             return result["connector-data"]
-        except ComponentLookupError:
-            raise ValueError("No suitable connector found for the context.")
+        except ComponentLookupError as ex:
+            raise ValueError(
+                "No suitable connector found for the context.") from ex
 
 
 class ConnectorDataPost(Service):
