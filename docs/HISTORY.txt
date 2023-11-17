@@ -1,6 +1,9 @@
 Changelog
 =========
 
+7.1-dev0 - (unreleased)
+---------------------------
+
 7.0 - (2023-11-17)
 ---------------------------
 * Change: feat: serialize embed_visualization and new embed_map
