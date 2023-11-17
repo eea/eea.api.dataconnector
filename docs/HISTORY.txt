@@ -1,8 +1,10 @@
 Changelog
 =========
 
-7.0-dev0 - (unreleased)
+7.0 - (2023-11-17)
 ---------------------------
+* Change: feat: serialize embed_visualization and new embed_map
+  [razvanMiu]
 
 6.3 - (2023-10-31)
 ---------------------------
