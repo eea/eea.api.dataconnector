@@ -1,5 +1,6 @@
 """ Base test cases
 """
+# pylint: disable=C0415
 from plone.app.testing import (
     TEST_USER_ID,
     FunctionalTesting,
