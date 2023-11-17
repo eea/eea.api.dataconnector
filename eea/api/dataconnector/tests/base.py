@@ -1,14 +1,12 @@
 """ Base test cases
 """
 # pylint: disable=C0415
-from plone.app.testing import (
-    TEST_USER_ID,
-    FunctionalTesting,
-    PloneSandboxLayer,
-    applyProfile,
-    setRoles,
-)
-from plone.testing import z2
+from plone.app.testing import applyProfile
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import setRoles
+from plone.testing.zope import installProduct, uninstallProduct
 from Products.CMFPlone import setuphandlers
 
 
@@ -25,8 +23,8 @@ class EEAFixture(PloneSandboxLayer):
         self.loadZCML(package=eea.schema.slate)
         self.loadZCML(package=eea.api.dataconnector)
 
-        z2.installProduct(app, "plone.restapi")
-        z2.installProduct(app, "eea.api.dataconnector")
+        installProduct(app, "plone.restapi")
+        installProduct(app, "eea.api.dataconnector")
 
     def setUpPloneSite(self, portal):
         """Setup Plone"""
@@ -51,7 +49,7 @@ class EEAFixture(PloneSandboxLayer):
 
     def tearDownZope(self, app):
         """Uninstall Zope"""
-        z2.uninstallProduct(app, "eea.api.dataconnector")
+        uninstallProduct(app, "eea.api.dataconnector")
 
 
 EEAFIXTURE = EEAFixture()
