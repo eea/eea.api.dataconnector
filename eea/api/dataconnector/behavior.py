@@ -46,7 +46,7 @@ class DataConnector(MetadataBase):
 
 @implementer(IDataProvider)
 @adapter(IFileDataProvider, IBrowserRequest)
-class DataProviderForFiles(object):
+class DataProviderForFiles:
     """Behavior implementation for content types with a File primary field"""
 
     def __init__(self, context, request):
@@ -91,7 +91,7 @@ class DataProviderForFiles(object):
 
 @implementer(IDataProvider)
 @adapter(IElasticConnector, IBrowserRequest)
-class DataProviderForElasticCSVWidget(object):
+class DataProviderForElasticCSVWidget:
     """Behavior implementation for CT with elastic_csv_widget field"""
 
     def __init__(self, context, request):

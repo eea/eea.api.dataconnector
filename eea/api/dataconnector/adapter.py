@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 @adapter(IConnectorDataProvider, IBrowserRequest)
 @implementer(IDataProvider)
-class DataProviderForConnectors(object):
+class DataProviderForConnectors:
     """data provider for connectors"""
 
     def __init__(self, context, request):
