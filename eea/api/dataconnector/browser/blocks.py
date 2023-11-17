@@ -57,7 +57,8 @@ def getMetadata(serializer):
     - serializer: The serializer providing metadata information.
 
     Returns:
-    - dict: A dictionary containing metadata information with the following keys:
+    - dict: A dictionary containing metadata information with
+    the following keys:
       - "@id": The identifier.
       - "title": The title.
       - "publisher": The publisher.
@@ -67,9 +68,10 @@ def getMetadata(serializer):
       - "data_provenance": Data provenance information.
       - "figure_note": Additional notes related to the figure.
 
-    The function retrieves metadata information from the provided serializer
-    and returns it as a dictionary. If a specific metadata field is not present
-    in the serializer, the corresponding key in the dictionary will have a value of None.
+    The function retrieves metadata information from the provided 
+    serializer and returns it as a dictionary. If a specific metadata
+    field is not present in the serializer, the corresponding key in
+    the dictionary will have a value of None.
     """
 
     return {
@@ -116,15 +118,16 @@ def getVisualization(serializer, layout=True):
       visualization data. Defaults to True.
 
     Returns:
-    - dict or None: A dictionary containing visualization information with the
-      following keys:
+    - dict or None: A dictionary containing visualization information
+    with the following keys:
       - "chartData": The chart data.
       - "provider_url": The provider URL.
       Returns None if the visualization information is not present.
 
-    The function retrieves visualization information from the provided serializer,
-    including chart data and provider URL. If layout is set to True (default),
-    it applies layout adjustments to the chart data using the getVisualizationLayout function.
+    The function retrieves visualization information from the provided
+    serializer, including chart data and provider URL. If layout is set
+    to True (default), it applies layout adjustments to the chart data using
+    the getVisualizationLayout function.
     If visualization information is not present, the function returns None.
     """
 
