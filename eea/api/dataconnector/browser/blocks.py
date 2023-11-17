@@ -68,7 +68,7 @@ def getMetadata(serializer):
       - "data_provenance": Data provenance information.
       - "figure_note": Additional notes related to the figure.
 
-    The function retrieves metadata information from the provided 
+    The function retrieves metadata information from the provided
     serializer and returns it as a dictionary. If a specific metadata
     field is not present in the serializer, the corresponding key in
     the dictionary will have a value of None.
