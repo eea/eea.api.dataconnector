@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """ dataconnector """
-# eea imports
 import logging
+import os
 import requests
+# eea imports
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from eea.api.dataconnector.interfaces import IElasticDataProvider
@@ -20,8 +21,15 @@ from zope.interface.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
 
+# Set the default logging level to ERROR
+log_level = os.environ.get('LOG_LEVEL', 'ERROR')
+numeric_log_level = getattr(logging, log_level, None)
 
-logging.basicConfig(level=logging.ERROR)  # This will log only errors and above
+if not isinstance(numeric_log_level, int):
+    raise ValueError(f"Invalid log level: {log_level}")
+
+# This will log only errors and above
+logging.basicConfig(level=numeric_log_level)
 logger = logging.getLogger(__name__)
 
 
