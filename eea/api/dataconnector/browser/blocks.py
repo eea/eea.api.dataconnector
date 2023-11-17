@@ -138,7 +138,7 @@ def getVisualization(serializer, layout=True):
     if layout:
         chartData = getVisualizationLayout(chartData)
 
-    if chartData:
+    if chartData and "provider_url" in chartData:
         del chartData["provider_url"]
 
     if not visualization:
