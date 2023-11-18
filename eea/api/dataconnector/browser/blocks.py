@@ -149,6 +149,76 @@ def getVisualization(serializer, layout=True):
         "provider_url": provider_url
     }
 
+def getTableauVisualization(serializer, layout=True):
+    """
+    Extract visualization information from a serializer.
+
+    Parameters:
+    - serializer: The serializer providing visualization information.
+    - layout (bool, optional): If True, apply layout adjustments to the
+      visualization data. Defaults to True.
+
+    Returns:
+    - dict or None: A dictionary containing visualization information
+    with the following keys:
+      - "chartData": The chart data.
+      - "provider_url": The provider URL.
+      Returns None if the visualization information is not present.
+
+    The function retrieves visualization information from the provided
+    serializer, including chart data and provider URL. If layout is set
+    to True (default), it applies layout adjustments to the chart data using
+    the getVisualizationLayout function.
+    If visualization information is not present, the function returns None.
+    """
+
+    tableau_visualization = serializer.get("tableau_visualization", {})
+    url = tableau_visualization.get("url", {})
+    toolbar_position = tableau_visualization.get("toolbarPosition")
+
+    if not tableau_visualization:
+        return None
+
+    return {
+        "url": url,
+        "toolbarPosition": toolbar_position
+    }
+@implementer(IBlockFieldSerializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedTableauVisualizationSerializationTransformer:
+    """Embed tableau visualization serialization"""
+
+    order = 9999
+    block_type = "embed_tableau_visualization"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        uid = getUid(self.context, value.get('tableau_vis_url'))
+        if not uid:
+            return value
+        doc = api.content.get(UID=uid)
+        doc_serializer = queryMultiAdapter(
+            (doc, self.request),
+            ISerializeToJson
+        ) if doc else None
+        if doc_serializer:
+            doc_serializer = doc_serializer(
+                version=self.request.get("version"))
+            return {
+                **value,
+                "tableau_visualization": {
+                    **getMetadata(doc_serializer),
+                    **doc_serializer.get('tableau_visualization'),
+                    **getTableauVisualization(
+                        serializer=doc_serializer,
+                    ),
+                }
+            }
+        return value
+
 
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
@@ -164,6 +234,7 @@ class EmbedVisualizationSerializationTransformer:
 
     def __call__(self, value):
         uid = getUid(self.context, value.get('vis_url'))
+
         if not uid:
             return value
         doc = api.content.get(UID=uid)

@@ -52,7 +52,9 @@
   <subscriber 
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedVisualizationSerializationTransformer" />
-
+  <subscriber 
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
+    factory=".blocks.EmbedTableauVisualizationSerializationTransformer" />
   <subscriber 
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedMapsSerializationTransformer" />
