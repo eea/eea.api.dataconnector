@@ -149,7 +149,7 @@ def getVisualization(serializer, layout=True):
         "provider_url": provider_url
     }
 
-def getTableauVisualization(serializer, layout=True):
+
     """
     Extract visualization information from a serializer.
 
@@ -175,12 +175,12 @@ def getTableauVisualization(serializer, layout=True):
     tableau_visualization = serializer.get("tableau_visualization", {})
     url = tableau_visualization.get("url", {})
     toolbar_position = tableau_visualization.get("toolbarPosition")
-
+    print("serializer",tableau_visualization)
     if not tableau_visualization:
         return None
 
     return {
-        "url": url,
+        **tableau_visualization
     }
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
@@ -211,9 +211,6 @@ class EmbedTableauVisualizationSerializationTransformer:
                 "tableau_visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('tableau_visualization'),
-                    **getTableauVisualization(
-                        serializer=doc_serializer,
-                    ),
                 }
             }
         return value
@@ -245,6 +242,7 @@ class EmbedVisualizationSerializationTransformer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
+            print(doc_serializer.get('visualization'))
             return {
                 **value,
                 "visualization": {
