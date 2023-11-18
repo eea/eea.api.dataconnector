@@ -215,6 +215,23 @@ class EmbedTableauVisualizationSerializationTransformer:
             }
         return value
 
+@implementer(IBlockFieldDeserializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedTableauVisualizationDeserializationTransformer:
+    """Embed Tableau visualization deserialization"""
+
+    order = 9999
+    block_type = "embed_tableau_visualization"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        if value.get('tableau_vis_url'):
+            value['tableau_vis_url'] = path2uid(
+                context=self.context, link=value['tableau_vis_url'])
+        return value
 
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
@@ -242,7 +259,7 @@ class EmbedVisualizationSerializationTransformer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
-            print(doc_serializer.get('visualization'))
+            print(value)
             return {
                 **value,
                 "visualization": {
