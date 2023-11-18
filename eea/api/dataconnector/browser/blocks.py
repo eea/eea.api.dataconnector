@@ -181,7 +181,6 @@ def getTableauVisualization(serializer, layout=True):
 
     return {
         "url": url,
-        "toolbarPosition": toolbar_position
     }
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
