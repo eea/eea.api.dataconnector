@@ -261,7 +261,59 @@ class EmbedVisualizationDeserializationTransformer:
                 context=self.context, link=value['vis_url'])
         return value
 
+@implementer(IBlockFieldSerializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedEEAMapsSerializationTransformer:
+    """Embed maps serializer"""
 
+    order = 9999
+    block_type = "embed_eea_map_block"
+   
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        uid = getUid(self.context, value.get('vis_url'))
+
+        if not uid:
+            return value
+        doc = api.content.get(UID=uid)
+        doc_serializer = queryMultiAdapter(
+            (doc, self.request),
+            ISerializeToJson
+        ) if doc else None
+        if doc_serializer:
+            doc_serializer = doc_serializer(
+                version=self.request.get("version"))
+            return {
+                **value,
+                "vis_url":  uid_to_url(value.get('vis_url')),
+                "map_visualization_data": {
+                    **getMetadata(doc_serializer),
+                    **doc_serializer.get('map_visualization_data'),
+                }
+            }
+        return value
+
+@implementer(IBlockFieldDeserializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedEEAMapsDeserializationTransformer:
+    """Embed Tableau visualization deserialization"""
+
+    order = 9999
+    block_type = "embed_eea_map_block"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        if value.get('vis_url'):
+            value['vis_url'] = path2uid(
+                context=self.context, link=value['vis_url'])
+        return value
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedMapsSerializationTransformer:
@@ -269,6 +321,7 @@ class EmbedMapsSerializationTransformer:
 
     order = 9999
     block_type = "embed_maps"
+   
 
     def __init__(self, context, request):
         self.context = context
@@ -279,6 +332,7 @@ class EmbedMapsSerializationTransformer:
         if not uid:
             return value
         doc = api.content.get(UID=uid)
+        print("enter")
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
             ISerializeToJson
