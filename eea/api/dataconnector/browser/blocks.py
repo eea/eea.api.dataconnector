@@ -336,7 +336,6 @@ class EmbedMapsSerializationTransformer:
         if not uid:
             return value
         doc = api.content.get(UID=uid)
-        print("enter")
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
             ISerializeToJson
