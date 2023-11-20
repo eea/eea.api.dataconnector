@@ -14,7 +14,6 @@ from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 
 
-
 def getUid(context, link, retry=True):
     """
     Get the UID corresponding to a given link.
@@ -150,6 +149,7 @@ def getVisualization(serializer, layout=True):
         "provider_url": provider_url
     }
 
+
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedTableauVisualizationSerializationTransformer:
@@ -184,6 +184,7 @@ class EmbedTableauVisualizationSerializationTransformer:
             }
         return value
 
+
 @implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedTableauVisualizationDeserializationTransformer:
@@ -201,6 +202,7 @@ class EmbedTableauVisualizationDeserializationTransformer:
             value['tableau_vis_url'] = path2uid(
                 context=self.context, link=value['tableau_vis_url'])
         return value
+
 
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
@@ -261,6 +263,7 @@ class EmbedVisualizationDeserializationTransformer:
                 context=self.context, link=value['vis_url'])
         return value
 
+
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedEEAMapsSerializationTransformer:
@@ -296,6 +299,7 @@ class EmbedEEAMapsSerializationTransformer:
                 }
             }
         return value
+
 
 @implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
