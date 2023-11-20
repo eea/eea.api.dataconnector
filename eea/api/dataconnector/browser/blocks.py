@@ -7,11 +7,12 @@ from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
 from plone.restapi.deserializer.utils import path2uid
-from plone.restapi.serializer.utils import RESOLVEUID_RE
+from plone.restapi.serializer.utils import RESOLVEUID_RE, uid_to_url
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+
 
 
 def getUid(context, link, retry=True):
@@ -149,39 +150,6 @@ def getVisualization(serializer, layout=True):
         "provider_url": provider_url
     }
 
-
-    """
-    Extract visualization information from a serializer.
-
-    Parameters:
-    - serializer: The serializer providing visualization information.
-    - layout (bool, optional): If True, apply layout adjustments to the
-      visualization data. Defaults to True.
-
-    Returns:
-    - dict or None: A dictionary containing visualization information
-    with the following keys:
-      - "chartData": The chart data.
-      - "provider_url": The provider URL.
-      Returns None if the visualization information is not present.
-
-    The function retrieves visualization information from the provided
-    serializer, including chart data and provider URL. If layout is set
-    to True (default), it applies layout adjustments to the chart data using
-    the getVisualizationLayout function.
-    If visualization information is not present, the function returns None.
-    """
-
-    tableau_visualization = serializer.get("tableau_visualization", {})
-    url = tableau_visualization.get("url", {})
-    toolbar_position = tableau_visualization.get("toolbarPosition")
-    print("serializer",tableau_visualization)
-    if not tableau_visualization:
-        return None
-
-    return {
-        **tableau_visualization
-    }
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedTableauVisualizationSerializationTransformer:
@@ -208,6 +176,7 @@ class EmbedTableauVisualizationSerializationTransformer:
                 version=self.request.get("version"))
             return {
                 **value,
+                "tableau_vis_url":  uid_to_url(value.get('tableau_vis_url')),
                 "tableau_visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('tableau_visualization'),
@@ -259,9 +228,9 @@ class EmbedVisualizationSerializationTransformer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
-            print(value)
             return {
                 **value,
+                "vis_url":  uid_to_url(value.get('vis_url')),
                 "visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('visualization'),
