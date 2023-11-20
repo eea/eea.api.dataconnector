@@ -266,7 +266,7 @@ class EmbedVisualizationDeserializationTransformer:
 
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
-class EmbedEEAMapsSerializationTransformer:
+class EmbedEEAMapBlockSerializationTransformer:
     """Embed eea map block serializer"""
 
     order = 9999
@@ -302,7 +302,7 @@ class EmbedEEAMapsSerializationTransformer:
 
 @implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
-class EmbedEEAMapsDeserializationTransformer:
+class EmbedEEAMapBlockDeserializationTransformer:
     """Embed eea map block deserialization"""
 
     order = 9999

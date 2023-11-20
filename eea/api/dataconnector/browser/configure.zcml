@@ -60,7 +60,7 @@
     factory=".blocks.EmbedMapsSerializationTransformer" />
   <subscriber 
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
-    factory=".blocks.EmbedEEAMapsSerializationTransformer" />
+    factory=".blocks.EmbedEEAMapBlockSerializationTransformer" />
   <subscriber 
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer" 
     factory=".blocks.PlotlyChartSerializationTransformer" />
@@ -71,7 +71,7 @@
       factory=".blocks.EmbedVisualizationDeserializationTransformer" />
   <subscriber
       provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
-      factory=".blocks.EmbedEEAMapsDeserializationTransformer" />
+      factory=".blocks.EmbedEEAMapBlockDeserializationTransformer" />
   <subscriber
       provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
       factory=".blocks.EmbedTableauVisualizationDeserializationTransformer" />
