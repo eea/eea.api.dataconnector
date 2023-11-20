@@ -267,11 +267,10 @@ class EmbedVisualizationDeserializationTransformer:
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedEEAMapsSerializationTransformer:
-    """Embed maps serializer"""
+    """Embed eea map block serializer"""
 
     order = 9999
     block_type = "embed_eea_map_block"
-   
 
     def __init__(self, context, request):
         self.context = context
@@ -304,7 +303,7 @@ class EmbedEEAMapsSerializationTransformer:
 @implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedEEAMapsDeserializationTransformer:
-    """Embed Tableau visualization deserialization"""
+    """Embed eea map block deserialization"""
 
     order = 9999
     block_type = "embed_eea_map_block"
@@ -318,6 +317,8 @@ class EmbedEEAMapsDeserializationTransformer:
             value['vis_url'] = path2uid(
                 context=self.context, link=value['vis_url'])
         return value
+
+
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedMapsSerializationTransformer:
@@ -325,7 +326,6 @@ class EmbedMapsSerializationTransformer:
 
     order = 9999
     block_type = "embed_maps"
-   
 
     def __init__(self, context, request):
         self.context = context
