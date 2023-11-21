@@ -298,8 +298,8 @@ class MapVisualizationGet(Service):
         res["map_visualization"] = {
             "@id": ser.get("@id"),
             "title": ser.get("title"),
-            "data": ser["map_visualization_data"],
-            "data_provenance": ser["data_provenance"],
+            "data": ser.get("map_visualization_data"),
+            "data_provenance": ser.get("data_provenance"),
             "figure_note": figure_note,
         }
 
