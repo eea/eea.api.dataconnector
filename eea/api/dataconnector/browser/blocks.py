@@ -1,17 +1,30 @@
 """ block-related utils """
 
 import re
+from urllib.parse import urlparse
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
 from plone.restapi.deserializer.utils import path2uid
-from plone.restapi.serializer.utils import RESOLVEUID_RE
+from plone.restapi.serializer.utils import RESOLVEUID_RE, uid_to_url
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+
+
+def getLink(path):
+    """
+    Get link
+    """
+
+    URL = urlparse(path)
+
+    if URL.netloc.startswith('localhost') and URL.scheme:
+        return path.replace(URL.scheme + "://" + URL.netloc, "")
+    return path
 
 
 def getUid(context, link, retry=True):
@@ -43,7 +56,12 @@ def getUid(context, link, retry=True):
     if match is None:
         if not retry:
             return link
-        return getUid(context, path2uid(context=context, link=link), False)
+        # Alin Voinea a zis sa las asa
+        return getUid(
+            context,
+            path2uid(
+                context=context, link=getLink(link)),
+            False)
 
     uid, _ = match.groups()
     return uid
@@ -164,6 +182,10 @@ class EmbedVisualizationSerializationTransformer:
 
     def __call__(self, value):
         uid = getUid(self.context, value.get('vis_url'))
+
+        if 'visualization' in value:
+            del value['visualization']
+
         if not uid:
             return value
         doc = api.content.get(UID=uid)
@@ -175,18 +197,23 @@ class EmbedVisualizationSerializationTransformer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             use_live_data = value.get('use_live_data', True)
+
             return {
                 **value,
+                "vis_url":  uid_to_url(value.get('vis_url')),
                 "visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('visualization'),
                     **getVisualization(
                         serializer=doc_serializer,
-                        layout=(not use_live_data)
+                        layout=use_live_data
                     ),
                 }
             }
-        return value
+        return {
+            **value,
+            "vis_url":  uid_to_url(value.get('vis_url'))
+        }
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -202,7 +229,133 @@ class EmbedVisualizationDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        if value.get('vis_url'):
+        if 'vis_url' in value:
+            value['vis_url'] = path2uid(
+                context=self.context, link=getLink(value['vis_url']))
+        return value
+
+
+@implementer(IBlockFieldSerializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedTableauVisualizationSerializationTransformer:
+    """Embed tableau visualization serialization"""
+
+    order = 9999
+    block_type = "embed_tableau_visualization"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        tableau_vis_url = value.get('tableau_vis_url')
+        uid = getUid(self.context, tableau_vis_url)
+
+        if 'tableau_visualization' in value:
+            del value['tableau_visualization']
+
+        if not uid:
+            return value
+
+        doc = api.content.get(UID=uid)
+        doc_serializer = queryMultiAdapter(
+            (doc, self.request),
+            ISerializeToJson
+        ) if doc else None
+        if doc_serializer:
+            doc_serializer = doc_serializer(
+                version=self.request.get("version"))
+            return {
+                **value,
+                "tableau_vis_url":  uid_to_url(tableau_vis_url),
+                "tableau_visualization": {
+                    **getMetadata(doc_serializer),
+                    **doc_serializer.get('tableau_visualization'),
+                }
+            }
+        return {
+            **value,
+            "tableau_vis_url":  uid_to_url(tableau_vis_url),
+        }
+
+
+@implementer(IBlockFieldDeserializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedTableauVisualizationDeserializationTransformer:
+    """Embed Tableau visualization deserialization"""
+
+    order = 9999
+    block_type = "embed_tableau_visualization"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        if 'tableau_vis_url' in value:
+            value['tableau_vis_url'] = path2uid(
+                context=self.context, link=value['tableau_vis_url'])
+        return value
+
+
+@implementer(IBlockFieldSerializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedEEAMapBlockSerializationTransformer:
+    """Embed eea map block serializer"""
+
+    order = 9999
+    block_type = "embed_eea_map_block"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        vis_url = value.get('vis_url')
+        uid = getUid(self.context, vis_url)
+
+        if 'map_visualization_data' in value:
+            del value['map_visualization_data']
+
+        if not uid:
+            return value
+
+        doc = api.content.get(UID=uid)
+        doc_serializer = queryMultiAdapter(
+            (doc, self.request),
+            ISerializeToJson
+        ) if doc else None
+        if doc_serializer:
+            doc_serializer = doc_serializer(
+                version=self.request.get("version"))
+            return {
+                **value,
+                "vis_url":  uid_to_url(vis_url),
+                "map_visualization_data": {
+                    **getMetadata(doc_serializer),
+                    **doc_serializer.get('map_visualization_data'),
+                }
+            }
+        return {
+            **value,
+            "vis_url":  uid_to_url(vis_url),
+        }
+
+
+@implementer(IBlockFieldDeserializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedEEAMapBlockDeserializationTransformer:
+    """Embed eea map block deserialization"""
+
+    order = 9999
+    block_type = "embed_eea_map_block"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        if 'vis_url' in value:
             value['vis_url'] = path2uid(
                 context=self.context, link=value['vis_url'])
         return value
@@ -222,8 +375,13 @@ class EmbedMapsSerializationTransformer:
 
     def __call__(self, value):
         uid = getUid(self.context, value.get('url'))
+
+        if 'maps' in value:
+            del value['maps']
+
         if not uid:
             return value
+
         doc = api.content.get(UID=uid)
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
