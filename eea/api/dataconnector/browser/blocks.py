@@ -1,6 +1,7 @@
 """ block-related utils """
 
 import re
+from urllib.parse import urlparse
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import ISerializeToJson
@@ -12,10 +13,13 @@ from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
-from urllib.parse import urlparse
 
 
 def getLink(path):
+    """
+    Get link
+    """
+
     URL = urlparse(path)
 
     if URL.netloc.startswith('localhost') and URL.scheme:
