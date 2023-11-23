@@ -2,7 +2,7 @@
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service
 from zope.component import queryMultiAdapter
-from eea.api.dataconnector.browser.blocks import getVisualization
+from eea.api.dataconnector.browser.blocks import getMetadata, getVisualization
 
 
 class VisualizationGet(Service):
@@ -21,15 +21,15 @@ class VisualizationGet(Service):
 
         serializer = serializer(version=self.request.get("version"))
 
-        res = {
-            "@id": self.context.absolute_url() + "/@visualization",
-            "visualization": getVisualization(
-                serializer=serializer,
-                layout=False
-            )
+        return {
+            "visualization": {
+                **getMetadata(serializer=serializer),
+                **getVisualization(
+                    serializer=serializer,
+                    layout=False
+                )
+            }
         }
-
-        return res
 
 
 class VisualizationLayoutGet(Service):
@@ -48,11 +48,11 @@ class VisualizationLayoutGet(Service):
 
         serializer = serializer(version=self.request.get("version"))
 
-        res = {
-            "@id": self.context.absolute_url() + "/@visualization",
-            "visualization": getVisualization(
-                serializer=serializer
-            )
+        return {
+            "visualization": {
+                **getMetadata(serializer=serializer),
+                **getVisualization(
+                    serializer=serializer
+                )
+            }
         }
-
-        return res

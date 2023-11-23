@@ -1,6 +1,11 @@
 Changelog
 =========
 
+8.0 - (2023-11-22)
+---------------------------
+* Change: (feat): Serializer and deserializer for embed tableau and embed eea map
+  [razvanMiu]
+
 7.0 - (2023-11-17)
 ---------------------------
 * Change: feat: serialize embed_visualization and new embed_map

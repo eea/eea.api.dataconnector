@@ -10,13 +10,11 @@ from eea.api.dataconnector.interfaces import IElasticDataProvider
 
 # plone imports
 from plone.restapi.interfaces import IExpandableElement
-from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.services import Service
 
 # zope imports
 from zope.component import adapter
 from zope.component import getMultiAdapter
-from zope.component import queryMultiAdapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
@@ -272,68 +270,3 @@ class ConnectorDataPost(Service):
         result = connector(expand=True)
 
         return result["connector-data"]
-
-
-class MapVisualizationGet(Service):
-    """Get map visualization data"""
-
-    def reply(self):
-        """reply"""
-
-        res = {
-            "@id": self.context.absolute_url(),
-            "map_visualization": {},
-        }
-
-        serializer = queryMultiAdapter(
-            (self.context, self.request), ISerializeToJson)
-
-        if serializer is None:
-            self.request.response.setStatus(501)
-
-            return dict(error=dict(message="No serializer available."))
-
-        ser = serializer(version=self.request.get("version"))
-        figure_note = ser.get("figure_note", {})
-        res["map_visualization"] = {
-            "@id": ser.get("@id"),
-            "title": ser.get("title"),
-            "data": ser["map_visualization_data"],
-            "data_provenance": ser["data_provenance"],
-            "figure_note": figure_note,
-        }
-
-        return res
-
-
-class TableauVisualizationGet(Service):
-    """Get tableau visualization data"""
-
-    def reply(self):
-        """reply"""
-
-        res = {
-            "@id": self.context.absolute_url(),
-            "tableau_visualization": {},
-        }
-
-        serializer = queryMultiAdapter(
-            (self.context, self.request), ISerializeToJson)
-
-        if serializer is None:
-            self.request.response.setStatus(501)
-
-            return dict(error=dict(message="No serializer available."))
-
-        ser = serializer(version=self.request.get("version"))
-        figure_note = ser.get("figure_note", {})
-
-        res["tableau_visualization"] = {
-            "@id": ser.get("@id"),
-            "title": ser.get("title"),
-            "data": ser["tableau_visualization"],
-            "data_provenance": ser["data_provenance"],
-            "figure_note": figure_note,
-        }
-
-        return res
