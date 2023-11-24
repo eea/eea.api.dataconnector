@@ -25,12 +25,8 @@
         <element value="volto.blocks.fixed.layout"/>
     </property>
     <property name="schema"/>
-    <property name="model_source">
-        <model xmlns="http://namespaces.plone.org/supermodel/schema">
-            <schema></schema>
-        </model>
-    </property>
-    <property name="model_file"/>
+    <property name="model_source"></property>
+    <property name="model_file">plone.app.contenttypes.schema:document.xml</property>
     <property name="schema_policy">dexterity</property>
     <alias from="(Default)" to="(dynamic view)"/>
     <alias from="edit" to="@@edit"/>
