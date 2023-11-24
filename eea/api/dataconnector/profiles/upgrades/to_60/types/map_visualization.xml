@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<object name="tableau_visualization" meta_type="Dexterity FTI" i18n:domain="plone"
+<object name="map_visualization" meta_type="Dexterity FTI" i18n:domain="plone"
    xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-   <property name="title" i18n:translate="">Dashboard</property>
+   <property name="title" i18n:translate="">Map (simple)</property>
    <property name="icon_expr"></property>
-   <property name="factory">tableau_visualization</property>
+   <property name="factory">map_visualization</property>
    <property
-      name="add_view_expr">string:${folder_url}/++add++tableau_visualization</property>
+      name="add_view_expr">string:${folder_url}/++add++map_visualization</property>
    <property name="link_target"></property>
    <property name="immediate_view">view</property>
    <property name="global_allow">True</property>
@@ -20,14 +20,11 @@
    <property
       name="klass">collective.folderishtypes.dx.content.FolderishDocument</property>
    <property name="behaviors">
-      <element value="eea.dataconnector.tableau_visualization" />
-      <element value="eea.coremetadata.behavior" />
-      <element value="eea.dataconnector.figure_note" />
-      <element value="plone.dublincore" />
       <element value="plone.namefromtitle" />
-      <element value="plone.shortname" />
       <element value="plone.allowdiscussion" />
       <element value="plone.excludefromnavigation" />
+      <element value="plone.shortname" />
+      <element value="plone.dublincore" />
       <element value="plone.richtext" />
       <element value="plone.relateditems" />
       <element value="plone.versioning" />
@@ -35,6 +32,8 @@
       <element value="plone.locking" />
       <element
          value="Products.CMFPlone.interfaces.constrains.ISelectableConstrainTypes" />
+      <element value="eea.dataconnector.map_visualization" />
+      <element value="eea.dataconnector.figure_note" />
    </property>
    <property name="schema"></property>
    <property name="model_source"></property>

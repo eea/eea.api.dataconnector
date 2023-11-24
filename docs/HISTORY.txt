@@ -1,6 +1,11 @@
 Changelog
 =========
 
+8.1 - (2023-11-24)
+---------------------------
+* Change: map-interactive content type
+  [claudiaifrim]
+
 8.0 - (2023-11-22)
 ---------------------------
 * Change: (feat): Serializer and deserializer for embed tableau and embed eea map

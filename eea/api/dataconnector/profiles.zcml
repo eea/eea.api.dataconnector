@@ -32,6 +32,14 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+  <genericsetup:registerProfile
+      name="upgrade_60"
+      title="Upgrade profile for eea.api.dataconnector 6.0"
+      description=""
+      directory="profiles/upgrades/to_60"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="eea.api.dataconnector-hiddenprofiles"
