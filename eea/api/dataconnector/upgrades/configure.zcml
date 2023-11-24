@@ -32,15 +32,6 @@
     profile="eea.api.dataconnector:default"
     />
 
-  <genericsetup:upgradeStep
-    title="Import map_interactive type profile"
-    description=""
-    source="*"
-    destination="6.0"
-    handler=".to6.run_upgrade"
-    profile="eea.api.dataconnector:default"
-    />
-
   <genericsetup:upgradeSteps
     source="4.0"
     destination="5.0"
@@ -49,6 +40,17 @@
     <genericsetup:upgradeDepends
       title="Enable behavior Figure Note"
       import_profile="eea.api.dataconnector:upgrade_50"
+      />
+  </genericsetup:upgradeSteps>
+
+  <genericsetup:upgradeSteps
+    source="5.0"
+    destination="6.0"
+    profile="eea.api.dataconnector:default">
+
+    <genericsetup:upgradeDepends
+      title="Import map_interactive type profile"
+      import_profile="eea.api.dataconnector:upgrade_60"
       />
   </genericsetup:upgradeSteps>
 
