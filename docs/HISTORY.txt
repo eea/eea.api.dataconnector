@@ -1,6 +1,9 @@
 Changelog
 =========
 
+8.2-dev0 - (unreleased)
+---------------------------
+
 8.1 - (2023-11-24)
 ---------------------------
 * Change: map-interactive content type
