@@ -21,6 +21,30 @@ class IEeaDataconnectorLayer(IDefaultBrowserLayer):
     """Marker interface that defines a browser layer."""
 
 
+class IBasicDataProvider(Interface):
+    """A data provider concept"""
+
+
+class IDataProvider(IBasicDataProvider):
+    """An export of data for remote purposes"""
+
+    provided_data = Attribute("Data made available by this data provider")
+
+
+class IElasticDataProvider(IBasicDataProvider):
+    """An export of data for remote purposes"""
+
+    provided_data = Attribute("Data made available by this data provider")
+
+
+class IFileDataProvider(IBasicDataProvider):
+    """Marker interface for objects that provide data to visualizations"""
+
+
+class IConnectorDataProvider(IBasicDataProvider):
+    """Marker interface for objects that provide data to visualizations"""
+
+
 @provider(IFormFieldProvider)
 class IDataConnector(model.Schema):
     """A generic discodata connector"""
@@ -28,7 +52,6 @@ class IDataConnector(model.Schema):
     endpoint_url = schema.TextLine(
         title="Discodata endpoint URL",
         required=True,
-        # default=u"http://discomap.eea.europa.eu/App/SqlEndpoint/query"
         default="https://discodata.eea.europa.eu/sql",
     )
     sql_query = schema.Text(
@@ -61,34 +84,6 @@ class IDataConnector(model.Schema):
         required=False,
         default="",
     )
-
-    # directives.fieldset('dataconnector', label="Data connector", fields=[
-    #     'endpoint_url', 'query',
-    # ])
-
-
-class IBasicDataProvider(Interface):
-    """A data provider concept"""
-
-
-class IDataProvider(IBasicDataProvider):
-    """An export of data for remote purposes"""
-
-    provided_data = Attribute("Data made available by this data provider")
-
-
-class IElasticDataProvider(IBasicDataProvider):
-    """An export of data for remote purposes"""
-
-    provided_data = Attribute("Data made available by this data provider")
-
-
-class IFileDataProvider(IBasicDataProvider):
-    """Marker interface for objects that provide data to visualizations"""
-
-
-class IConnectorDataProvider(IBasicDataProvider):
-    """Marker interface for objects that provide data to visualizations"""
 
 
 EMBED_MAP_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})

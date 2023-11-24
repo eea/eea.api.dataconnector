@@ -100,7 +100,7 @@ def getMetadata(serializer):
         "temporal_coverage": serializer.get("temporal_coverage"),
         "other_organisations": serializer.get("other_organisations"),
         "data_provenance": serializer.get("data_provenance"),
-        "figure_note": serializer.get("figure_note"),
+        "figure_note": serializer.get("figure_note")
     }
 
 

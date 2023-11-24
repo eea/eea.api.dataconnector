@@ -9,9 +9,9 @@
     profile="eea.api.dataconnector:default">
 
     <genericsetup:upgradeDepends
-       title="Import all steps from eea.api.dataconnector default profile"
-       import_profile="eea.api.dataconnector:default"
-      />
+      title="Import all steps from eea.api.dataconnector default profile"
+      import_profile="eea.api.dataconnector:default"
+    />
   </genericsetup:upgradeSteps>
 
   <genericsetup:upgradeStep
@@ -21,7 +21,7 @@
     destination="3.0"
     handler=".to2.run_upgrade"
     profile="eea.api.dataconnector:default"
-    />
+  />
 
   <genericsetup:upgradeStep
     title="Import map_visualization type profile"
@@ -30,7 +30,7 @@
     destination="4.0"
     handler=".to4.run_upgrade"
     profile="eea.api.dataconnector:default"
-    />
+  />
 
   <genericsetup:upgradeSteps
     source="4.0"
@@ -40,7 +40,7 @@
     <genericsetup:upgradeDepends
       title="Enable behavior Figure Note"
       import_profile="eea.api.dataconnector:upgrade_50"
-      />
+    />
   </genericsetup:upgradeSteps>
 
   <genericsetup:upgradeSteps
@@ -49,11 +49,10 @@
     profile="eea.api.dataconnector:default">
 
     <genericsetup:upgradeDepends
-      title="Import map_interactive type profile"
+      title="Import map_interactive type profile and update behaviors name"
       import_profile="eea.api.dataconnector:upgrade_60"
-      />
+    />
   </genericsetup:upgradeSteps>
-
 
 
 </configure>
