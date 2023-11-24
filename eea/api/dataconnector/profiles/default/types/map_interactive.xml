@@ -1,7 +1,7 @@
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n" name="map_interactive" meta_type="Dexterity FTI" i18n:domain="plone">
     <property name="title" i18n:translate="">Map (Interactive)</property>
     <property name="description" i18n:translate="">Simple embed of an Arcgis Map</property>
-    <property name="icon_expr">string:file-earmark-text</property>
+    <property name="icon_expr">string:map</property>
     <property name="factory">map_interactive</property>
     <property name="add_view_expr">string:${folder_url}/++add++map_interactive</property>
     <property name="link_target"/>
@@ -21,6 +21,8 @@
         <element value="plone.dublincore"/>
         <element value="plone.namefromtitle"/>
         <element value="eea.dataconnector.maps"/>
+        <element value="eea.coremetadata.behavior"/>
+        <element value="volto.blocks.fixed.layout"/>
     </property>
     <property name="schema"/>
     <property name="model_source">
