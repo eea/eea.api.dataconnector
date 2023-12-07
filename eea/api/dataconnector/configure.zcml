@@ -10,6 +10,7 @@
   <adapter factory=".adapter.DataQueryJsonSchemaProvider" name="data_query" />
 
   <include file="profiles.zcml" />
+  <include file="permissions.zcml" />
   <include file="behavior.zcml" />
   <include package=".api" />
   <include package=".browser" />

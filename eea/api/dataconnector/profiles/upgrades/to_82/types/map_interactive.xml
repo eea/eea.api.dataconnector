@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<object name="map_interactive" meta_type="Dexterity FTI">
+  <property name="add_permission">eea.dataconnector.addInteractiveMap</property>
+</object>

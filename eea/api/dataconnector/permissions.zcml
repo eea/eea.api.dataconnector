@@ -1,0 +1,37 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:zcml="http://namespaces.zope.org/zcml">
+
+<configure zcml:condition="installed AccessControl.security">
+  <permission
+    id="eea.dataconnector.addPlotly"
+    title="EEA-Viz: Add Plotly Chart"
+    />
+
+  <permission
+    id="eea.dataconnector.addTableau"
+    title="EEA-Viz: Add Tableau Dashboard"
+    />
+
+  <permission
+    id="eea.dataconnector.addArcGISLayers"
+    title="EEA-Viz: Add ArcGIS Layers"
+    />
+
+  <permission
+    id="eea.dataconnector.addInteractiveMap"
+    title="EEA-Viz: Add Interactive Map"
+    />
+
+  <permission
+    id="eea.dataconnector.addDiscodataConnector"
+    title="EEA-Viz: Add Discodata Connector"
+    />
+
+  <permission
+    id="eea.dataconnector.addElasticConnector"
+    title="EEA-Viz: Add Elastic Connector"
+    />
+  </configure>
+
+</configure>

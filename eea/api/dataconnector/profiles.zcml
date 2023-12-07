@@ -40,6 +40,14 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+  <genericsetup:registerProfile
+      name="upgrade_82"
+      title="Upgrade profile for eea.api.dataconnector 8.2"
+      description=""
+      directory="profiles/upgrades/to_82"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="eea.api.dataconnector-hiddenprofiles"

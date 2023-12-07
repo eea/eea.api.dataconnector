@@ -17,7 +17,7 @@
     <element value="view"/>
   </property>
   <property name="default_view_fallback">False</property>
-  <property name="add_permission">cmf.AddPortalContent</property>
+  <property name="add_permission">eea.dataconnector.addElasticConnector</property>
   <property name="klass">plone.dexterity.content.Container</property>
   <property name="behaviors">
     <element value="plone.dublincore"/>
@@ -48,4 +48,3 @@
     <permission value="Modify portal content"/>
   </action>
 </object>
-

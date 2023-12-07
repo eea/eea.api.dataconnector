@@ -54,5 +54,16 @@
     />
   </genericsetup:upgradeSteps>
 
+  <genericsetup:upgradeSteps
+    source="6.0"
+    destination="8.2"
+    profile="eea.api.dataconnector:default">
+
+    <genericsetup:upgradeDepends
+      title="Custom Add permissions for EEA-Viz content-types"
+      import_profile="eea.api.dataconnector:upgrade_82"
+    />
+
+  </genericsetup:upgradeSteps>
 
 </configure>
