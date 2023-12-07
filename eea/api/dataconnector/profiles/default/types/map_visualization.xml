@@ -16,7 +16,7 @@
    <property name="view_methods">
    </property>
    <property name="default_view_fallback">False</property>
-   <property name="add_permission">plone.app.contenttypes.addDocument</property>
+   <property name="add_permission">eea.dataconnector.addArcGISLayers</property>
    <property
       name="klass">collective.folderishtypes.dx.content.FolderishDocument</property>
    <property name="behaviors">
