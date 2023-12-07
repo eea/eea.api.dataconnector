@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.2-dev0 - (unreleased)
+8.2 - (2023-12-07)
 ---------------------------
 * Feature: Add custom add permissions for EEA-Viz content-types
   [avoinea - refs #257682]
