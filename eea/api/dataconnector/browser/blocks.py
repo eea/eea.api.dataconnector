@@ -203,7 +203,7 @@ class EmbedVisualizationSerializationTransformer:
                 "vis_url":  uid_to_url(value.get('vis_url')),
                 "visualization": {
                     **getMetadata(doc_serializer),
-                    **doc_serializer.get('visualization'),
+                    **doc_serializer.get('visualization', {}),
                     **getVisualization(
                         serializer=doc_serializer,
                         layout=use_live_data
@@ -270,7 +270,7 @@ class EmbedTableauVisualizationSerializationTransformer:
                 "tableau_vis_url":  uid_to_url(tableau_vis_url),
                 "tableau_visualization": {
                     **getMetadata(doc_serializer),
-                    **doc_serializer.get('tableau_visualization'),
+                    **doc_serializer.get('tableau_visualization', {}),
                 }
             }
         return {
@@ -333,7 +333,7 @@ class EmbedEEAMapBlockSerializationTransformer:
                 "vis_url":  uid_to_url(vis_url),
                 "map_visualization_data": {
                     **getMetadata(doc_serializer),
-                    **doc_serializer.get('map_visualization_data'),
+                    **doc_serializer.get('map_visualization_data', {}),
                 }
             }
         return {
