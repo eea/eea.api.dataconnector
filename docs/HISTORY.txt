@@ -1,8 +1,10 @@
 Changelog
 =========
 
-8.3-dev0 - (unreleased)
+8.3 - (2023-12-08)
 ---------------------------
+* Change: fix - default values
+  [claudiaifrim]
 
 8.2 - (2023-12-07)
 ---------------------------
