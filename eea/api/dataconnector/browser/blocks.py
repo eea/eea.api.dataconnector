@@ -229,6 +229,8 @@ class EmbedVisualizationDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
+        if 'visualization' in value:
+            del value['visualization']
         if 'vis_url' in value:
             value['vis_url'] = path2uid(
                 context=self.context, link=getLink(value['vis_url']))
@@ -292,6 +294,8 @@ class EmbedTableauVisualizationDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
+        if 'tableau_visualization' in value:
+            del value['tableau_visualization']
         if 'tableau_vis_url' in value:
             value['tableau_vis_url'] = path2uid(
                 context=self.context, link=value['tableau_vis_url'])
@@ -355,6 +359,8 @@ class EmbedEEAMapBlockDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
+        if 'map_visualization_data' in value:
+            del value['map_visualization_data']
         if 'vis_url' in value:
             value['vis_url'] = path2uid(
                 context=self.context, link=value['vis_url'])
@@ -397,6 +403,24 @@ class EmbedMapsSerializationTransformer:
                     **doc_serializer.get('maps', {}),
                 }
             }
+        return value
+
+
+@implementer(IBlockFieldDeserializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedMapsDeserializationTransformer:
+    """Embed maps deserialization"""
+
+    order = 9999
+    block_type = "embed_maps"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        if 'maps' in value:
+            del value['maps']
         return value
 
 

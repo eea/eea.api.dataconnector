@@ -9,7 +9,7 @@
     for="eea.api.dataconnector.interfaces.IConnectorDataProvider"
     permission="zope2.View"
     template="pt/data_connector_view.pt"
-    />
+  />
 
   <browser:page
     name="provided_data"
@@ -17,21 +17,21 @@
     permission="zope2.View"
     template="pt/provided_data.pt"
     class=".dataprovider.DataProviderView"
-    />
+  />
 
   <browser:page
     name="download-provider-data"
     for="eea.api.dataconnector.interfaces.IBasicDataProvider"
     permission="zope2.View"
     class=".dataprovider.DataProviderDownload"
-    />
+  />
 
   <browser:page
     name="view"
     for="eea.api.dataconnector.interfaces.IDataVisualization"
     permission="zope2.View"
     template="pt/visualization_view.pt"
-    />
+  />
 
 
   <browser:page
@@ -39,41 +39,44 @@
     for="eea.api.dataconnector.interfaces.IMapVisualization"
     permission="zope2.View"
     template="pt/arcgis_map_view.pt"
-    /> 
+  />
 
   <browser:page
     name="view"
     for="eea.api.dataconnector.interfaces.ITableauVisualization"
     permission="zope2.View"
     template="pt/tableau_view.pt"
-    />
+  />
 
   <!--  Serializations -->
-  <subscriber 
+  <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedVisualizationSerializationTransformer" />
-  <subscriber 
+  <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedTableauVisualizationSerializationTransformer" />
-  <subscriber 
+  <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedMapsSerializationTransformer" />
-  <subscriber 
+  <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedEEAMapBlockSerializationTransformer" />
-  <subscriber 
-    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer" 
+  <subscriber
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.PlotlyChartSerializationTransformer" />
 
   <!--  Deserializations -->
   <subscriber
-      provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
-      factory=".blocks.EmbedVisualizationDeserializationTransformer" />
+    provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
+    factory=".blocks.EmbedVisualizationDeserializationTransformer" />
   <subscriber
-      provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
-      factory=".blocks.EmbedEEAMapBlockDeserializationTransformer" />
+    provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
+    factory=".blocks.EmbedEEAMapBlockDeserializationTransformer" />
   <subscriber
-      provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
-      factory=".blocks.EmbedTableauVisualizationDeserializationTransformer" />
-  
+    provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
+    factory=".blocks.EmbedTableauVisualizationDeserializationTransformer" />
+  <subscriber
+    provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
+    factory=".blocks.EmbedMapsDeserializationTransformer" />
+
 </configure>
