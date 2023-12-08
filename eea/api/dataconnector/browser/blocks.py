@@ -394,7 +394,7 @@ class EmbedMapsSerializationTransformer:
                 **value,
                 "maps": {
                     **getMetadata(doc_serializer),
-                    **doc_serializer.get('maps'),
+                    **doc_serializer.get('maps', {}),
                 }
             }
         return value
