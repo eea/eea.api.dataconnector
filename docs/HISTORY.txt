@@ -3,6 +3,8 @@ Changelog
 
 8.4-dev0 - (unreleased)
 ---------------------------
+* Bug fix: Add upgrade step to fix plotly with BOM character \ufeff
+  [avoinea - refs #262155]
 
 8.3 - (2023-12-08)
 ---------------------------
