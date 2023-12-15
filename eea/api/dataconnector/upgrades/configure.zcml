@@ -66,4 +66,16 @@
 
   </genericsetup:upgradeSteps>
 
+  <genericsetup:upgradeSteps
+    source="8.2"
+    destination="8.4"
+    profile="eea.api.dataconnector:default">
+
+    <genericsetup:upgradeStep
+      title="Fix Plotly charts BOM character \ufeff"
+      handler="eea.api.dataconnector.upgrades.evolve84.cleanup"
+      />
+
+  </genericsetup:upgradeSteps>
+
 </configure>

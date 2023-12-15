@@ -1,6 +1,11 @@
 Changelog
 =========
 
+8.4 - (2023-12-15)
+---------------------------
+* Bug fix: Add upgrade step to fix plotly with BOM character \ufeff
+  [avoinea - refs #262155]
+
 8.3 - (2023-12-08)
 ---------------------------
 * Change: fix - default values
