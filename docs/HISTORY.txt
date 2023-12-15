@@ -1,6 +1,9 @@
 Changelog
 =========
 
+8.5-dev0 - (unreleased)
+---------------------------
+
 8.4 - (2023-12-15)
 ---------------------------
 * Bug fix: Add upgrade step to fix plotly with BOM character \ufeff
