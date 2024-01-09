@@ -1,8 +1,10 @@
 Changelog
 =========
 
-8.5-dev0 - (unreleased)
+8.5 - (2024-01-09)
 ---------------------------
+* Change: fix: don't break visualizations if selected content is not a viz
+  [razvanMiu]
 
 8.4 - (2023-12-15)
 ---------------------------
