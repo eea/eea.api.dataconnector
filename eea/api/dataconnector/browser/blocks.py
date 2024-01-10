@@ -107,7 +107,7 @@ def getMetadata(serializer):
 def getVisualizationLayout(chartData):
     """Get visualization layout with no data"""
     if not chartData or not chartData.get("data"):
-        return None
+        return {}
 
     newData = chartData.get("data")
 
@@ -160,7 +160,7 @@ def getVisualization(serializer, layout=True):
         del chartData["provider_url"]
 
     if not visualization:
-        return None
+        return {}
 
     return {
         "chartData": chartData,
