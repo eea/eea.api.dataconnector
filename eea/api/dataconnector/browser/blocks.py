@@ -214,7 +214,10 @@ class EmbedVisualizationSerializationTransformer:
                 "vis_url":  uid_to_url(value.get('vis_url')),
                 "visualization": {
                     **getMetadata(doc_serializer),
-                    **getVisualization(serializer=doc_serializer, layout=use_data_sources),
+                    **getVisualization(
+                        serializer=doc_serializer,
+                        layout=use_data_sources
+                    ),
                 }
             }
         return {
