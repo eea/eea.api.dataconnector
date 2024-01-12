@@ -155,10 +155,10 @@ def getVisualization(serializer, layout=True):
         return {}
 
     chartData = visualization.get("chartData", {})
-    use_live_data = visualization.get("use_live_data", layout)
+    use_data_sources = visualization.get("use_data_sources", layout)
     provider_url = visualization.get("provider_url", None)
 
-    if use_live_data:
+    if use_data_sources:
         chartData = getVisualizationLayout(chartData)
 
     response = {
@@ -167,14 +167,14 @@ def getVisualization(serializer, layout=True):
             "layout": chartData.get("layout", {}),
             "frames": chartData.get("frames", [])
         },
-        "use_live_data": use_live_data
+        "use_data_sources": use_data_sources
     }
 
-    if use_live_data and provider_url:
+    if use_data_sources and provider_url:
         response["provider_url"] = provider_url
 
-    if use_live_data and "json_data" in visualization:
-        response["json_data"] = visualization.get("json_data")
+    if use_data_sources and "data_source" in visualization:
+        response["data_source"] = visualization.get("data_source")
 
     return response
 
@@ -207,18 +207,14 @@ class EmbedVisualizationSerializationTransformer:
         if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
-            use_live_data = value.get('use_live_data', True)
+            use_data_sources = value.get('use_data_sources', True)
 
             return {
                 **value,
                 "vis_url":  uid_to_url(value.get('vis_url')),
                 "visualization": {
                     **getMetadata(doc_serializer),
-                    **doc_serializer.get('visualization', {}),
-                    **getVisualization(
-                        serializer=doc_serializer,
-                        layout=use_live_data
-                    ),
+                    **getVisualization(serializer=doc_serializer, layout=use_data_sources),
                 }
             }
         return {
@@ -455,7 +451,7 @@ class PlotlyChartSerializationTransformer:
     #     return value
 
     def __call__(self, value):
-        if value.get("use_live_data", True):
+        if value.get("use_data_sources", True):
             newData = (
                 value.get("visualization", {})
                 .get("chartData", {})
