@@ -149,23 +149,34 @@ def getVisualization(serializer, layout=True):
     If visualization information is not present, the function returns None.
     """
 
-    visualization = serializer.get("visualization", {})
-    chartData = visualization.get("chartData", {})
-    provider_url = chartData.get("provider_url")
-
-    if layout:
-        chartData = getVisualizationLayout(chartData)
-
-    if chartData and "provider_url" in chartData:
-        del chartData["provider_url"]
+    visualization = serializer.get("visualization", None)
 
     if not visualization:
         return {}
 
-    return {
-        "chartData": chartData,
-        "provider_url": provider_url
+    chartData = visualization.get("chartData", {})
+    use_live_data = visualization.get("use_live_data", layout)
+    provider_url = visualization.get("provider_url", None)
+
+    if use_live_data:
+        chartData = getVisualizationLayout(chartData)
+
+    response = {
+        "chartData": {
+            "data": chartData.get("data", []),
+            "layout": chartData.get("layout", {}),
+            "frames": chartData.get("frames", [])
+        },
+        "use_live_data": use_live_data
     }
+
+    if use_live_data and provider_url:
+        response["provider_url"] = provider_url
+
+    if use_live_data and "json_data" in visualization:
+        response["json_data"] = visualization.get("json_data")
+
+    return response
 
 
 @implementer(IBlockFieldSerializationTransformer)
