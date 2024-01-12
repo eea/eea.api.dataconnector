@@ -1,8 +1,10 @@
 Changelog
 =========
 
-9.0-dev0 - (unreleased)
+9.0 - (2024-01-12)
 ---------------------------
+* Change: feat: improve plotlychart visualization serialization
+  [razvanMiu]
 
 8.5 - (2024-01-09)
 ---------------------------
