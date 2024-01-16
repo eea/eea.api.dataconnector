@@ -19,8 +19,8 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 
 def getLinkHTML(url, text=None):
     """
-    Get link HTML
-    """
+      Get link HTML
+      """
 
     if not url:
         return url
@@ -33,8 +33,8 @@ def getLinkHTML(url, text=None):
 
 def getLink(path):
     """
-    Get link
-    """
+      Get link
+      """
 
     URL = urlparse(path)
 
@@ -45,26 +45,26 @@ def getLink(path):
 
 def getUid(context, link, retry=True):
     """
-    Get the UID corresponding to a given link.
+      Get the UID corresponding to a given link.
 
-    Parameters:
-    - context: The context or object providing the link.
-    - link (str): The link for which to retrieve the UID.
-    - retry (bool, optional): If True, attempt to resolve the UID
-      even if the initial attempt fails. Defaults to True.
+      Parameters:
+      - context: The context or object providing the link.
+      - link (str): The link for which to retrieve the UID.
+      - retry (bool, optional): If True, attempt to resolve the UID
+        even if the initial attempt fails. Defaults to True.
 
-    Returns:
-    - str or None: The UID corresponding to the provided link,
-      or None if the link is empty or cannot be resolved.
+      Returns:
+      - str or None: The UID corresponding to the provided link,
+        or None if the link is empty or cannot be resolved.
 
-    If the link is empty, the function returns the link itself.
-    If the link cannot be resolved in the initial attempt and retry
-    is True, the function retries resolving the link by calling itself
-    with retry set to False.
+      If the link is empty, the function returns the link itself.
+      If the link cannot be resolved in the initial attempt and retry
+      is True, the function retries resolving the link by calling itself
+      with retry set to False.
 
-    The function uses the RESOLVEUID_RE regular expression to match
-    and extract the UID from the link.
-    """
+      The function uses the RESOLVEUID_RE regular expression to match
+      and extract the UID from the link.
+      """
 
     if not link:
         return link
@@ -73,11 +73,8 @@ def getUid(context, link, retry=True):
         if not retry:
             return link
         # Alin Voinea a zis sa las asa
-        return getUid(
-            context,
-            path2uid(
-                context=context, link=getLink(link)),
-            False)
+        return getUid(context, path2uid(context=context, link=getLink(link)),
+                      False)
 
     uid, _ = match.groups()
     return uid
@@ -92,28 +89,28 @@ def getUrlUid(self, value, field):
 
 def getMetadata(serializer):
     """
-    Extract metadata information from a serializer.
+      Extract metadata information from a serializer.
 
-    Parameters:
-    - serializer: The serializer providing metadata information.
+      Parameters:
+      - serializer: The serializer providing metadata information.
 
-    Returns:
-    - dict: A dictionary containing metadata information with
-    the following keys:
-      - "@id": The identifier.
-      - "title": The title.
-      - "publisher": The publisher.
-      - "geo_coverage": The geographic coverage.
-      - "temporal_coverage": The temporal coverage.
-      - "other_organisations": Other organizations involved.
-      - "data_provenance": Data provenance information.
-      - "figure_note": Additional notes related to the figure.
+      Returns:
+      - dict: A dictionary containing metadata information with
+      the following keys:
+        - "@id": The identifier.
+        - "title": The title.
+        - "publisher": The publisher.
+        - "geo_coverage": The geographic coverage.
+        - "temporal_coverage": The temporal coverage.
+        - "other_organisations": Other organizations involved.
+        - "data_provenance": Data provenance information.
+        - "figure_note": Additional notes related to the figure.
 
-    The function retrieves metadata information from the provided
-    serializer and returns it as a dictionary. If a specific metadata
-    field is not present in the serializer, the corresponding key in
-    the dictionary will have a value of None.
-    """
+      The function retrieves metadata information from the provided
+      serializer and returns it as a dictionary. If a specific metadata
+      field is not present in the serializer, the corresponding key in
+      the dictionary will have a value of None.
+      """
 
     return {
         "@id": serializer.get("@id"),
@@ -152,26 +149,26 @@ def getVisualizationLayout(chartData):
 
 def getVisualization(serializer, layout=True):
     """
-    Extract visualization information from a serializer.
+      Extract visualization information from a serializer.
 
-    Parameters:
-    - serializer: The serializer providing visualization information.
-    - layout (bool, optional): If True, apply layout adjustments to the
-      visualization data. Defaults to True.
+      Parameters:
+      - serializer: The serializer providing visualization information.
+      - layout (bool, optional): If True, apply layout adjustments to the
+        visualization data. Defaults to True.
 
-    Returns:
-    - dict or None: A dictionary containing visualization information
-    with the following keys:
-      - "chartData": The chart data.
-      - "provider_url": The provider URL.
-      Returns None if the visualization information is not present.
+      Returns:
+      - dict or None: A dictionary containing visualization information
+      with the following keys:
+        - "chartData": The chart data.
+        - "provider_url": The provider URL.
+        Returns None if the visualization information is not present.
 
-    The function retrieves visualization information from the provided
-    serializer, including chart data and provider URL. If layout is set
-    to True (default), it applies layout adjustments to the chart data using
-    the getVisualizationLayout function.
-    If visualization information is not present, the function returns None.
-    """
+      The function retrieves visualization information from the provided
+      serializer, including chart data and provider URL. If layout is set
+      to True (default), it applies layout adjustments to the chart data using
+      the getVisualizationLayout function.
+      If visualization information is not present, the function returns None.
+      """
 
     visualization = serializer.get("visualization", None)
 
@@ -230,45 +227,40 @@ class EmbedVisualizationSerializationTransformer:
             doc = api.content.get(UID=uid)
         except Unauthorized:
             return {
-                **value,
-                "vis_url": vis_url,
+                **value, "vis_url": vis_url,
                 "visualization": {
-                    "error": "Apologies, it seems this " + getLinkHTML(vis_url, 'Chart (Interactive)') + " has not been published yet."
+                    "error":
+                    "Apologies, it seems this " +
+                    getLinkHTML(vis_url, 'Chart (Interactive)') +
+                    " has not been published yet."
                 }
             }
         except Forbidden:
             return {
-                **value,
-                "vis_url": vis_url,
+                **value, "vis_url": vis_url,
                 "visualization": {
-                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(vis_url, 'Chart (Interactive)') + "."
+                    "error":
+                    "Apologies, it seems you do not have permissions to see this "
+                    + getLinkHTML(vis_url, 'Chart (Interactive)') + "."
                 }
             }
 
         doc_serializer = queryMultiAdapter(
-            (doc, self.request),
-            ISerializeToJson
-        ) if doc else None
+            (doc, self.request), ISerializeToJson) if doc else None
         if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             use_data_sources = value.get('use_data_sources', True)
 
             return {
-                **value,
-                "vis_url": vis_url,
+                **value, "vis_url": vis_url,
                 "visualization": {
                     **getMetadata(doc_serializer),
-                    **getVisualization(
-                        serializer=doc_serializer,
-                        layout=use_data_sources
-                    ),
+                    **getVisualization(serializer=doc_serializer,
+                                       layout=use_data_sources),
                 }
             }
-        return {
-            **value,
-            "vis_url":  uid_to_url(value.get('vis_url'))
-        }
+        return {**value, "vis_url": uid_to_url(value.get('vis_url'))}
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -287,8 +279,8 @@ class EmbedVisualizationDeserializationTransformer:
         if 'visualization' in value:
             del value['visualization']
         if 'vis_url' in value:
-            value['vis_url'] = path2uid(
-                context=self.context, link=getLink(value['vis_url']))
+            value['vis_url'] = path2uid(context=self.context,
+                                        link=getLink(value['vis_url']))
         return value
 
 
@@ -319,31 +311,31 @@ class EmbedTableauVisualizationSerializationTransformer:
             doc = api.content.get(UID=uid)
         except Unauthorized:
             return {
-                **value,
-                "tableau_vis_url": tableau_vis_url,
+                **value, "tableau_vis_url": tableau_vis_url,
                 "tableau_visualization": {
-                    "error": "Apologies, it seems this " + getLinkHTML(tableau_vis_url, 'Dashboard') + " has not been published yet."
+                    "error":
+                    "Apologies, it seems this " +
+                    getLinkHTML(tableau_vis_url, 'Dashboard') +
+                    " has not been published yet."
                 }
             }
         except Forbidden:
             return {
-                **value,
-                "tableau_vis_url": tableau_vis_url,
+                **value, "tableau_vis_url": tableau_vis_url,
                 "tableau_visualization": {
-                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(tableau_vis_url, 'Dashboard') + "."
+                    "error":
+                    "Apologies, it seems you do not have permissions to see this "
+                    + getLinkHTML(tableau_vis_url, 'Dashboard') + "."
                 }
             }
 
         doc_serializer = queryMultiAdapter(
-            (doc, self.request),
-            ISerializeToJson
-        ) if doc else None
+            (doc, self.request), ISerializeToJson) if doc else None
         if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             return {
-                **value,
-                "tableau_vis_url": tableau_vis_url,
+                **value, "tableau_vis_url": tableau_vis_url,
                 "tableau_visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('tableau_visualization', {}),
@@ -371,8 +363,8 @@ class EmbedTableauVisualizationDeserializationTransformer:
         if 'tableau_visualization' in value:
             del value['tableau_visualization']
         if 'tableau_vis_url' in value:
-            value['tableau_vis_url'] = path2uid(
-                context=self.context, link=value['tableau_vis_url'])
+            value['tableau_vis_url'] = path2uid(context=self.context,
+                                                link=value['tableau_vis_url'])
         return value
 
 
@@ -403,31 +395,31 @@ class EmbedEEAMapBlockSerializationTransformer:
             doc = api.content.get(UID=uid)
         except Unauthorized:
             return {
-                **value,
-                "tableau_vis_url": vis_url,
+                **value, "tableau_vis_url": vis_url,
                 "map_visualization_data": {
-                    "error": "Apologies, it seems this " + getLinkHTML(vis_url, 'Map (Simple)') + " has not been published yet."
+                    "error":
+                    "Apologies, it seems this " +
+                    getLinkHTML(vis_url, 'Map (Simple)') +
+                    " has not been published yet."
                 }
             }
         except Forbidden:
             return {
-                **value,
-                "tableau_vis_url": vis_url,
+                **value, "tableau_vis_url": vis_url,
                 "map_visualization_data": {
-                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(vis_url, 'Map (Simple)') + "."
+                    "error":
+                    "Apologies, it seems you do not have permissions to see this "
+                    + getLinkHTML(vis_url, 'Map (Simple)') + "."
                 }
             }
 
         doc_serializer = queryMultiAdapter(
-            (doc, self.request),
-            ISerializeToJson
-        ) if doc else None
+            (doc, self.request), ISerializeToJson) if doc else None
         if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             return {
-                **value,
-                "vis_url":  vis_url,
+                **value, "vis_url": vis_url,
                 "map_visualization_data": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('map_visualization_data', {}),
@@ -435,7 +427,7 @@ class EmbedEEAMapBlockSerializationTransformer:
             }
         return {
             **value,
-            "vis_url":  vis_url,
+            "vis_url": vis_url,
         }
 
 
@@ -455,8 +447,8 @@ class EmbedEEAMapBlockDeserializationTransformer:
         if 'map_visualization_data' in value:
             del value['map_visualization_data']
         if 'vis_url' in value:
-            value['vis_url'] = path2uid(
-                context=self.context, link=value['vis_url'])
+            value['vis_url'] = path2uid(context=self.context,
+                                        link=value['vis_url'])
         return value
 
 
@@ -485,29 +477,29 @@ class EmbedMapsSerializationTransformer:
             doc = api.content.get(UID=uid)
         except Unauthorized:
             return {
-                **value,
-                "maps": {
-                    "error": "Apologies, it seems this " + getLinkHTML(url, 'Map (Interactive)') + " has not been published yet."
+                **value, "maps": {
+                    "error":
+                    "Apologies, it seems this " +
+                    getLinkHTML(url, 'Map (Interactive)') +
+                    " has not been published yet."
                 }
             }
         except Forbidden:
             return {
-                **value,
-                "maps": {
-                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(url, 'Map (Interactive)') + "."
+                **value, "maps": {
+                    "error":
+                    "Apologies, it seems you do not have permissions to see this "
+                    + getLinkHTML(url, 'Map (Interactive)') + "."
                 }
             }
 
         doc_serializer = queryMultiAdapter(
-            (doc, self.request),
-            ISerializeToJson
-        ) if doc else None
+            (doc, self.request), ISerializeToJson) if doc else None
         if doc_serializer:
             doc_serializer = doc_serializer(
                 version=self.request.get("version"))
             return {
-                **value,
-                "maps": {
+                **value, "maps": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('maps', {}),
                 }
@@ -554,11 +546,8 @@ class PlotlyChartSerializationTransformer:
 
     def __call__(self, value):
         if value.get("use_data_sources", True):
-            newData = (
-                value.get("visualization", {})
-                .get("chartData", {})
-                .get("data", None)
-            )
+            newData = (value.get("visualization",
+                                 {}).get("chartData", {}).get("data", None))
             if not newData:
                 return value
             for traceIndex, trace in enumerate(newData):
@@ -570,8 +559,7 @@ class PlotlyChartSerializationTransformer:
                     continue
                 for transformIndex, _ in enumerate(trace.get("transforms")):
                     newData[traceIndex]["transforms"][transformIndex][
-                        "target"
-                    ] = []
+                        "target"] = []
             value["visualization"]["chartData"]["data"] = newData
 
         return value
