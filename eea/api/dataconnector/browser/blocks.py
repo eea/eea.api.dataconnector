@@ -2,6 +2,7 @@
 
 import re
 from urllib.parse import urlparse
+from AccessControl import Unauthorized
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import ISerializeToJson
@@ -9,10 +10,25 @@ from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
 from plone.restapi.deserializer.utils import path2uid
 from plone.restapi.serializer.utils import RESOLVEUID_RE, uid_to_url
+from zExceptions import Forbidden
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+
+
+def getLinkHTML(url, text=None):
+    """
+    Get link HTML
+    """
+
+    if not url:
+        return url
+
+    if not text:
+        text = url
+
+    return '<a href="' + url + '" target="_blank">' + text + '</a>'
 
 
 def getLink(path):
@@ -67,6 +83,13 @@ def getUid(context, link, retry=True):
     return uid
 
 
+def getUrlUid(self, value, field):
+    url = value.get(field)
+    uid = getUid(self.context, url)
+    url = uid_to_url(url)
+    return url, uid
+
+
 def getMetadata(serializer):
     """
     Extract metadata information from a serializer.
@@ -95,6 +118,7 @@ def getMetadata(serializer):
     return {
         "@id": serializer.get("@id"),
         "title": serializer.get("title"),
+        "description": serializer.get("description"),
         "publisher": serializer.get("publisher"),
         "geo_coverage": serializer.get("geo_coverage"),
         "temporal_coverage": serializer.get("temporal_coverage"),
@@ -192,14 +216,35 @@ class EmbedVisualizationSerializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        uid = getUid(self.context, value.get('vis_url'))
+        vis_url, uid = getUrlUid(self, value, 'vis_url')
 
         if 'visualization' in value:
             del value['visualization']
 
         if not uid:
             return value
-        doc = api.content.get(UID=uid)
+
+        doc = None
+
+        try:
+            doc = api.content.get(UID=uid)
+        except Unauthorized:
+            return {
+                **value,
+                "vis_url": vis_url,
+                "visualization": {
+                    "error": "Apologies, it seems this " + getLinkHTML(vis_url, 'Chart (Interactive)') + " has not been published yet."
+                }
+            }
+        except Forbidden:
+            return {
+                **value,
+                "vis_url": vis_url,
+                "visualization": {
+                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(vis_url, 'Chart (Interactive)') + "."
+                }
+            }
+
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
             ISerializeToJson
@@ -211,7 +256,7 @@ class EmbedVisualizationSerializationTransformer:
 
             return {
                 **value,
-                "vis_url":  uid_to_url(value.get('vis_url')),
+                "vis_url": vis_url,
                 "visualization": {
                     **getMetadata(doc_serializer),
                     **getVisualization(
@@ -260,8 +305,7 @@ class EmbedTableauVisualizationSerializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        tableau_vis_url = value.get('tableau_vis_url')
-        uid = getUid(self.context, tableau_vis_url)
+        tableau_vis_url, uid = getUrlUid(self, value, 'tableau_vis_url')
 
         if 'tableau_visualization' in value:
             del value['tableau_visualization']
@@ -269,7 +313,27 @@ class EmbedTableauVisualizationSerializationTransformer:
         if not uid:
             return value
 
-        doc = api.content.get(UID=uid)
+        doc = None
+
+        try:
+            doc = api.content.get(UID=uid)
+        except Unauthorized:
+            return {
+                **value,
+                "tableau_vis_url": tableau_vis_url,
+                "tableau_visualization": {
+                    "error": "Apologies, it seems this " + getLinkHTML(tableau_vis_url, 'Dashboard') + " has not been published yet."
+                }
+            }
+        except Forbidden:
+            return {
+                **value,
+                "tableau_vis_url": tableau_vis_url,
+                "tableau_visualization": {
+                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(tableau_vis_url, 'Dashboard') + "."
+                }
+            }
+
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
             ISerializeToJson
@@ -279,7 +343,7 @@ class EmbedTableauVisualizationSerializationTransformer:
                 version=self.request.get("version"))
             return {
                 **value,
-                "tableau_vis_url":  uid_to_url(tableau_vis_url),
+                "tableau_vis_url": tableau_vis_url,
                 "tableau_visualization": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('tableau_visualization', {}),
@@ -287,7 +351,7 @@ class EmbedTableauVisualizationSerializationTransformer:
             }
         return {
             **value,
-            "tableau_vis_url":  uid_to_url(tableau_vis_url),
+            "tableau_vis_url": tableau_vis_url,
         }
 
 
@@ -325,8 +389,7 @@ class EmbedEEAMapBlockSerializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        vis_url = value.get('vis_url')
-        uid = getUid(self.context, vis_url)
+        vis_url, uid = getUrlUid(self, value, 'vis_url')
 
         if 'map_visualization_data' in value:
             del value['map_visualization_data']
@@ -334,7 +397,27 @@ class EmbedEEAMapBlockSerializationTransformer:
         if not uid:
             return value
 
-        doc = api.content.get(UID=uid)
+        doc = None
+
+        try:
+            doc = api.content.get(UID=uid)
+        except Unauthorized:
+            return {
+                **value,
+                "tableau_vis_url": vis_url,
+                "map_visualization_data": {
+                    "error": "Apologies, it seems this " + getLinkHTML(vis_url, 'Map (Simple)') + " has not been published yet."
+                }
+            }
+        except Forbidden:
+            return {
+                **value,
+                "tableau_vis_url": vis_url,
+                "map_visualization_data": {
+                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(vis_url, 'Map (Simple)') + "."
+                }
+            }
+
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
             ISerializeToJson
@@ -344,7 +427,7 @@ class EmbedEEAMapBlockSerializationTransformer:
                 version=self.request.get("version"))
             return {
                 **value,
-                "vis_url":  uid_to_url(vis_url),
+                "vis_url":  vis_url,
                 "map_visualization_data": {
                     **getMetadata(doc_serializer),
                     **doc_serializer.get('map_visualization_data', {}),
@@ -352,7 +435,7 @@ class EmbedEEAMapBlockSerializationTransformer:
             }
         return {
             **value,
-            "vis_url":  uid_to_url(vis_url),
+            "vis_url":  vis_url,
         }
 
 
@@ -390,7 +473,7 @@ class EmbedMapsSerializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        uid = getUid(self.context, value.get('url'))
+        url, uid = getUrlUid(self, value, 'url')
 
         if 'maps' in value:
             del value['maps']
@@ -398,7 +481,23 @@ class EmbedMapsSerializationTransformer:
         if not uid:
             return value
 
-        doc = api.content.get(UID=uid)
+        try:
+            doc = api.content.get(UID=uid)
+        except Unauthorized:
+            return {
+                **value,
+                "maps": {
+                    "error": "Apologies, it seems this " + getLinkHTML(url, 'Map (Interactive)') + " has not been published yet."
+                }
+            }
+        except Forbidden:
+            return {
+                **value,
+                "maps": {
+                    "error": "Apologies, it seems you do not have permissions to see this " + getLinkHTML(url, 'Map (Interactive)') + "."
+                }
+            }
+
         doc_serializer = queryMultiAdapter(
             (doc, self.request),
             ISerializeToJson
