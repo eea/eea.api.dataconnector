@@ -255,11 +255,8 @@ class EmbedVisualizationSerializationTransformer:
                 }
             }
 
-        doc_serializer = queryMultiAdapter(
-            (doc, self.request), ISerializeToJson) if doc else None
+        doc_serializer = self._get_doc_serializer(doc)
         if doc_serializer:
-            doc_serializer = doc_serializer(
-                version=self.request.get("version"))
             use_data_sources = value.get('use_data_sources', True)
 
             return {
@@ -271,6 +268,15 @@ class EmbedVisualizationSerializationTransformer:
                 }
             }
         return {**value, "vis_url": uid_to_url(value.get('vis_url'))}
+
+    def _get_doc_serializer(self, doc):
+        if doc:
+            doc_serializer = queryMultiAdapter(
+                (doc, self.request), ISerializeToJson)
+            if doc_serializer:
+                return doc_serializer(
+                    version=self.request.get("version"))
+        return None
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -340,11 +346,8 @@ class EmbedTableauVisualizationSerializationTransformer:
                 }
             }
 
-        doc_serializer = queryMultiAdapter(
-            (doc, self.request), ISerializeToJson) if doc else None
+        doc_serializer = self._get_doc_serializer(doc)
         if doc_serializer:
-            doc_serializer = doc_serializer(
-                version=self.request.get("version"))
             return {
                 **value, "tableau_vis_url": tableau_vis_url,
                 "tableau_visualization": {
@@ -356,6 +359,15 @@ class EmbedTableauVisualizationSerializationTransformer:
             **value,
             "tableau_vis_url": tableau_vis_url,
         }
+
+    def _get_doc_serializer(self, doc):
+        if doc:
+            doc_serializer = queryMultiAdapter(
+                (doc, self.request), ISerializeToJson)
+            if doc_serializer:
+                return doc_serializer(
+                    version=self.request.get("version"))
+        return None
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -425,11 +437,8 @@ class EmbedEEAMapBlockSerializationTransformer:
                 }
             }
 
-        doc_serializer = queryMultiAdapter(
-            (doc, self.request), ISerializeToJson) if doc else None
+        doc_serializer = self._get_doc_serializer(doc)
         if doc_serializer:
-            doc_serializer = doc_serializer(
-                version=self.request.get("version"))
             return {
                 **value, "vis_url": vis_url,
                 "map_visualization_data": {
@@ -441,6 +450,15 @@ class EmbedEEAMapBlockSerializationTransformer:
             **value,
             "vis_url": vis_url,
         }
+
+    def _get_doc_serializer(self, doc):
+        if doc:
+            doc_serializer = queryMultiAdapter(
+                (doc, self.request), ISerializeToJson)
+            if doc_serializer:
+                return doc_serializer(
+                    version=self.request.get("version"))
+        return None
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -506,11 +524,8 @@ class EmbedMapsSerializationTransformer:
                 }
             }
 
-        doc_serializer = queryMultiAdapter(
-            (doc, self.request), ISerializeToJson) if doc else None
+        doc_serializer = self._get_doc_serializer(doc)
         if doc_serializer:
-            doc_serializer = doc_serializer(
-                version=self.request.get("version"))
             return {
                 **value, "maps": {
                     **getMetadata(doc_serializer),
@@ -518,6 +533,15 @@ class EmbedMapsSerializationTransformer:
                 }
             }
         return value
+
+    def _get_doc_serializer(self, doc):
+        if doc:
+            doc_serializer = queryMultiAdapter(
+                (doc, self.request), ISerializeToJson)
+            if doc_serializer:
+                return doc_serializer(
+                    version=self.request.get("version"))
+        return None
 
 
 @implementer(IBlockFieldDeserializationTransformer)
