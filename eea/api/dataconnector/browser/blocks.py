@@ -240,8 +240,9 @@ class EmbedVisualizationSerializationTransformer:
                 **value, "vis_url": vis_url,
                 "visualization": {
                     "error":
-                    "Apologies, it seems you do not have permissions to see this "
-                    + getLinkHTML(vis_url, 'Chart (Interactive)') + "."
+                    "Apologies, it seems you do not have " +
+                    "permissions to see this " +
+                    getLinkHTML(vis_url, 'Chart (Interactive)') + "."
                 }
             }
 
@@ -324,8 +325,9 @@ class EmbedTableauVisualizationSerializationTransformer:
                 **value, "tableau_vis_url": tableau_vis_url,
                 "tableau_visualization": {
                     "error":
-                    "Apologies, it seems you do not have permissions to see this "
-                    + getLinkHTML(tableau_vis_url, 'Dashboard') + "."
+                    "Apologies, it seems you do not have " +
+                    "permissions to see this " +
+                    getLinkHTML(tableau_vis_url, 'Dashboard') + "."
                 }
             }
 
@@ -408,8 +410,9 @@ class EmbedEEAMapBlockSerializationTransformer:
                 **value, "tableau_vis_url": vis_url,
                 "map_visualization_data": {
                     "error":
-                    "Apologies, it seems you do not have permissions to see this "
-                    + getLinkHTML(vis_url, 'Map (Simple)') + "."
+                    "Apologies, it seems you do not have " +
+                    "permissions to see this " +
+                    getLinkHTML(vis_url, 'Map (Simple)') + "."
                 }
             }
 
@@ -488,8 +491,9 @@ class EmbedMapsSerializationTransformer:
             return {
                 **value, "maps": {
                     "error":
-                    "Apologies, it seems you do not have permissions to see this "
-                    + getLinkHTML(url, 'Map (Interactive)') + "."
+                    "Apologies, it seems you do not have " +
+                    "permissions to see this " +
+                    getLinkHTML(url, 'Map (Interactive)') + "."
                 }
             }
 
