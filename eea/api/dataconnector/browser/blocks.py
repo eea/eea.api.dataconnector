@@ -280,7 +280,7 @@ class EmbedVisualizationSerializationTransformer:
         :param doc: The document for which to get a serializer.
         :type doc: object
 
-        :return: An instantiated JSON serializer if available, or None if 
+        :return: An instantiated JSON serializer if available, or None if
                  not found.
         :rtype: object or None
         """
@@ -385,7 +385,7 @@ class EmbedTableauVisualizationSerializationTransformer:
         :param doc: The document for which to get a serializer.
         :type doc: object
 
-        :return: An instantiated JSON serializer if available, or None if 
+        :return: An instantiated JSON serializer if available, or None if
                  not found.
         :rtype: object or None
         """
@@ -490,7 +490,7 @@ class EmbedEEAMapBlockSerializationTransformer:
         :param doc: The document for which to get a serializer.
         :type doc: object
 
-        :return: An instantiated JSON serializer if available, or None if 
+        :return: An instantiated JSON serializer if available, or None if
                  not found.
         :rtype: object or None
         """
@@ -587,7 +587,7 @@ class EmbedMapsSerializationTransformer:
         :param doc: The document for which to get a serializer.
         :type doc: object
 
-        :return: An instantiated JSON serializer if available, or None if 
+        :return: An instantiated JSON serializer if available, or None if
                  not found.
         :rtype: object or None
         """
