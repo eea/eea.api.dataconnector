@@ -81,6 +81,15 @@ def getUid(context, link, retry=True):
 
 
 def getUrlUid(self, value, field):
+    """
+    Get URL and UID based on the provided value and field.
+
+    :param value: The input value.
+    :param field: The field to extract the URL from in the value.
+
+    :return: A tuple containing the URL and UID.
+    """
+
     url = value.get(field)
     uid = getUid(self.context, url)
     url = uid_to_url(url)
