@@ -270,6 +270,20 @@ class EmbedVisualizationSerializationTransformer:
         return {**value, "vis_url": uid_to_url(value.get('vis_url'))}
 
     def _get_doc_serializer(self, doc):
+        """
+        Get a serializer for the given document.
+
+        This method queries for a JSON serializer adapter for the provided
+        document and request. If a serializer is found, it is instantiated
+        with the version from the request and returned.
+
+        :param doc: The document for which to get a serializer.
+        :type doc: object
+
+        :return: An instantiated JSON serializer if available, or None if 
+                 not found.
+        :rtype: object or None
+        """
         if doc:
             doc_serializer = queryMultiAdapter(
                 (doc, self.request), ISerializeToJson)
@@ -361,6 +375,20 @@ class EmbedTableauVisualizationSerializationTransformer:
         }
 
     def _get_doc_serializer(self, doc):
+        """
+        Get a serializer for the given document.
+
+        This method queries for a JSON serializer adapter for the provided
+        document and request. If a serializer is found, it is instantiated
+        with the version from the request and returned.
+
+        :param doc: The document for which to get a serializer.
+        :type doc: object
+
+        :return: An instantiated JSON serializer if available, or None if 
+                 not found.
+        :rtype: object or None
+        """
         if doc:
             doc_serializer = queryMultiAdapter(
                 (doc, self.request), ISerializeToJson)
@@ -452,6 +480,20 @@ class EmbedEEAMapBlockSerializationTransformer:
         }
 
     def _get_doc_serializer(self, doc):
+        """
+        Get a serializer for the given document.
+
+        This method queries for a JSON serializer adapter for the provided
+        document and request. If a serializer is found, it is instantiated
+        with the version from the request and returned.
+
+        :param doc: The document for which to get a serializer.
+        :type doc: object
+
+        :return: An instantiated JSON serializer if available, or None if 
+                 not found.
+        :rtype: object or None
+        """
         if doc:
             doc_serializer = queryMultiAdapter(
                 (doc, self.request), ISerializeToJson)
@@ -535,6 +577,20 @@ class EmbedMapsSerializationTransformer:
         return value
 
     def _get_doc_serializer(self, doc):
+        """
+        Get a serializer for the given document.
+
+        This method queries for a JSON serializer adapter for the provided
+        document and request. If a serializer is found, it is instantiated
+        with the version from the request and returned.
+
+        :param doc: The document for which to get a serializer.
+        :type doc: object
+
+        :return: An instantiated JSON serializer if available, or None if 
+                 not found.
+        :rtype: object or None
+        """
         if doc:
             doc_serializer = queryMultiAdapter(
                 (doc, self.request), ISerializeToJson)
