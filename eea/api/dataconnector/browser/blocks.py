@@ -185,8 +185,10 @@ def getVisualization(serializer, layout=True):
         return {}
 
     chartData = visualization.get("chartData", {})
-    use_data_sources = visualization.get("use_data_sources", layout)
     provider_url = visualization.get("provider_url", None)
+    use_data_sources = visualization.get("use_data_sources", layout)
+    filters = visualization.get("filters", None)
+    variation = visualization.get("variation", None)
 
     if use_data_sources:
         chartData = getVisualizationLayout(chartData)
@@ -197,7 +199,9 @@ def getVisualization(serializer, layout=True):
             "layout": chartData.get("layout", {}),
             "frames": chartData.get("frames", [])
         },
-        "use_data_sources": use_data_sources
+        "use_data_sources": use_data_sources,
+        "filters": filters,
+        "variation": variation
     }
 
     if use_data_sources and provider_url:

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+9.1 - (2024-03-18)
+---------------------------
+* Change: feat: add filters to plotly visualizations
+  [razvanMiu]
+
 9.0 - (2024-01-12)
 ---------------------------
 * Change: feat: improve plotlychart visualization serialization
