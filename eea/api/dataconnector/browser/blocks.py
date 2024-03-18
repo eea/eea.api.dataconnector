@@ -187,8 +187,8 @@ def getVisualization(serializer, layout=True):
     chartData = visualization.get("chartData", {})
     provider_url = visualization.get("provider_url", None)
     use_data_sources = visualization.get("use_data_sources", layout)
-    filters = visualization.get("filters", layout)
-    variation = visualization.get("variation", layout)
+    filters = visualization.get("filters", None)
+    variation = visualization.get("variation", None)
 
     if use_data_sources:
         chartData = getVisualizationLayout(chartData)
