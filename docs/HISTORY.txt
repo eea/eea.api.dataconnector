@@ -1,6 +1,9 @@
 Changelog
 =========
 
+10.1-dev0 - (unreleased)
+---------------------------
+
 9.1 - (2024-03-18)
 ---------------------------
 * Change: feat: add filters to plotly visualizations
