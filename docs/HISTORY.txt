@@ -1,6 +1,11 @@
 Changelog
 =========
 
+10.1 - (2024-05-08)
+---------------------------
+* Change: Release
+  [claudiaifrim]
+
 9.1 - (2024-03-18)
 ---------------------------
 * Change: feat: add filters to plotly visualizations
