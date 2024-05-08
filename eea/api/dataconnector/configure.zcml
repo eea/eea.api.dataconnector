@@ -9,6 +9,7 @@
   <adapter factory=".adapter.DataProviderForConnectors" />
   <adapter factory=".adapter.DataQueryJsonSchemaProvider" name="data_query" />
 
+  <include package="plone.restapi"  />
   <include file="profiles.zcml" />
   <include file="permissions.zcml" />
   <include file="behavior.zcml" />
