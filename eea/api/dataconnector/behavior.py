@@ -4,7 +4,10 @@ import csv
 import logging
 from io import StringIO
 
-from plone.app.dexterity.behaviors.metadata import DCFieldProperty, MetadataBase
+from plone.app.dexterity.behaviors.metadata import (
+    DCFieldProperty, 
+    MetadataBase
+)
 from plone.dexterity.interfaces import IDexterityContent
 from plone.rfc822.interfaces import IPrimaryFieldInfo
 from plone.restapi.deserializer import json_body
@@ -16,8 +19,11 @@ from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
 
 from .interfaces import (
-    IConnectorDataParameters, IDataConnector, IDataProvider, IDataVisualization,
-    IMaps, IMapVisualization, ITableauVisualization, IFileDataProvider,
+    IConnectorDataParameters, IDataConnector, 
+    IDataProvider, 
+    IDataVisualization,
+    IMaps, IMapVisualization, ITableauVisualization, 
+    IFileDataProvider,
     IElasticConnector, IFigureNote
 )
 
