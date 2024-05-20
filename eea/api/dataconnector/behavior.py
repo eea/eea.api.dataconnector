@@ -21,7 +21,6 @@ from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
 from .interfaces import IElasticConnector
 from .interfaces import IFigureNote
-from eea.api.dataconnector.queryparser import parseQuery
 from plone.restapi.deserializer import json_body
 logger = logging.getLogger(__name__)
 
@@ -78,22 +77,11 @@ class DataProviderForFiles:
 
         keys = rows[0]
         data = []
-        cnt = 0;
-        if page>= 1 and nrOfHits >= 1:
-            for index, row in enumerate(rows[1:]):
-                if index+1 > (page-1)*nrOfHits and index+1 <= page*nrOfHits:
-                    data.append({})
-                    for (i, k) in enumerate(keys):
-                      data[cnt][k] = row[i]
-                    cnt = cnt+1;
-      
-           
-        else:
-            for index, row in enumerate(rows[1:]):
+
+        for index, row in enumerate(rows[((page-1)*nrOfHits+1):(page*nrOfHits+1)] if page>= 1 and nrOfHits >= 1 else rows[1:]):
                 data.append({})
                 for (i, k) in enumerate(keys):
                     data[index][k] = row[i]
-                  
 
         data_query = computeDataQuery(self.request)
 
