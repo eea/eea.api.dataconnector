@@ -12,6 +12,7 @@ from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
+from plone.restapi.deserializer import json_body
 from .interfaces import IConnectorDataParameters
 from .interfaces import IDataConnector
 from .interfaces import IDataProvider
@@ -22,7 +23,7 @@ from .interfaces import ITableauVisualization
 from .interfaces import IFileDataProvider
 from .interfaces import IElasticConnector
 from .interfaces import IFigureNote
-from plone.restapi.deserializer import json_body
+
 
 logger = logging.getLogger(__name__)
 
