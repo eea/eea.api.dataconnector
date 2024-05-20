@@ -3,26 +3,23 @@
 import csv
 import logging
 from io import StringIO
-from plone.app.dexterity.behaviors.metadata import DCFieldProperty
-from plone.app.dexterity.behaviors.metadata import MetadataBase
+
+from plone.app.dexterity.behaviors.metadata import DCFieldProperty, MetadataBase
 from plone.dexterity.interfaces import IDexterityContent
 from plone.rfc822.interfaces import IPrimaryFieldInfo
+from plone.restapi.deserializer import json_body
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
-from plone.restapi.deserializer import json_body
-from .interfaces import IConnectorDataParameters
-from .interfaces import IDataConnector
-from .interfaces import IDataProvider
-from .interfaces import IDataVisualization
-from .interfaces import IMaps
-from .interfaces import IMapVisualization
-from .interfaces import ITableauVisualization
-from .interfaces import IFileDataProvider
-from .interfaces import IElasticConnector
-from .interfaces import IFigureNote
+
+from .interfaces import (
+    IConnectorDataParameters, IDataConnector, IDataProvider, IDataVisualization,
+    IMaps, IMapVisualization, ITableauVisualization, IFileDataProvider,
+    IElasticConnector, IFigureNote
+)
 
 
 logger = logging.getLogger(__name__)
