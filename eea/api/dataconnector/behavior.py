@@ -19,10 +19,10 @@ from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
 
 from .interfaces import (
-    IConnectorDataParameters, IDataConnector, 
-    IDataProvider, 
+    IConnectorDataParameters, IDataConnector,
+    IDataProvider,
     IDataVisualization,
-    IMaps, IMapVisualization, ITableauVisualization, 
+    IMaps, IMapVisualization, ITableauVisualization,
     IFileDataProvider,
     IElasticConnector, IFigureNote
 )
