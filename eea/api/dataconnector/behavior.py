@@ -80,7 +80,7 @@ class DataProviderForFiles:
         data = []
 
         for index, row in enumerate(
-            rows[((page - 1) * nrOfHits + 1) : (page * nrOfHits + 1)]
+            rows[((page - 1) * nrOfHits + 1):(page * nrOfHits + 1)]
             if page >= 1 and nrOfHits >= 1
             else rows[1:]
         ):
