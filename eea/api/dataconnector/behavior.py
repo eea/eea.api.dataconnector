@@ -5,7 +5,7 @@ import logging
 from io import StringIO
 
 from plone.app.dexterity.behaviors.metadata import (
-    DCFieldProperty, 
+    DCFieldProperty,
     MetadataBase
 )
 from plone.dexterity.interfaces import IDexterityContent
