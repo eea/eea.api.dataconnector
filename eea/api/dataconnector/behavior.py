@@ -1,4 +1,5 @@
 """ behavior module """
+
 import csv
 import logging
 from io import StringIO
@@ -22,6 +23,7 @@ from .interfaces import IFileDataProvider
 from .interfaces import IElasticConnector
 from .interfaces import IFigureNote
 from plone.restapi.deserializer import json_body
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,9 +38,7 @@ class DataConnector(MetadataBase):
     endpoint_url = DCFieldProperty(IDataConnector["endpoint_url"])
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
-    required_parameters = DCFieldProperty(
-        IDataConnector["required_parameters"]
-    )
+    required_parameters = DCFieldProperty(IDataConnector["required_parameters"])
     collate = DCFieldProperty(IDataConnector["collate"])
     readme = DCFieldProperty(IDataConnector["readme"])
 
@@ -57,12 +57,12 @@ class DataProviderForFiles:
         """provided data"""
         field = IPrimaryFieldInfo(self.context)
 
-        page = json_body(self.request).get("form",{}).get("p", 0)
-        nrOfHits = json_body(self.request).get("form",{}).get("nrOfHits", 0)
+        page = json_body(self.request).get("form", {}).get("p", 0)
+        nrOfHits = json_body(self.request).get("form", {}).get("nrOfHits", 0)
 
         if not field.value:
             return []
-        
+
         text = field.value.data
         f = StringIO(text.decode("utf-8-sig"))
         try:
@@ -78,10 +78,14 @@ class DataProviderForFiles:
         keys = rows[0]
         data = []
 
-        for index, row in enumerate(rows[((page-1)*nrOfHits+1):(page*nrOfHits+1)] if page>= 1 and nrOfHits >= 1 else rows[1:]):
-                data.append({})
-                for (i, k) in enumerate(keys):
-                    data[index][k] = row[i]
+        for index, row in enumerate(
+            rows[((page - 1) * nrOfHits + 1) : (page * nrOfHits + 1)]
+            if page >= 1 and nrOfHits >= 1
+            else rows[1:]
+        ):
+            data.append({})
+            for i, k in enumerate(keys):
+                data[index][k] = row[i]
 
         data_query = computeDataQuery(self.request)
 
@@ -104,9 +108,9 @@ class DataProviderForElasticCSVWidget:
     def provided_data(self):
         """provided data"""
 
-        widget = getattr(self.context, 'elastic_csv_widget', None)
+        widget = getattr(self.context, "elastic_csv_widget", None)
 
-        data = widget['tableData'] if widget else {}
+        data = widget["tableData"] if widget else {}
 
         return {
             "results": data,
@@ -151,14 +155,10 @@ class ConnectorDataParameters(MetadataBase):
 class ElasticConnectorWidget(MetadataBase):
     """Build csv data from ES data"""
 
-    elastic_csv_widget = DCFieldProperty(
-        IElasticConnector["elastic_csv_widget"]
-    )
+    elastic_csv_widget = DCFieldProperty(IElasticConnector["elastic_csv_widget"])
 
 
 class FigureNoteField(MetadataBase):
     """Insert Figure Note field"""
 
-    figure_note = DCFieldProperty(
-        IFigureNote["figure_note"]
-    )
+    figure_note = DCFieldProperty(IFigureNote["figure_note"])
