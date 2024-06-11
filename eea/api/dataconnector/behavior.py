@@ -1,26 +1,31 @@
 """ behavior module """
+
 import csv
 import logging
 from io import StringIO
-from plone.app.dexterity.behaviors.metadata import DCFieldProperty
-from plone.app.dexterity.behaviors.metadata import MetadataBase
+
+from plone.app.dexterity.behaviors.metadata import (
+    DCFieldProperty,
+    MetadataBase
+)
 from plone.dexterity.interfaces import IDexterityContent
 from plone.rfc822.interfaces import IPrimaryFieldInfo
+from plone.restapi.deserializer import json_body
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
-from .interfaces import IConnectorDataParameters
-from .interfaces import IDataConnector
-from .interfaces import IDataProvider
-from .interfaces import IDataVisualization
-from .interfaces import IMaps
-from .interfaces import IMapVisualization
-from .interfaces import ITableauVisualization
-from .interfaces import IFileDataProvider
-from .interfaces import IElasticConnector
-from .interfaces import IFigureNote
+
+from .interfaces import (
+    IConnectorDataParameters, IDataConnector,
+    IDataProvider,
+    IDataVisualization,
+    IMaps, IMapVisualization, ITableauVisualization,
+    IFileDataProvider,
+    IElasticConnector, IFigureNote
+)
 
 
 logger = logging.getLogger(__name__)
@@ -38,8 +43,7 @@ class DataConnector(MetadataBase):
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
     required_parameters = DCFieldProperty(
-        IDataConnector["required_parameters"]
-    )
+                    IDataConnector["required_parameters"])
     collate = DCFieldProperty(IDataConnector["collate"])
     readme = DCFieldProperty(IDataConnector["readme"])
 
@@ -57,6 +61,9 @@ class DataProviderForFiles:
     def provided_data(self):
         """provided data"""
         field = IPrimaryFieldInfo(self.context)
+
+        page = json_body(self.request).get("form", {}).get("p", 0)
+        nrOfHits = json_body(self.request).get("form", {}).get("nrOfHits", 0)
 
         if not field.value:
             return []
@@ -76,9 +83,13 @@ class DataProviderForFiles:
         keys = rows[0]
         data = []
 
-        for index, row in enumerate(rows[1:]):
+        for index, row in enumerate(
+            rows[((page - 1) * nrOfHits + 1):(page * nrOfHits + 1)]
+            if page >= 1 and nrOfHits >= 1
+            else rows[1:]
+        ):
             data.append({})
-            for (i, k) in enumerate(keys):
+            for i, k in enumerate(keys):
                 data[index][k] = row[i]
 
         data_query = computeDataQuery(self.request)
@@ -102,9 +113,9 @@ class DataProviderForElasticCSVWidget:
     def provided_data(self):
         """provided data"""
 
-        widget = getattr(self.context, 'elastic_csv_widget', None)
+        widget = getattr(self.context, "elastic_csv_widget", None)
 
-        data = widget['tableData'] if widget else {}
+        data = widget["tableData"] if widget else {}
 
         return {
             "results": data,
@@ -150,13 +161,10 @@ class ElasticConnectorWidget(MetadataBase):
     """Build csv data from ES data"""
 
     elastic_csv_widget = DCFieldProperty(
-        IElasticConnector["elastic_csv_widget"]
-    )
+        IElasticConnector["elastic_csv_widget"])
 
 
 class FigureNoteField(MetadataBase):
     """Insert Figure Note field"""
 
-    figure_note = DCFieldProperty(
-        IFigureNote["figure_note"]
-    )
+    figure_note = DCFieldProperty(IFigureNote["figure_note"])
