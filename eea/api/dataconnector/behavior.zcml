@@ -65,6 +65,25 @@
     />
 
     <plone:behavior
+        name="eea.dataconnector.flourish"
+        title="EEA-Viz_Flourish"
+        description="Allows adding a Flourish zip."
+        provides=".behavior.IDataFlourish"
+    />
+
+    <subscriber
+        for=".behavior.IDataFlourish
+            zope.lifecycleevent.interfaces.IObjectAddedEvent"
+        handler=".subscriber.annotations_flourish_set"
+    />
+
+    <subscriber
+        for=".behavior.IDataFlourish
+            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+        handler=".subscriber.annotations_flourish_set"
+    />
+
+    <plone:behavior
         name="eea.dataconnector.tableau_visualization"
         title="EEA-Viz_Tableau"
         description="Allows adding a dashboard (tableau)"

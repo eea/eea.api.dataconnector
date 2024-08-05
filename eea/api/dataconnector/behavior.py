@@ -8,6 +8,9 @@ from plone.app.dexterity.behaviors.metadata import (
     DCFieldProperty,
     MetadataBase
 )
+from zope.interface import provider
+from plone.autoform.interfaces import IFormFieldProvider
+from plone.supermodel import model
 from plone.dexterity.interfaces import IDexterityContent
 from plone.rfc822.interfaces import IPrimaryFieldInfo
 from plone.restapi.deserializer import json_body
@@ -17,6 +20,8 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
+
+from plone.namedfile.field import NamedBlobFile
 
 from .interfaces import (
     IConnectorDataParameters, IDataConnector,
@@ -43,7 +48,7 @@ class DataConnector(MetadataBase):
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
     required_parameters = DCFieldProperty(
-                    IDataConnector["required_parameters"])
+        IDataConnector["required_parameters"])
     collate = DCFieldProperty(IDataConnector["collate"])
     readme = DCFieldProperty(IDataConnector["readme"])
 
@@ -121,6 +126,17 @@ class DataProviderForElasticCSVWidget:
             "results": data,
             "metadata": {},  # Add metadata if needed
         }
+
+
+@provider(IFormFieldProvider)
+class IDataFlourish(model.Schema):
+    # class IDataFlourish():
+    """Standard Flourish Metadata adaptor"""
+
+    flourish_zip = NamedBlobFile(
+        title="Flourish zip file",
+        required=False,
+    )
 
 
 class DataVisualization(MetadataBase):
