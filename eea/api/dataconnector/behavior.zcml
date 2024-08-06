@@ -1,141 +1,124 @@
 <configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    xmlns:i18n="http://namespaces.zope.org/i18n"
-    xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="eea.dataconnector"
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+  xmlns:i18n="http://namespaces.zope.org/i18n"
+  xmlns:plone="http://namespaces.plone.org/plone"
+  i18n_domain="eea.dataconnector"
 >
 
-    <interface interface=".interfaces.IConnectorDataProvider" />
-    <interface interface=".interfaces.IFileDataProvider" />
+  <interface interface=".interfaces.IConnectorDataProvider" />
+  <interface interface=".interfaces.IFileDataProvider" />
 
-    <adapter factory=".behavior.DataProviderForFiles" />
-    <adapter factory=".behavior.DataProviderForElasticCSVWidget" />
+  <adapter factory=".behavior.DataProviderForFiles" />
+  <adapter factory=".behavior.DataProviderForElasticCSVWidget" />
 
-    <plone:behavior
-        name="discodata.connector"
-        title="Discodata connector behavior"
-        description="Adds discodata connector query execution"
-        factory=".behavior.DataConnector"
-        provides=".interfaces.IDataConnector"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IConnectorDataProvider"
-    />
+  <plone:behavior
+    name="discodata.connector"
+    title="Discodata connector behavior"
+    description="Adds discodata connector query execution"
+    factory=".behavior.DataConnector"
+    provides=".interfaces.IDataConnector"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IConnectorDataProvider"
+  />
 
-    <plone:behavior
-        name="dataprovider.files"
-        title="Data provider for files"
-        description="Allows Files to provide remote data"
-        factory=".behavior.DataProviderForFiles"
-        provides=".interfaces.IDataProvider"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IFileDataProvider"
-    />
-
-
-    <plone:behavior
-        name="elastic.connector"
-        title="Data provider for Elastic Connector"
-        description="Allows EC to provide remote data"
-        factory=".behavior.DataProviderForElasticCSVWidget"
-        provides=".interfaces.IElasticDataProvider"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IElasticDataProvider"
-    />
+  <plone:behavior
+    name="dataprovider.files"
+    title="Data provider for files"
+    description="Allows Files to provide remote data"
+    factory=".behavior.DataProviderForFiles"
+    provides=".interfaces.IDataProvider"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IFileDataProvider"
+  />
 
 
-    <plone:behavior
-        name="eea.restapi.parameters"
-        title="Parameters for data connections"
-        description="Allow content to preset parameters for connector data"
-        factory=".behavior.ConnectorDataParameters"
-        provides=".interfaces.IConnectorDataParameters"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IConnectorDataParameters"
-    />
+  <plone:behavior
+    name="elastic.connector"
+    title="Data provider for Elastic Connector"
+    description="Allows EC to provide remote data"
+    factory=".behavior.DataProviderForElasticCSVWidget"
+    provides=".interfaces.IElasticDataProvider"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IElasticDataProvider"
+  />
 
-    <plone:behavior
-        name="eea.dataconnector.visualization"
-        title="EEA-Viz_Plotly"
-        description="Allows adding an interactive chart."
-        factory=".behavior.DataVisualization"
-        provides=".interfaces.IDataVisualization"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IDataVisualization"
-    />
 
-    <plone:behavior
-        name="eea.dataconnector.flourish"
-        title="EEA-Viz_Flourish"
-        description="Allows adding a Flourish zip."
-        provides=".behavior.IDataFlourish"
-    />
+  <plone:behavior
+    name="eea.restapi.parameters"
+    title="Parameters for data connections"
+    description="Allow content to preset parameters for connector data"
+    factory=".behavior.ConnectorDataParameters"
+    provides=".interfaces.IConnectorDataParameters"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IConnectorDataParameters"
+  />
 
-    <subscriber
-        for=".behavior.IDataFlourish
-            zope.lifecycleevent.interfaces.IObjectAddedEvent"
-        handler=".subscriber.annotations_flourish_set"
-    />
+  <plone:behavior
+    name="eea.dataconnector.visualization"
+    title="EEA-Viz_Plotly"
+    description="Allows adding an interactive chart."
+    factory=".behavior.DataVisualization"
+    provides=".interfaces.IDataVisualization"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IDataVisualization"
+  />
 
-    <subscriber
-        for=".behavior.IDataFlourish
-            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
-        handler=".subscriber.annotations_flourish_set"
-    />
+  <plone:behavior
+    name="eea.dataconnector.flourish"
+    title="EEA-Viz_Flourish"
+    description="Allows adding a Flourish zip."
+    provides=".behavior.IDataFlourish"
+  />
 
-  <adapter
-      factory=".traversal.FlourishAcquisitionNamespace"
-      name="flourish"
-      />
+  <plone:behavior
+    name="eea.dataconnector.tableau_visualization"
+    title="EEA-Viz_Tableau"
+    description="Allows adding a dashboard (tableau)"
+    factory=".behavior.TableauViewVisualization"
+    provides=".interfaces.ITableauVisualization"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.ITableauVisualization"
+  />
 
-    <plone:behavior
-        name="eea.dataconnector.tableau_visualization"
-        title="EEA-Viz_Tableau"
-        description="Allows adding a dashboard (tableau)"
-        factory=".behavior.TableauViewVisualization"
-        provides=".interfaces.ITableauVisualization"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.ITableauVisualization"
-    />
+  <plone:behavior
+    name="eea.dataconnector.map_visualization"
+    title="EEA-Viz_ArcGISLayers"
+    description="Allows adding map layers (ArcGIS)."
+    factory=".behavior.MapViewVisualization"
+    provides=".interfaces.IMapVisualization"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IMapVisualization"
+  />
 
-    <plone:behavior
-        name="eea.dataconnector.map_visualization"
-        title="EEA-Viz_ArcGISLayers"
-        description="Allows adding map layers (ArcGIS)."
-        factory=".behavior.MapViewVisualization"
-        provides=".interfaces.IMapVisualization"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IMapVisualization"
-    />
+  <plone:behavior
+    name="eea.dataconnector.maps"
+    title="EEA-Viz_InteractiveMap"
+    description="Allows adding an interactive map."
+    factory=".behavior.Maps"
+    provides=".interfaces.IMaps"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IMaps"
+  />
 
-    <plone:behavior
-        name="eea.dataconnector.maps"
-        title="EEA-Viz_InteractiveMap"
-        description="Allows adding an interactive map."
-        factory=".behavior.Maps"
-        provides=".interfaces.IMaps"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IMaps"
-    />
+  <plone:behavior
+    name="eea.dataconnector.elastic_csv_widget"
+    title="Elastic to CSV behavior"
+    description="Inserts a widget that constructs CSV data from ES"
+    factory=".behavior.ElasticConnectorWidget"
+    provides=".interfaces.IElasticConnector"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IElasticConnector"
+  />
 
-    <plone:behavior
-        name="eea.dataconnector.elastic_csv_widget"
-        title="Elastic to CSV behavior"
-        description="Inserts a widget that constructs CSV data from ES"
-        factory=".behavior.ElasticConnectorWidget"
-        provides=".interfaces.IElasticConnector"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IElasticConnector"
-    />
-
-    <plone:behavior
-        name="eea.dataconnector.figure_note"
-        title="Figure Note"
-        description="Inserts a widget that constructs CSV data from ES"
-        factory=".behavior.FigureNoteField"
-        provides=".interfaces.IFigureNote"
-        for="plone.dexterity.interfaces.IDexterityContent"
-        marker=".interfaces.IFigureNote"
-    />
+  <plone:behavior
+    name="eea.dataconnector.figure_note"
+    title="Figure Note"
+    description="Inserts a widget that constructs CSV data from ES"
+    factory=".behavior.FigureNoteField"
+    provides=".interfaces.IFigureNote"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    marker=".interfaces.IFigureNote"
+  />
 
 </configure>

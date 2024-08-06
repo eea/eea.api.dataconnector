@@ -48,6 +48,13 @@
     template="pt/tableau_view.pt"
   />
 
+  <browser:page
+    name="flourish"
+    for="*"
+    class=".flourish.FlourishDownload"
+    permission="zope2.View"
+  />
+
   <!--  Serializations -->
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
