@@ -83,6 +83,11 @@
         handler=".subscriber.annotations_flourish_set"
     />
 
+  <adapter
+      factory=".traversal.FlourishAcquisitionNamespace"
+      name="flourish"
+      />
+
     <plone:behavior
         name="eea.dataconnector.tableau_visualization"
         title="EEA-Viz_Tableau"
