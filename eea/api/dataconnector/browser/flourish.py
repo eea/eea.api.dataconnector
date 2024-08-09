@@ -60,16 +60,10 @@ class FlourishDownload(BrowserView):
             return default
 
     def set_headers(self, file):
-        # With filename None, set_headers will not add the download headers.
-        # if not self.filename:
-        #     self.filename = getattr(file, "filename", None)
-        #     if self.filename is None:
-        #         self.filename = self.fieldname
-        #         if self.filename is None:
-        #             self.filename = "file.ext"
-        set_headers(file, self.request.response, filename=self.filename)
+        set_headers(file, self.request.response)
 
     def _getFile(self):
+
         context = getattr(self.context, "aq_explicit", self.context)
         annotations = IAnnotations(context)
         data = annotations.get("flourish_zip", {})
