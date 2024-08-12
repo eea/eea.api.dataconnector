@@ -8,20 +8,19 @@ from plone.app.dexterity.behaviors.metadata import (
     DCFieldProperty,
     MetadataBase
 )
-from zope.interface import provider
 from plone.autoform.interfaces import IFormFieldProvider
-from plone.supermodel import model
 from plone.dexterity.interfaces import IDexterityContent
+from plone.namedfile.field import NamedBlobFile
 from plone.rfc822.interfaces import IPrimaryFieldInfo
 from plone.restapi.deserializer import json_body
+from plone.supermodel import model
 from zope.component import adapter
-from zope.interface import implementer
+from zope.interface import (implementer, provider)
 from zope.publisher.interfaces.browser import IBrowserRequest
 
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
 
-from plone.namedfile.field import NamedBlobFile
 
 from .interfaces import (
     IConnectorDataParameters, IDataConnector,

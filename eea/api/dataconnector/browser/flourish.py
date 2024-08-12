@@ -1,3 +1,6 @@
+""" flourish
+"""
+
 from plone.namedfile.utils import set_headers, stream_data
 from Products.Five.browser import BrowserView
 from zope.annotation.interfaces import IAnnotations
@@ -19,6 +22,7 @@ class FlourishDownload(BrowserView):
         self.filename = None
 
     def publishTraverse(self, request, name):
+        """ traverse """
         if self.filename is None:  # ../@@download/fieldname/filename
             self.filename = name
         else:
@@ -32,6 +36,7 @@ class FlourishDownload(BrowserView):
         return stream_data(file, **request_range)
 
     def handle_request_range(self, file):
+        """ handle_request_range """
         default = {}
         # check if we have a range in the request
         header_range = self.request.getHeader("Range", None)
@@ -60,9 +65,12 @@ class FlourishDownload(BrowserView):
             return default
 
     def set_headers(self, file):
+        """ set_headers """
+
         set_headers(file, self.request.response)
 
     def _getFile(self):
+        """ _getFiles """
 
         context = getattr(self.context, "aq_explicit", self.context)
         annotations = IAnnotations(context)
