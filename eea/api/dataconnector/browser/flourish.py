@@ -49,7 +49,7 @@ class FlourishDownload(BrowserView):
             return default
         ranges = parseRange(header_range)
         if not ranges or len(ranges) != 1:
-            # TODO: multipart ranges not implemented
+            # multipart ranges not implemented
             return default
         try:
             length = file.getSize()
