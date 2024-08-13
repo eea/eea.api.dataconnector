@@ -4,13 +4,62 @@
 from plone.namedfile.utils import set_headers, stream_data
 from Products.Five.browser import BrowserView
 from zope.annotation.interfaces import IAnnotations
-from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse, NotFound
+from zope.interface import implementer
 from ZPublisher.HTTPRangeSupport import expandRanges, parseRange
+from zipfile import (ZipFile, is_zipfile)
 
+from persistent.mapping import PersistentMapping
+from plone.namedfile.file import NamedBlobFile
+from zope.annotation.interfaces import IAnnotations
 # from AccessControl.ZopeGuards import guarded_getattr
 # from plone.rfc822.interfaces import IPrimaryFieldInfo
 # from plone.namedfile.utils import extract_media_type
+
+
+class FlourishUpload(BrowserView):
+    """Upload a zip file, extract it and add to context annotation"""
+
+    def list(self):
+        response = {}
+        response['title'] = self.context.title
+        response['portal_type'] = self.context.portal_type
+        response['url'] = self.context.absolute_url()
+        response['annotations'] = []
+        response['message'] = None
+        annotations = IAnnotations(self.context)
+        fileUploaded = self.request.form.get("fileToUpload", None)
+        if fileUploaded and is_zipfile(fileUploaded):
+            annot_data = PersistentMapping()
+            with ZipFile(fileUploaded.file) as myzip:
+                for file_name in myzip.namelist():
+                    with myzip.open(file_name) as file_content:
+                        file = NamedBlobFile(
+                            filename=file_name, data=file_content.read())
+                        annot_data[file_name] = file
+            annotations['flourish_zip'] = annot_data
+        elif 'fileToUpload' in self.request.form:
+            response['message'] = 'The file sent was either empty \
+                 or not a valid zip archive.'
+        response['annotations'] = annotations['flourish_zip'] if 'flourish_zip' in annotations else []
+        return response
+
+
+class FlourishDelete(BrowserView):
+    """Remove flourish data from context annotation"""
+
+    def list(self):
+        response = {}
+        response['title'] = self.context.title
+        response['portal_type'] = self.context.portal_type
+        response['url'] = self.context.absolute_url()
+        response['annotations'] = []
+        response['message'] = None
+        annotations = IAnnotations(self.context)
+        if 'flourish_zip' in annotations:
+            annotations['flourish_zip'] = []
+        response['annotations'] = annotations['flourish_zip'] if 'flourish_zip' in annotations else []
+        return response
 
 
 @implementer(IPublishTraverse)
