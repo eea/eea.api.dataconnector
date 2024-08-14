@@ -18,6 +18,9 @@
                     <td tal:content="item"></td>
                 </tr>
             </table>
+            <form action="@@flourish_upload" method="post">
+                <input type="submit" value="Delete flourish data" name="delete" onclick="return confirm('Delete flourish data?')"/>
+            </form>
             <hr><a href="@@flourish_delete">Clear flourish data</a>
         </div>
         <div tal:condition="python: len(items)<1">

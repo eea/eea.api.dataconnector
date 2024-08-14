@@ -16,17 +16,4 @@
   <include package=".browser" />
   <include package=".upgrades" />
 
-
-  <subscriber
-    for=".behavior.IDataFlourish
-            zope.lifecycleevent.interfaces.IObjectAddedEvent"
-    handler=".subscriber.annotations_flourish_set"
-  />
-
-  <subscriber
-    for=".behavior.IDataFlourish
-            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
-    handler=".subscriber.annotations_flourish_set"
-  />
-
 </configure>

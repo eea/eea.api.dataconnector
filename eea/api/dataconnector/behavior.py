@@ -127,17 +127,6 @@ class DataProviderForElasticCSVWidget:
         }
 
 
-@provider(IFormFieldProvider)
-class IDataFlourish(model.Schema):
-    # class IDataFlourish():
-    """Standard Flourish Metadata adaptor"""
-
-    flourish_zip = NamedBlobFile(
-        title="Flourish zip file",
-        required=False,
-    )
-
-
 class DataVisualization(MetadataBase):
     """Standard Fise Metadata adaptor"""
 

@@ -65,13 +65,6 @@
   />
 
   <plone:behavior
-    name="eea.dataconnector.flourish"
-    title="EEA-Viz_Flourish"
-    description="Allows adding a Flourish zip."
-    provides=".behavior.IDataFlourish"
-  />
-
-  <plone:behavior
     name="eea.dataconnector.tableau_visualization"
     title="EEA-Viz_Tableau"
     description="Allows adding a dashboard (tableau)"

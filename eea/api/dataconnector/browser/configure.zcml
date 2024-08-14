@@ -63,14 +63,6 @@
     permission="zope2.View"
   />
 
-  <browser:page
-    name="flourish_delete"
-    for="*"
-    template="pt/flourish_upload.pt"
-    class=".flourish.FlourishDelete"
-    permission="zope2.View"
-  />
-
   <!--  Serializations -->
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
