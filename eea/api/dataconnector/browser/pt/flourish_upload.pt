@@ -6,7 +6,7 @@
         <form action="@@flourish_upload" method="post" enctype="multipart/form-data">
             <p i18n:translate="">Zip file:</p>
             <input type="file" name="fileToUpload" id="fileToUpload" />
-            <input type="submit" value="Submit" name="submit" i18n:translate=""/>
+            <input type="submit" value="Submit" name="submit" i18n:attributes="value"/>
         </form>
         <p style="border:2px solid #900;padding:10px;color:#900;font-weight:bold;" tal:condition="response/message" tal:content="response/message"></p>
     </div>
@@ -20,7 +20,7 @@
             </table>
             <hr />
             <form action="@@flourish_upload" method="post">
-                <input type="submit" value="Delete flourish data" name="delete" onclick="return confirm('Delete flourish data?')" i18n:translate=""/>
+                <input type="submit" value="Delete flourish data" name="delete" onclick="return confirm('Delete flourish data?')" i18n:attributes="value"/>
             </form>
         </div>
         <div tal:condition="python: len(items)<1">
