@@ -1,15 +1,15 @@
 """ flourish
 """
 
+from zipfile import (ZipFile, is_zipfile)
+
 from plone.namedfile.utils import set_headers, stream_data
 from plone.namedfile.file import NamedBlobFile
 from Products.Five.browser import BrowserView
 from zope.annotation.interfaces import IAnnotations
 from zope.publisher.interfaces import IPublishTraverse, NotFound
 from zope.interface import implementer
-from zope.annotation.interfaces import IAnnotations
 from ZPublisher.HTTPRangeSupport import expandRanges, parseRange
-from zipfile import (ZipFile, is_zipfile)
 
 from persistent.mapping import PersistentMapping
 # from AccessControl.ZopeGuards import guarded_getattr
