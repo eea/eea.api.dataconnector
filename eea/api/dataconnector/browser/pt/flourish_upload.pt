@@ -4,27 +4,27 @@
     <div style="border:1px solid #000;padding:20px;">
         <h3 i18n:translate="">Upload flourish zip</h3>
         <form action="@@flourish_upload" method="post" enctype="multipart/form-data">
-            <br i18n:translate="">Zip file:
+            <p i18n:translate="">Zip file:</p>
             <input type="file" name="fileToUpload" id="fileToUpload" />
-            <input type="submit" value="Submit" name="submit" />
+            <input type="submit" value="Submit" name="submit" i18n:translate=""/>
         </form>
         <p style="border:2px solid #900;padding:10px;color:#900;font-weight:bold;" tal:condition="response/message" tal:content="response/message"></p>
     </div>
     <div tal:define="items response/annotations">
         <div tal:condition="python: len(items)">
-            <h4>Annotation</h4>
+            <h4 i18n:translate="">Annotation</h4>
             <table>
                 <tr tal:repeat="item items">
                     <td tal:content="item"></td>
                 </tr>
             </table>
+            <hr />
             <form action="@@flourish_upload" method="post">
-                <input type="submit" value="Delete flourish data" name="delete" onclick="return confirm('Delete flourish data?')"/>
+                <input type="submit" value="Delete flourish data" name="delete" onclick="return confirm('Delete flourish data?')" i18n:translate=""/>
             </form>
-            <hr><a href="@@flourish_delete">Clear flourish data</a>
         </div>
         <div tal:condition="python: len(items)<1">
-            <h4>There is no data for a flourish zip file.</h4>
+            <h4 i18n:translate="">There is no data for a flourish zip file.</h4>
         </div>
     </div>
 </div>
