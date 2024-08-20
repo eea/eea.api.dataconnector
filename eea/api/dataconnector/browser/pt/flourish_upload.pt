@@ -1,0 +1,30 @@
+<div tal:define="response view/list">
+    <h1><a  tal:content="response/title" tal:attributes="href response/url"></a></h1>
+    <h2 tal:content="response/portal_type"></h2>
+    <div style="border:1px solid #000;padding:20px;">
+        <h3 i18n:translate="">Upload flourish zip</h3>
+        <form action="@@flourish_upload" method="post" enctype="multipart/form-data">
+            <p i18n:translate="">Zip file:</p>
+            <input type="file" name="fileToUpload" id="fileToUpload" />
+            <input type="submit" value="Submit" name="submit" i18n:attributes="value"/>
+        </form>
+        <p style="border:2px solid #900;padding:10px;color:#900;font-weight:bold;" tal:condition="response/message" tal:content="response/message"></p>
+    </div>
+    <div tal:define="items response/annotations">
+        <div tal:condition="python: len(items)">
+            <h4 i18n:translate="">Annotation</h4>
+            <table>
+                <tr tal:repeat="item items">
+                    <td tal:content="item"></td>
+                </tr>
+            </table>
+            <hr />
+            <form action="@@flourish_upload" method="post">
+                <input type="submit" value="Delete flourish data" name="delete" onclick="return confirm('Delete flourish data?')" i18n:attributes="value"/>
+            </form>
+        </div>
+        <div tal:condition="python: len(items)<1">
+            <h4 i18n:translate="">There is no data for a flourish zip file.</h4>
+        </div>
+    </div>
+</div>
