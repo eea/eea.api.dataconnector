@@ -5,6 +5,7 @@
   <object name="discodataconnector" meta_type="Dexterity FTI" />
   <object name="elasticconnector" meta_type="Dexterity FTI" />
   <object name="visualization" meta_type="Dexterity FTI" />
+  <object name="flourish_visualization" meta_type="Dexterity FTI" />
   <object name="File" meta_type="Dexterity FTI" />
   <object name="map_interactive" meta_type="Dexterity FTI"/>
 </object>
