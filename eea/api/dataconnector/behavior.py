@@ -18,6 +18,7 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
 
+
 from .interfaces import (
     IConnectorDataParameters, IDataConnector,
     IDataProvider,
@@ -43,7 +44,7 @@ class DataConnector(MetadataBase):
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
     required_parameters = DCFieldProperty(
-                    IDataConnector["required_parameters"])
+        IDataConnector["required_parameters"])
     collate = DCFieldProperty(IDataConnector["collate"])
     readme = DCFieldProperty(IDataConnector["readme"])
 
