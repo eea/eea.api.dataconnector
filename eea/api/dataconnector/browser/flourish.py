@@ -68,6 +68,7 @@ class FlourishDownload(BrowserView):
         return self
 
     def __call__(self):
+        self.request.response.setHeader('X-Theme-Disabled', '1')
         file = self._getFile()
         self.set_headers(file)
         request_range = self.handle_request_range(file)
