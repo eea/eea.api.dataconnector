@@ -3,7 +3,7 @@ Changelog
 
 10.5 - (2024-09-27)
 ---------------------------
-* Change: Develop
+* Change: Disable Diazo Theming for flourish browser view 
   [tiberiuichim]
 
 10.4 - (2024-09-06)
