@@ -1,6 +1,9 @@
 Changelog
 =========
 
+10.6-dev0 - (unreleased)
+---------------------------
+
 10.5 - (2024-09-27)
 ---------------------------
 * Change: Disable Diazo Theming for flourish browser view 
