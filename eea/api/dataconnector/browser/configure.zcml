@@ -66,6 +66,9 @@
   <!--  Serializations -->
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
+    factory=".blocks.EmbedContentSerializationTransformer" />
+  <subscriber
+    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedVisualizationSerializationTransformer" />
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
