@@ -4,6 +4,7 @@ import re
 from urllib.parse import urlparse
 from AccessControl import Unauthorized
 from plone import api
+from plone.restapi.blocks import iter_block_transform_handlers
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import ISerializeToJson
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
@@ -215,6 +216,41 @@ def getVisualization(serializer, layout=True):
 
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
+class EmbedContentSerializationTransformer:
+    """Embed content serialization"""
+
+    order = 9999
+    block_type = "embed_content"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        properties = value.get("properties", {})
+        content_type = properties.get('@type', None)
+        block_type = 'none'
+
+        if content_type == 'visualization':
+            block_type = 'embed_visualization'
+        if content_type == 'tableau_visualization':
+            block_type = 'embed_tableau_visualization'
+        if content_type == 'map_visualization':
+            block_type = 'embed_eea_map_block'
+        if content_type == 'map_interactive':
+            block_type = 'embed_maps'
+
+        new_value = value.copy()
+        for handler in iter_block_transform_handlers(
+                self.context, {**value, "@type": block_type},
+                IBlockFieldSerializationTransformer):
+            new_value = handler(new_value)
+
+        return new_value
+
+
+@implementer(IBlockFieldSerializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
 class EmbedVisualizationSerializationTransformer:
     """Embed visualization serialization"""
 
@@ -227,6 +263,8 @@ class EmbedVisualizationSerializationTransformer:
 
     def __call__(self, value):
         vis_url, uid = getUrlUid(self, value, 'vis_url')
+        if not uid:
+            vis_url, uid = getUrlUid(self, value, 'url')
 
         if 'visualization' in value:
             del value['visualization']
@@ -332,6 +370,8 @@ class EmbedTableauVisualizationSerializationTransformer:
 
     def __call__(self, value):
         tableau_vis_url, uid = getUrlUid(self, value, 'tableau_vis_url')
+        if not uid:
+            tableau_vis_url, uid = getUrlUid(self, value, 'url')
 
         if 'tableau_visualization' in value:
             del value['tableau_visualization']
@@ -437,6 +477,8 @@ class EmbedEEAMapBlockSerializationTransformer:
 
     def __call__(self, value):
         vis_url, uid = getUrlUid(self, value, 'vis_url')
+        if not uid:
+            vis_url, uid = getUrlUid(self, value, 'url')
 
         if 'map_visualization_data' in value:
             del value['map_visualization_data']

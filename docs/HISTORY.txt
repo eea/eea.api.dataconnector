@@ -1,6 +1,11 @@
 Changelog
 =========
 
+10.6 - (2024-10-21)
+---------------------------
+* Change: Add embed_content block serializer
+  [razvanMiu - refs #274326]
+
 10.5 - (2024-09-27)
 ---------------------------
 * Change: Disable Diazo Theming for flourish browser view 
