@@ -228,16 +228,16 @@ class EmbedContentSerializationTransformer:
 
     def __call__(self, value):
         properties = value.get("properties", {})
-        type = properties.get('@type', None)
+        content_type = properties.get('@type', None)
         block_type = 'none'
 
-        if type == 'visualization':
+        if content_type == 'visualization':
             block_type = 'embed_visualization'
-        if type == 'tableau_visualization':
+        if content_type == 'tableau_visualization':
             block_type = 'embed_tableau_visualization'
-        if type == 'map_visualization':
+        if content_type == 'map_visualization':
             block_type = 'embed_eea_map_block'
-        if type == 'map_interactive':
+        if content_type == 'map_interactive':
             block_type = 'embed_maps'
 
         new_value = value.copy()
