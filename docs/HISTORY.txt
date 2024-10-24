@@ -1,10 +1,10 @@
 Changelog
 =========
 
-10.7 - (2024-10-24)
+11.0 - (2024-10-24)
 ---------------------------
-* Change: improvments
-  [razvanMiu]
+* Change: Refactor Visualisation serializers
+  [razvanMiu - refs #274326]
 
 10.6 - (2024-10-21)
 ---------------------------
