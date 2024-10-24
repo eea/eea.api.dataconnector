@@ -252,11 +252,13 @@ class EmbedingBlockSerializationTransformer:
         except Unauthorized:
             self.error = "Apologies, it seems this " + getLinkHTML(
                 url, self.title) + " has not been published yet."
+            return None
 
         except Forbidden:
             self.error = "Apologies, it seems you do not have " + \
                 "permissions to see this " + getLinkHTML(url, self.title) + \
                 "."
+            return None
 
     def get_doc_json(self):
         """Get document json"""
