@@ -332,6 +332,25 @@ class EmbedContentSerializationTransformer(
         return new_value
 
 
+@implementer(IBlockFieldDeserializationTransformer)
+@adapter(IBlocks, IBrowserRequest)
+class EmbedContentDeserializationTransformer:
+    """Embed content deserialization"""
+
+    order = 9999
+    block_type = "embed_content"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        return {
+            "@type": value.get("@type"),
+            "url": value.get("url")
+        }
+
+
 class EmbedVisualizationSerializationTransformer(
         EmbedingBlockSerializationTransformer):
     """Embed visualization serialization"""
