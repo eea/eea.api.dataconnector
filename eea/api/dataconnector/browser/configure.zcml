@@ -86,6 +86,9 @@
   <!--  Deserializations -->
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
+    factory=".blocks.EmbedContentDeserializationTransformer" />
+  <subscriber
+    provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
     factory=".blocks.EmbedVisualizationDeserializationTransformer" />
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"

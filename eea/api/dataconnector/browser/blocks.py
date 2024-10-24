@@ -81,28 +81,12 @@ def getUid(context, link, retry=True):
     return uid
 
 
-def getUrlUid(self, value, field):
+def getMetadata(doc_json):
     """
-    Get URL and UID based on the provided value and field.
-
-    :param value: The input value.
-    :param field: The field to extract the URL from in the value.
-
-    :return: A tuple containing the URL and UID.
-    """
-
-    url = value.get(field)
-    uid = getUid(self.context, url)
-    url = uid_to_url(url)
-    return url, uid
-
-
-def getMetadata(serializer):
-    """
-      Extract metadata information from a serializer.
+      Extract metadata information from a doc_json.
 
       Parameters:
-      - serializer: The serializer providing metadata information.
+      - doc_json: The doc_json providing metadata information.
 
       Returns:
       - dict: A dictionary containing metadata information with
@@ -117,21 +101,21 @@ def getMetadata(serializer):
         - "figure_note": Additional notes related to the figure.
 
       The function retrieves metadata information from the provided
-      serializer and returns it as a dictionary. If a specific metadata
-      field is not present in the serializer, the corresponding key in
+      doc_json and returns it as a dictionary. If a specific metadata
+      field is not present in the doc_json, the corresponding key in
       the dictionary will have a value of None.
       """
 
     return {
-        "@id": serializer.get("@id"),
-        "title": serializer.get("title"),
-        "description": serializer.get("description"),
-        "publisher": serializer.get("publisher"),
-        "geo_coverage": serializer.get("geo_coverage"),
-        "temporal_coverage": serializer.get("temporal_coverage"),
-        "other_organisations": serializer.get("other_organisations"),
-        "data_provenance": serializer.get("data_provenance"),
-        "figure_note": serializer.get("figure_note")
+        "@id": doc_json.get("@id"),
+        "title": doc_json.get("title"),
+        "description": doc_json.get("description"),
+        "publisher": doc_json.get("publisher"),
+        "geo_coverage": doc_json.get("geo_coverage"),
+        "temporal_coverage": doc_json.get("temporal_coverage"),
+        "other_organisations": doc_json.get("other_organisations"),
+        "data_provenance": doc_json.get("data_provenance"),
+        "figure_note": doc_json.get("figure_note")
     }
 
 
@@ -157,12 +141,12 @@ def getVisualizationLayout(chartData):
     return chartData
 
 
-def getVisualization(serializer, layout=True):
+def getVisualization(doc_json, layout=True):
     """
-      Extract visualization information from a serializer.
+      Extract visualization information from a doc_json.
 
       Parameters:
-      - serializer: The serializer providing visualization information.
+      - doc_json: The doc_json providing visualization information.
       - layout (bool, optional): If True, apply layout adjustments to the
         visualization data. Defaults to True.
 
@@ -174,13 +158,13 @@ def getVisualization(serializer, layout=True):
         Returns None if the visualization information is not present.
 
       The function retrieves visualization information from the provided
-      serializer, including chart data and provider URL. If layout is set
+      doc_json, including chart data and provider URL. If layout is set
       to True (default), it applies layout adjustments to the chart data using
       the getVisualizationLayout function.
       If visualization information is not present, the function returns None.
       """
 
-    visualization = serializer.get("visualization", None)
+    visualization = doc_json.get("visualization", None)
 
     if not visualization:
         return {}
@@ -216,10 +200,86 @@ def getVisualization(serializer, layout=True):
 
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
-class EmbedContentSerializationTransformer:
-    """Embed content serialization"""
+class EmbedingBlockSerializationTransformer:
+    """Embeding block serialization"""
 
     order = 9999
+    block_type = "unknown"
+    title = 'content'
+    state = {}
+    error = None
+    initialized = False
+
+    def __call__(self, value):
+        return value
+
+    def init(self, value):
+        """Init"""
+        self.state = {}
+        self.initialized = True
+        url = self.get_url(value)
+
+        if not url:
+            return
+
+        self.state["url"] = url
+        self.state["uid"] = getUid(self.context, self.state["url"])
+        self.state["doc"] = self.get_doc()
+        self.state["doc_json"] = self.get_doc_json()
+
+        if not self.state["doc_json"]:
+            return
+
+        self.state["properties"] = {
+            **getMetadata(self.state["doc_json"]),
+            "@type": self.state["doc_json"].get("@type"),
+            "UID": self.state["doc_json"].get("UID")
+        }
+
+    def get_url(self, value):
+        """Get url"""
+        if not value:
+            return None
+        return value.get("url") or value.get("vis_url") or value.get(
+            "tableau_vis_url")
+
+    def get_doc(self):
+        """Get doc"""
+        url = self.state["url"]
+        uid = self.state["uid"]
+        try:
+            return api.content.get(UID=uid)
+        except Unauthorized:
+            self.error = "Apologies, it seems this " + getLinkHTML(
+                url, self.title) + " has not been published yet."
+            return None
+
+        except Forbidden:
+            self.error = "Apologies, it seems you do not have " + \
+                "permissions to see this " + getLinkHTML(url, self.title) + \
+                "."
+            return None
+
+    def get_doc_json(self):
+        """Get document json"""
+        doc = self.state["doc"]
+        if not doc:
+            return None
+        serializer = queryMultiAdapter(
+            (doc, self.request), ISerializeToJson)
+        if not serializer:
+            return None
+        return serializer(
+            version=self.request.get("version"))
+
+    def get_error(self):
+        """Get error"""
+
+
+class EmbedContentSerializationTransformer(
+        EmbedingBlockSerializationTransformer):
+    """Embed content serialization"""
+
     block_type = "embed_content"
 
     def __init__(self, context, request):
@@ -227,8 +287,31 @@ class EmbedContentSerializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        properties = value.get("properties", {})
-        content_type = properties.get('@type', None)
+        if not self.initialized:
+            self.init(value)
+
+        url = self.state.get("url")
+        doc_json = self.state.get("doc_json")
+
+        if not url:
+            return value
+
+        if self.error:
+            return {
+                **value,
+                "error": self.error
+            }
+
+        if not doc_json:
+            return {
+                **value,
+                "error": "Apologies, it seems this " + getLinkHTML(
+                    url, self.title) + " does not exist."
+            }
+
+        value["properties"] = self.state["properties"]
+
+        content_type = value["properties"].get('@type', None)
         block_type = 'none'
 
         if content_type == 'visualization':
@@ -249,90 +332,70 @@ class EmbedContentSerializationTransformer:
         return new_value
 
 
-@implementer(IBlockFieldSerializationTransformer)
+@implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
-class EmbedVisualizationSerializationTransformer:
-    """Embed visualization serialization"""
+class EmbedContentDeserializationTransformer:
+    """Embed content deserialization"""
 
     order = 9999
-    block_type = "embed_visualization"
+    block_type = "embed_content"
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
     def __call__(self, value):
-        vis_url, uid = getUrlUid(self, value, 'vis_url')
-        if not uid:
-            vis_url, uid = getUrlUid(self, value, 'url')
+        return {
+            "@type": value.get("@type"),
+            "url": value.get("url")
+        }
+
+
+class EmbedVisualizationSerializationTransformer(
+        EmbedingBlockSerializationTransformer):
+    """Embed visualization serialization"""
+
+    order = 9999
+    block_type = "embed_visualization"
+    title = "Chart (Interactive)"
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, value):
+        if not self.initialized:
+            self.init(value)
+
+        url = uid_to_url(self.state.get("url"))
+        doc_json = self.state.get("doc_json")
+
+        value["vis_url"] = url
+
+        if self.error:
+            return {
+                **value,
+                "visualization": {
+                    "error": self.error
+                }
+            }
 
         if 'visualization' in value:
             del value['visualization']
 
-        if not uid:
+        if not doc_json:
             return value
 
-        doc = None
+        use_data_sources = value.get('use_data_sources', True)
 
-        try:
-            doc = api.content.get(UID=uid)
-        except Unauthorized:
-            return {
-                **value, "vis_url": vis_url,
-                "visualization": {
-                    "error":
-                    "Apologies, it seems this " +
-                    getLinkHTML(vis_url, 'Chart (Interactive)') +
-                    " has not been published yet."
-                }
+        return {
+            **value,
+            "visualization": {
+                **getVisualization(doc_json=doc_json,
+                                   layout=use_data_sources),
+                **getMetadata(doc_json),
             }
-        except Forbidden:
-            return {
-                **value, "vis_url": vis_url,
-                "visualization": {
-                    "error":
-                    "Apologies, it seems you do not have " +
-                    "permissions to see this " +
-                    getLinkHTML(vis_url, 'Chart (Interactive)') + "."
-                }
-            }
-
-        doc_serializer = self._get_doc_serializer(doc)
-        if doc_serializer:
-            use_data_sources = value.get('use_data_sources', True)
-
-            return {
-                **value, "vis_url": vis_url,
-                "visualization": {
-                    **getVisualization(serializer=doc_serializer,
-                                       layout=use_data_sources),
-                    **getMetadata(doc_serializer),
-                }
-            }
-        return {**value, "vis_url": uid_to_url(value.get('vis_url'))}
-
-    def _get_doc_serializer(self, doc):
-        """
-        Get a serializer for the given document.
-
-        This method queries for a JSON serializer adapter for the provided
-        document and request. If a serializer is found, it is instantiated
-        with the version from the request and returned.
-
-        :param doc: The document for which to get a serializer.
-        :type doc: object
-
-        :return: An instantiated JSON serializer if available, or None if
-                 not found.
-        :rtype: object or None
-        """
-        if doc:
-            doc_serializer = queryMultiAdapter(
-                (doc, self.request), ISerializeToJson)
-            if doc_serializer:
-                return doc_serializer(
-                    version=self.request.get("version"))
-        return None
+        }
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -356,90 +419,48 @@ class EmbedVisualizationDeserializationTransformer:
         return value
 
 
-@implementer(IBlockFieldSerializationTransformer)
-@adapter(IBlocks, IBrowserRequest)
-class EmbedTableauVisualizationSerializationTransformer:
+class EmbedTableauVisualizationSerializationTransformer((
+        EmbedingBlockSerializationTransformer)):
     """Embed tableau visualization serialization"""
 
     order = 9999
     block_type = "embed_tableau_visualization"
+    title = "Dashboard"
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
     def __call__(self, value):
-        tableau_vis_url, uid = getUrlUid(self, value, 'tableau_vis_url')
-        if not uid:
-            tableau_vis_url, uid = getUrlUid(self, value, 'url')
+        if not self.initialized:
+            self.init(value)
+
+        url = uid_to_url(self.state.get("url"))
+        doc_json = self.state.get("doc_json")
+
+        value["tableau_vis_url"] = url
+
+        if self.error:
+            return {
+                **value,
+                "visualization": {
+                    "error": self.error
+                }
+            }
 
         if 'tableau_visualization' in value:
             del value['tableau_visualization']
 
-        if not uid:
+        if not doc_json:
             return value
 
-        doc = None
-
-        try:
-            doc = api.content.get(UID=uid)
-        except Unauthorized:
-            return {
-                **value, "tableau_vis_url": tableau_vis_url,
-                "tableau_visualization": {
-                    "error":
-                    "Apologies, it seems this " +
-                    getLinkHTML(tableau_vis_url, 'Dashboard') +
-                    " has not been published yet."
-                }
-            }
-        except Forbidden:
-            return {
-                **value, "tableau_vis_url": tableau_vis_url,
-                "tableau_visualization": {
-                    "error":
-                    "Apologies, it seems you do not have " +
-                    "permissions to see this " +
-                    getLinkHTML(tableau_vis_url, 'Dashboard') + "."
-                }
-            }
-
-        doc_serializer = self._get_doc_serializer(doc)
-        if doc_serializer:
-            return {
-                **value, "tableau_vis_url": tableau_vis_url,
-                "tableau_visualization": {
-                    **doc_serializer.get('tableau_visualization', {}),
-                    **getMetadata(doc_serializer),
-                }
-            }
         return {
             **value,
-            "tableau_vis_url": tableau_vis_url,
+            "tableau_visualization": {
+                **doc_json.get('tableau_visualization', {}),
+                **getMetadata(doc_json),
+            }
         }
-
-    def _get_doc_serializer(self, doc):
-        """
-        Get a serializer for the given document.
-
-        This method queries for a JSON serializer adapter for the provided
-        document and request. If a serializer is found, it is instantiated
-        with the version from the request and returned.
-
-        :param doc: The document for which to get a serializer.
-        :type doc: object
-
-        :return: An instantiated JSON serializer if available, or None if
-                 not found.
-        :rtype: object or None
-        """
-        if doc:
-            doc_serializer = queryMultiAdapter(
-                (doc, self.request), ISerializeToJson)
-            if doc_serializer:
-                return doc_serializer(
-                    version=self.request.get("version"))
-        return None
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -463,90 +484,48 @@ class EmbedTableauVisualizationDeserializationTransformer:
         return value
 
 
-@implementer(IBlockFieldSerializationTransformer)
-@adapter(IBlocks, IBrowserRequest)
-class EmbedEEAMapBlockSerializationTransformer:
+class EmbedEEAMapBlockSerializationTransformer(
+        EmbedingBlockSerializationTransformer):
     """Embed eea map block serializer"""
 
     order = 9999
     block_type = "embed_eea_map_block"
+    title = "Map (Simple)"
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
     def __call__(self, value):
-        vis_url, uid = getUrlUid(self, value, 'vis_url')
-        if not uid:
-            vis_url, uid = getUrlUid(self, value, 'url')
+        if not self.initialized:
+            self.init(value)
+
+        url = uid_to_url(self.state.get("url"))
+        doc_json = self.state.get("doc_json")
+
+        value["vis_url"] = url
+
+        if self.error:
+            return {
+                **value,
+                "visualization": {
+                    "error": self.error
+                }
+            }
 
         if 'map_visualization_data' in value:
             del value['map_visualization_data']
 
-        if not uid:
+        if not doc_json:
             return value
 
-        doc = None
-
-        try:
-            doc = api.content.get(UID=uid)
-        except Unauthorized:
-            return {
-                **value, "tableau_vis_url": vis_url,
-                "map_visualization_data": {
-                    "error":
-                    "Apologies, it seems this " +
-                    getLinkHTML(vis_url, 'Map (Simple)') +
-                    " has not been published yet."
-                }
-            }
-        except Forbidden:
-            return {
-                **value, "tableau_vis_url": vis_url,
-                "map_visualization_data": {
-                    "error":
-                    "Apologies, it seems you do not have " +
-                    "permissions to see this " +
-                    getLinkHTML(vis_url, 'Map (Simple)') + "."
-                }
-            }
-
-        doc_serializer = self._get_doc_serializer(doc)
-        if doc_serializer:
-            return {
-                **value, "vis_url": vis_url,
-                "map_visualization_data": {
-                    **doc_serializer.get('map_visualization_data', {}),
-                    **getMetadata(doc_serializer),
-                }
-            }
         return {
             **value,
-            "vis_url": vis_url,
+            "map_visualization_data": {
+                **doc_json.get('map_visualization_data', {}),
+                **getMetadata(doc_json),
+            }
         }
-
-    def _get_doc_serializer(self, doc):
-        """
-        Get a serializer for the given document.
-
-        This method queries for a JSON serializer adapter for the provided
-        document and request. If a serializer is found, it is instantiated
-        with the version from the request and returned.
-
-        :param doc: The document for which to get a serializer.
-        :type doc: object
-
-        :return: An instantiated JSON serializer if available, or None if
-                 not found.
-        :rtype: object or None
-        """
-        if doc:
-            doc_serializer = queryMultiAdapter(
-                (doc, self.request), ISerializeToJson)
-            if doc_serializer:
-                return doc_serializer(
-                    version=self.request.get("version"))
-        return None
 
 
 @implementer(IBlockFieldDeserializationTransformer)
@@ -570,80 +549,47 @@ class EmbedEEAMapBlockDeserializationTransformer:
         return value
 
 
-@implementer(IBlockFieldSerializationTransformer)
-@adapter(IBlocks, IBrowserRequest)
-class EmbedMapsSerializationTransformer:
+class EmbedMapsSerializationTransformer(
+        EmbedingBlockSerializationTransformer):
     """Embed maps serializer"""
 
     order = 9999
     block_type = "embed_maps"
+    title = "Map (Interactive)"
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
     def __call__(self, value):
-        url, uid = getUrlUid(self, value, 'url')
+        if not self.initialized:
+            self.init(value)
+
+        url = uid_to_url(self.state.get("url"))
+        doc_json = self.state.get("doc_json")
+
+        value["url"] = url
+
+        if self.error:
+            return {
+                **value,
+                "visualization": {
+                    "error": self.error
+                }
+            }
 
         if 'maps' in value:
             del value['maps']
 
-        if not uid:
+        if not doc_json:
             return value
 
-        try:
-            doc = api.content.get(UID=uid)
-        except Unauthorized:
-            return {
-                **value, "maps": {
-                    "error":
-                    "Apologies, it seems this " +
-                    getLinkHTML(url, 'Map (Interactive)') +
-                    " has not been published yet."
-                }
+        return {
+            **value, "maps": {
+                **doc_json.get('maps', {}),
+                **getMetadata(doc_json),
             }
-        except Forbidden:
-            return {
-                **value, "maps": {
-                    "error":
-                    "Apologies, it seems you do not have " +
-                    "permissions to see this " +
-                    getLinkHTML(url, 'Map (Interactive)') + "."
-                }
-            }
-
-        doc_serializer = self._get_doc_serializer(doc)
-        if doc_serializer:
-            return {
-                **value, "maps": {
-                    **doc_serializer.get('maps', {}),
-                    **getMetadata(doc_serializer),
-                }
-            }
-        return value
-
-    def _get_doc_serializer(self, doc):
-        """
-        Get a serializer for the given document.
-
-        This method queries for a JSON serializer adapter for the provided
-        document and request. If a serializer is found, it is instantiated
-        with the version from the request and returned.
-
-        :param doc: The document for which to get a serializer.
-        :type doc: object
-
-        :return: An instantiated JSON serializer if available, or None if
-                 not found.
-        :rtype: object or None
-        """
-        if doc:
-            doc_serializer = queryMultiAdapter(
-                (doc, self.request), ISerializeToJson)
-            if doc_serializer:
-                return doc_serializer(
-                    version=self.request.get("version"))
-        return None
+        }
 
 
 @implementer(IBlockFieldDeserializationTransformer)
