@@ -210,10 +210,6 @@ class EmbedingBlockSerializationTransformer:
     error = None
     initialized = False
 
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
     def __call__(self, value):
         return value
 
