@@ -23,9 +23,9 @@ class VisualizationGet(Service):
 
         return {
             "visualization": {
-                **getMetadata(serializer=serializer),
+                **getMetadata(doc_json=serializer),
                 **getVisualization(
-                    serializer=serializer,
+                    doc_json=serializer,
                     layout=False
                 )
             }
@@ -50,9 +50,9 @@ class VisualizationLayoutGet(Service):
 
         return {
             "visualization": {
-                **getMetadata(serializer=serializer),
+                **getMetadata(doc_json=serializer),
                 **getVisualization(
-                    serializer=serializer
+                    doc_json=serializer
                 )
             }
         }
