@@ -1,6 +1,9 @@
 Changelog
 =========
 
+11.1-dev0 - (unreleased)
+---------------------------
+
 11.0 - (2024-10-24)
 ---------------------------
 * Change: Refactor Visualisation serializers
