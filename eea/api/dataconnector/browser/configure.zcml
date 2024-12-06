@@ -83,6 +83,8 @@
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.PlotlyChartSerializationTransformer" />
 
+    <adapter factory=".serializer.dxfields.JSONFieldSerializer" />
+
   <!--  Deserializations -->
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
@@ -99,5 +101,7 @@
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
     factory=".blocks.EmbedMapsDeserializationTransformer" />
+
+  <adapter factory=".deserializer.dxfields.JSONFieldDeserializer" />
 
 </configure>
