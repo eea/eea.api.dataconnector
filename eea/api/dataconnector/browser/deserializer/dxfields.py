@@ -1,3 +1,5 @@
+""" dxfields deserializers """
+
 from urllib.parse import urlparse
 from plone.schema import IJSONField
 from plone.dexterity.interfaces import IDexterityContent
@@ -62,6 +64,8 @@ def getUid(context, link, retry=True):
 @implementer(IFieldDeserializer)
 @adapter(IJSONField, IDexterityContent, IBrowserRequest)
 class JSONFieldDeserializer(DefaultFieldDeserializer):
+    """JSON field deserializer"""
+
     def __call__(self, value):
         if isinstance(value, dict) and 'provider_url' in value:
             url = value["provider_url"]
