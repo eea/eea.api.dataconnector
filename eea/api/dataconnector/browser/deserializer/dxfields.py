@@ -1,12 +1,12 @@
 """ dxfields deserializers """
 
 from urllib.parse import urlparse
-from plone.schema import IJSONField
-from plone.dexterity.interfaces import IDexterityContent
-from plone.restapi.interfaces import IFieldDeserializer
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
+from plone.schema import IJSONField
+from plone.dexterity.interfaces import IDexterityContent
+from plone.restapi.interfaces import IFieldDeserializer
 from plone.restapi.deserializer.dxfields import DefaultFieldDeserializer
 from plone.restapi.deserializer.utils import path2uid
 from plone.restapi.serializer.utils import RESOLVEUID_RE
@@ -72,5 +72,4 @@ class JSONFieldDeserializer(DefaultFieldDeserializer):
             uid = getUid(self.context, url)
             value["provider_url"] = ("../resolveuid/%s" %
                                      uid) if uid != url else url
-
-            return value
+        return value
