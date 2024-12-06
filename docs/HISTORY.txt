@@ -1,6 +1,11 @@
 Changelog
 =========
 
+11.1 - (2024-12-06)
+---------------------------
+* Change: Add serializer/deserializer for JSONField, ref #281589
+  [razvanMiu]
+
 11.0 - (2024-10-24)
 ---------------------------
 * Change: Refactor Visualisation serializers
