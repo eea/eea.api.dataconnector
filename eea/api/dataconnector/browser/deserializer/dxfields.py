@@ -32,6 +32,6 @@ class JSONFieldDeserializer(DefaultFieldDeserializer):
     def __call__(self, value):
         if isinstance(value, dict) and 'provider_url' in value:
             url = value["provider_url"]
-            resolveuid = path2uid(context=self.context, link=getLink(url))
-            value["provider_url"] = resolveuid if resolveuid != url else url
+            value["provider_url"] = path2uid(
+                context=self.context, link=getLink(url))
         return value
