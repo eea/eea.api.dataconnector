@@ -9,7 +9,6 @@ from plone.dexterity.interfaces import IDexterityContent
 from plone.restapi.interfaces import IFieldDeserializer
 from plone.restapi.deserializer.dxfields import DefaultFieldDeserializer
 from plone.restapi.deserializer.utils import path2uid
-from plone.restapi.serializer.utils import RESOLVEUID_RE
 
 
 def getLink(path):
