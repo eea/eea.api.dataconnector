@@ -1,5 +1,6 @@
 """ dxfields serializers """
 
+import copy
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
@@ -9,8 +10,6 @@ from plone.restapi.serializer.dxfields import DefaultFieldSerializer
 from plone.restapi.serializer.utils import uid_to_url
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.interfaces import IFieldSerializer
-
-import copy
 
 
 @implementer(IFieldSerializer)
