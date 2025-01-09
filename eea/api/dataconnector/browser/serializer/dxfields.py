@@ -10,6 +10,8 @@ from plone.restapi.serializer.utils import uid_to_url
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.interfaces import IFieldSerializer
 
+import copy
+
 
 @implementer(IFieldSerializer)
 @adapter(IJSONField, IDexterityContent, Interface)
@@ -17,7 +19,8 @@ class JSONFieldSerializer(DefaultFieldSerializer):
     """JSON field serializer"""
 
     def __call__(self):
-        value = self.get_value()
+        value = copy.deepcopy(self.get_value())
+
         if isinstance(value, dict) and 'provider_url' in value:
             value["provider_url"] = uid_to_url(value["provider_url"])
 

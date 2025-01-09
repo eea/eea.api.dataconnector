@@ -83,7 +83,7 @@
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.PlotlyChartSerializationTransformer" />
 
-    <adapter factory=".serializer.dxfields.JSONFieldSerializer" />
+  <adapter factory=".serializer.dxfields.JSONFieldSerializer" />
 
   <!--  Deserializations -->
   <subscriber
