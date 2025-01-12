@@ -14,7 +14,7 @@ def getLink(path):
     URL = urlparse(path)
 
     if URL.netloc.startswith('localhost') and URL.scheme:
-        return path.replace(f"{URL.scheme}://{URL.netloc}", "")
+        return path.replace(URL.scheme + "://" + URL.netloc, "")
     return path
 
 
