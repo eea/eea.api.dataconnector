@@ -1,9 +1,8 @@
+"""Upgrade step to transform provider_url to resolve uid if the case"""
+from urllib.parse import urlparse
 import transaction
 from zope.lifecycleevent import modified
 from Products.ZCatalog.ProgressHandler import ZLogHandler
-from plone.app.uuid.utils import uuidToObject
-from urllib.parse import urlparse
-from plone.uuid.interfaces import IUUID
 from plone.restapi.deserializer.utils import path2uid
 
 
