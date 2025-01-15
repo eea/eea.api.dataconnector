@@ -22,7 +22,7 @@ def upgrade_visualizations(portal):
     Upgrade step to handle provider_url in visualizations.
     """
     i = 0
-    brains = portal.portal_catalog(portal_type="viz")
+    brains = portal.portal_catalog(portal_type="visualization")
     pghandler = ZLogHandler(100)
     pghandler.init("Upgrade visualizations", len(brains))
 
