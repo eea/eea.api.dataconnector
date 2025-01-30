@@ -1,6 +1,9 @@
 Changelog
 =========
 
+11.3-dev0 - (unreleased)
+---------------------------
+
 11.2 - (2025-01-30)
 ---------------------------
 * Change: Upgrade step to make provider url use resolve uid - refs #279158
