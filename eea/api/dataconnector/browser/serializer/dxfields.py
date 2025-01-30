@@ -1,5 +1,6 @@
 """ dxfields serializers """
 
+import copy
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
@@ -17,7 +18,8 @@ class JSONFieldSerializer(DefaultFieldSerializer):
     """JSON field serializer"""
 
     def __call__(self):
-        value = self.get_value()
+        value = copy.deepcopy(self.get_value())
+
         if isinstance(value, dict) and 'provider_url' in value:
             value["provider_url"] = uid_to_url(value["provider_url"])
 
