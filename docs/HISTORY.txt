@@ -1,8 +1,10 @@
 Changelog
 =========
 
-11.3-dev0 - (unreleased)
+11.3 - (2025-01-31)
 ---------------------------
+* Change: Disable transforms when serving html for flourish
+  [tiberiuichim]
 
 11.2 - (2025-01-30)
 ---------------------------
