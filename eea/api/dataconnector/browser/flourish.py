@@ -2,6 +2,8 @@
 
 from zipfile import ZipFile, is_zipfile
 
+from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
+
 from plone.namedfile.utils import set_headers, stream_data
 from plone.namedfile.file import NamedBlobFile
 from Products.Five.browser import BrowserView
@@ -48,9 +50,9 @@ class FlourishUpload(BrowserView):
 
         if "flourish_zip" in annotations:
             response["annotations"] = annotations["flourish_zip"]
+
         return response
 
-from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
 
 @implementer(IPublishTraverse)
 class FlourishDownload(BrowserView):
