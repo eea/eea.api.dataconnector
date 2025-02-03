@@ -8,7 +8,7 @@ eea.api.dataconnector
   :target: https://ci.eionet.europa.eu/job/eea/job/eea.api.dataconnector/job/master/display/redirect
   :alt: Master
 
-The eea.api.dataconnector is a Plone add-on
+The eea.api.dataconnector is a Plone add-on.
 
 .. contents::
 
