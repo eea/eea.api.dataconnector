@@ -6,11 +6,13 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.schema import JSONField
 from plone.supermodel import model
 from zope import schema
-from zope.interface import Interface
-from zope.interface import Attribute
-from zope.interface import provider
+from zope.interface import Interface, Attribute, provider, directlyProvides
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 from eea.schema.slate.field import SlateJSONField
+
+
+class IVisualizationField(Interface):
+    """Marker interface for visualization JSON field"""
 
 
 class IEeaRestapiDataconnector(IDefaultBrowserLayer):
@@ -108,6 +110,8 @@ class IDataVisualization(model.Schema):
     visualization = JSONField(
         title="Visualization", required=False, default={}, schema=VIZ_SCHEMA
     )
+
+    directlyProvides(visualization, IVisualizationField)
 
 
 MAP_VIEW_SCHEMA = json.dumps({"type": "object", "properties": {}})
