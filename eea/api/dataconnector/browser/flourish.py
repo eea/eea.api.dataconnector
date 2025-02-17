@@ -2,20 +2,42 @@
 
 from zipfile import ZipFile, is_zipfile
 
-from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
-
-from plone.namedfile.utils import set_headers, stream_data
+import requests
+from persistent.mapping import PersistentMapping
 from plone.namedfile.file import NamedBlobFile
+from plone.namedfile.utils import set_headers, stream_data
+from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
 from Products.Five.browser import BrowserView
 from zope.annotation.interfaces import IAnnotations
-from zope.publisher.interfaces import IPublishTraverse, NotFound
 from zope.interface import implementer
+from zope.publisher.interfaces import IPublishTraverse, NotFound
 from ZPublisher.HTTPRangeSupport import expandRanges, parseRange
 
-from persistent.mapping import PersistentMapping
-# from AccessControl.ZopeGuards import guarded_getattr
-# from plone.rfc822.interfaces import IPrimaryFieldInfo
-# from plone.namedfile.utils import extract_media_type
+
+def fix_index_html(text):
+    text = text.replace(b"https://public.flourish.studio/", b"./flourish-studio/")
+    return text
+
+
+class IOWrapper(object):
+    def __init__(self, content, content_type):
+        self.data = content
+        self.content_type = content_type
+        # self.data = io.BytesIO(content)
+
+    def getSize(self):
+        return len(self.data)
+
+
+def apply_external_content(url, request):
+    resp = requests.get(url)
+    content_type = resp.headers.get("Content-Type", "text/plain")
+    request.response.setHeader(
+        "Content-Type", resp.headers.get("Content-Type", "text/plain")
+    )
+
+    file = IOWrapper(resp.content, content_type)
+    return file
 
 
 class FlourishUpload(BrowserView):
@@ -37,9 +59,10 @@ class FlourishUpload(BrowserView):
                 with ZipFile(fileUploaded.file) as myzip:
                     for file_name in myzip.namelist():
                         with myzip.open(file_name) as file_content:
-                            file = NamedBlobFile(
-                                filename=file_name, data=file_content.read()
-                            )
+                            data = file_content.read()
+                            if file_name == "index.html":
+                                data = fix_index_html(data)
+                            file = NamedBlobFile(filename=file_name, data=data)
                             annot_data[file_name] = file
                 annotations["flourish_zip"] = annot_data
             else:
@@ -60,14 +83,11 @@ class FlourishDownload(BrowserView):
 
     def __init__(self, context, request):
         super().__init__(context, request)
-        self.filename = None
+        self.filename = []
 
     def publishTraverse(self, request, name):
         """traverse"""
-        if self.filename is None:  # ../@@download/fieldname/filename
-            self.filename = name
-        else:
-            raise NotFound(self, name, request)
+        self.filename += [name]
         return self
 
     def __call__(self):
@@ -114,9 +134,17 @@ class FlourishDownload(BrowserView):
         context = getattr(self.context, "aq_explicit", self.context)
         annotations = IAnnotations(context)
         data = annotations.get("flourish_zip", {})
-        file = data.get(self.filename, None)
+
+        if len(self.filename) > 1:  # handle the flourish-studio paths
+            bits = self.filename[1:]
+            url = "https://public.flourish.studio/" + "/".join(bits)
+            content = apply_external_content(url, self.request)
+            return content
+
+        filename = self.filename[0]
+        file = data.get(filename, None)
 
         if file is None:
-            raise NotFound(self, self.filename, self.request)
+            raise NotFound(self, filename, self.request)
 
         return file
