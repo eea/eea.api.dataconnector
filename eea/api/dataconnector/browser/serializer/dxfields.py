@@ -4,16 +4,16 @@ import copy
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
-from plone.schema import IJSONField
 from plone.dexterity.interfaces import IDexterityContent
 from plone.restapi.serializer.dxfields import DefaultFieldSerializer
 from plone.restapi.serializer.utils import uid_to_url
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.interfaces import IFieldSerializer
+from eea.api.dataconnector.interfaces import IVisualizationField
 
 
 @implementer(IFieldSerializer)
-@adapter(IJSONField, IDexterityContent, Interface)
+@adapter(IVisualizationField, IDexterityContent, Interface)
 class JSONFieldSerializer(DefaultFieldSerializer):
     """JSON field serializer"""
 
