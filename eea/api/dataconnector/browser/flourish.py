@@ -15,21 +15,26 @@ from ZPublisher.HTTPRangeSupport import expandRanges, parseRange
 
 
 def fix_index_html(text):
+    """Localizes external urls"""
     text = text.replace(b"https://public.flourish.studio/", b"./flourish-studio/")
     return text
 
 
-class IOWrapper(object):
+class IOWrapper:
+    """Fake IO wrapper"""
+
     def __init__(self, content, content_type):
         self.data = content
         self.content_type = content_type
         # self.data = io.BytesIO(content)
 
     def getSize(self):
+        "getSize implementation"
         return len(self.data)
 
 
 def apply_external_content(url, request):
+    """Proxies external content"""
     resp = requests.get(url)
     content_type = resp.headers.get("Content-Type", "text/plain")
     request.response.setHeader(
