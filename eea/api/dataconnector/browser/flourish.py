@@ -16,7 +16,8 @@ from ZPublisher.HTTPRangeSupport import expandRanges, parseRange
 
 def fix_index_html(text):
     """Localizes external urls"""
-    text = text.replace(b"https://public.flourish.studio/", b"./flourish-studio/")
+    text = text.replace(b"https://public.flourish.studio/",
+                        b"./flourish-studio/")
     return text
 
 
