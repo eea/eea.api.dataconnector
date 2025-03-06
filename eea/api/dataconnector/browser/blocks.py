@@ -345,10 +345,11 @@ class EmbedContentDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        return {
-            "@type": value.get("@type"),
-            "url": value.get("url")
-        }
+        if 'properties' in value:
+            del value['properties']
+        if "image_scales" in value:
+            del value["image_scales"]
+        return value
 
 
 class EmbedVisualizationSerializationTransformer(
