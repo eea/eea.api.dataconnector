@@ -1,6 +1,9 @@
 Changelog
 =========
 
+11.6-dev0 - (unreleased)
+---------------------------
+
 11.5 - (2025-03-06)
 ---------------------------
 * Change: Don't remove embed_content block data
