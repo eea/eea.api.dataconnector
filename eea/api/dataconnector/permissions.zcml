@@ -3,10 +3,6 @@
   xmlns:zcml="http://namespaces.zope.org/zcml">
 
 <configure zcml:condition="installed AccessControl.security">
-  <permission
-    id="eea.dataconnector.addPlotly"
-    title="EEA-Viz: Add Plotly Chart"
-    />
 
   <permission
     id="eea.dataconnector.addTableau"

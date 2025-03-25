@@ -43,20 +43,5 @@
         permission="zope2.View"
     />
 
-    <plone:service
-        method="GET"
-        for="*"
-        factory=".visualization.VisualizationGet"
-        name="@visualization"
-        permission="zope2.View"
-    />
-
-    <plone:service
-        method="GET"
-        for="*"
-        factory=".visualization.VisualizationLayoutGet"
-        name="@visualization-layout"
-        permission="zope2.View"
-    />
 
 </configure>
