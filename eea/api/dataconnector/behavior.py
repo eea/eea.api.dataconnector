@@ -3,7 +3,6 @@
 import csv
 import json
 import logging
-from io import StringIO
 
 from plone.app.dexterity.behaviors.metadata import (
     DCFieldProperty,
@@ -80,7 +79,7 @@ class DataProviderForFiles:
             delimiter = ',' if subtype == "csv" else '\t'
             csv_data = decoded.splitlines()
             reader = csv.DictReader(csv_data, delimiter=delimiter)
-            return [row for row in reader]
+            return list(reader)
         except csv.Error:
             return []
 

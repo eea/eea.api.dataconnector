@@ -1,6 +1,5 @@
 """ block-related utils """
 
-import re
 from urllib.parse import urlparse
 from AccessControl import Unauthorized
 from plone import api
