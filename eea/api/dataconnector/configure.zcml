@@ -17,4 +17,6 @@
   <include package=".upgrades" />
 
   <!-- -*- extra stuff goes here -*- -->
+
+  <include package=".api" />
 </configure>

@@ -45,4 +45,6 @@
 
 
   <!-- -*- extra stuff goes here -*- -->
+
+  <include package=".services" />
 </configure>
