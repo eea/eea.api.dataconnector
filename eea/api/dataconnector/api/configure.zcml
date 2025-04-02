@@ -33,7 +33,7 @@
         name="@connector-data"
         permission="zope2.View"
     />
-    
+
     <!-- TODO: this should be eea.dataconnector.interfaces.IBasicDataProvider -->
     <plone:service
         method="POST"
@@ -44,4 +44,5 @@
     />
 
 
+  <!-- -*- extra stuff goes here -*- -->
 </configure>
