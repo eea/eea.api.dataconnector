@@ -85,4 +85,5 @@
     factory=".blocks.EmbedMapsDeserializationTransformer" />
 
 
+  <!-- -*- extra stuff goes here -*- -->
 </configure>
