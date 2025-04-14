@@ -92,7 +92,7 @@
 
   <genericsetup:upgradeSteps
     source="8.6"
-    destination="1116"
+    destination="1200"
     profile="eea.api.dataconnector:default">
 
     <genericsetup:upgradeStep
