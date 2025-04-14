@@ -1,8 +1,20 @@
 Changelog
 =========
 
-11.4-dev0 - (unreleased)
+11.6-dev0 - (unreleased)
 ---------------------------
+* Change: Upgrade step to transform Visualizations to use resolveuid in providerurl
+  [dobri1408 - refs #279158]
+
+11.5 - (2025-03-06)
+---------------------------
+* Change: Don't remove embed_content block data
+  [razvanMiu]
+
+11.4 - (2025-02-17)
+---------------------------
+* Change: Develop
+  [tiberiuichim]
 
 11.3 - (2025-01-31)
 ---------------------------

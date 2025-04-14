@@ -33,7 +33,7 @@
         name="@connector-data"
         permission="zope2.View"
     />
-    
+
     <!-- TODO: this should be eea.dataconnector.interfaces.IBasicDataProvider -->
     <plone:service
         method="POST"
@@ -43,20 +43,6 @@
         permission="zope2.View"
     />
 
-    <plone:service
-        method="GET"
-        for="*"
-        factory=".visualization.VisualizationGet"
-        name="@visualization"
-        permission="zope2.View"
-    />
 
-    <plone:service
-        method="GET"
-        for="*"
-        factory=".visualization.VisualizationLayoutGet"
-        name="@visualization-layout"
-        permission="zope2.View"
-    />
-
+  <!-- -*- extra stuff goes here -*- -->
 </configure>

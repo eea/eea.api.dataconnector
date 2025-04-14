@@ -99,8 +99,9 @@ def _gt(_filter, row):
 
 def _gte(_filter, row):
     """greater than equal"""
-    # return _default(row, 'gte')
-    return True
+    if not _filter.values:
+        return True
+    return row[_filter.index] >= _filter.values
 
 
 def _lt(_filter, row):
