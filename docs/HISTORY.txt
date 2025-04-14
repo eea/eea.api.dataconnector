@@ -1,7 +1,7 @@
 Changelog
 =========
 
-11.6-dev0 - (unreleased)
+11.6 - (2025-04-14)
 ---------------------------
 * Change: Upgrade step to transform Visualizations to use resolveuid in providerurl
   [dobri1408 - refs #279158]
