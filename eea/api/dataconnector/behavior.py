@@ -1,8 +1,8 @@
 """ behavior module """
 
 import csv
-import json
 import logging
+from io import StringIO
 
 from plone.app.dexterity.behaviors.metadata import (
     DCFieldProperty,
@@ -16,6 +16,7 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
+from eea.api.dataconnector.io_csv import CsvReader
 
 
 from .interfaces import (
@@ -59,29 +60,29 @@ class DataProviderForFiles:
     def fileToJson(self, file):
         """Convert binary file data to JSON"""
         if not file:
-            return []
-        try:
-            _, subtype = file.contentType.split("/")
-        except ValueError:
-            # The accept type is invalid. Skip it.
-            return []
+            return None
         data = file.data
-        if not data or subtype not in ["csv", 'tsv', "json"]:
-            return []
-        decoded = data.decode('utf-8')
-        if subtype == "json":
-            try:
-                return json.loads(decoded)
-            except json.JSONDecodeError:
-                return []
+        if not data:
+            return None
+        buff = StringIO(data.decode('utf-8'))
         try:
-            csv.Sniffer().sniff(decoded)
-            delimiter = ',' if subtype == "csv" else '\t'
-            csv_data = decoded.splitlines()
-            reader = csv.DictReader(csv_data, delimiter=delimiter)
-            return list(reader)
+            data = []
+            headers = []
+            i = -1
+            for row in CsvReader(buff):
+                i += 1
+                j = -1
+                for cell in row:
+                    if i == 0:
+                        headers.append(cell)
+                        continue
+                    j += 1
+                    if i > len(data):
+                        data.append({})
+                    data[i - 1][headers[j]] = cell
+            return data
         except csv.Error:
-            return []
+            return None
 
     @property
     def provided_data(self):

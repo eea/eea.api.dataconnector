@@ -163,7 +163,6 @@ class EmbedingBlockSerializationTransformer:
         return (
             value.get("url") or
             value.get("vis_url") or
-            value.get("viz_url") or
             value.get("tableau_vis_url")
         )
 
@@ -272,7 +271,7 @@ class EmbedContentDeserializationTransformer:
         for attr in [
             'properties', 'visualization', 'tableau_visualization',
             'map_visualization_data', 'maps', 'image_scales', 'vis_url',
-                'viz_url', 'tableau_vis_url']:
+                'tableau_vis_url']:
             if attr in value:
                 del value[attr]
 
