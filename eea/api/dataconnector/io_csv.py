@@ -3,7 +3,7 @@ import csv
 NULL = 'NULL'
 
 
-class CsvWriter(object):
+class CsvWriter:
     """CSV writer that handles NULL values."""
 
     def __init__(self, *args, **kwrds):
@@ -26,7 +26,7 @@ class CsvWriter(object):
             self.writerow(row)
 
 
-class CsvReader(object):
+class CsvReader:
     """CSV reader that handles NULL values."""
 
     def __init__(self, *args, **kwrds):
