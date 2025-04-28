@@ -107,7 +107,7 @@
 
   <plone:behavior
     name="eea.dataconnector.visualization"
-    title="EEA-Viz_Plotly"
+    title="EEA-Viz_Plotlyyy"
     description="Allows adding an interactive chart."
     factory=".behavior.DataVisualization"
     provides=".interfaces.IDataVisualization"
