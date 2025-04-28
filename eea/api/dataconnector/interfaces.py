@@ -6,7 +6,7 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.schema import JSONField
 from plone.supermodel import model
 from zope import schema
-from zope.interface import Interface, Attribute, provider
+from zope.interface import Interface, Attribute, provider, directlyProvides
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 from eea.schema.slate.field import SlateJSONField
 
@@ -175,3 +175,14 @@ class IFigureNote(model.Schema):
         description="Metadata field for visualization content-types",
         required=False,
     )
+
+
+@provider(IFormFieldProvider)
+class IDataVisualization(model.Schema):
+    """A data visualization (chart)"""
+
+    visualization = JSONField(
+        title="Visualization", required=False, default={}, schema=VIZ_SCHEMA
+    )
+
+    directlyProvides(visualization, IVisualizationField)

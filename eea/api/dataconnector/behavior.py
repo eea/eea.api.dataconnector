@@ -22,6 +22,7 @@ from eea.api.dataconnector.io_csv import CsvReader
 from .interfaces import (
     IConnectorDataParameters, IDataConnector,
     IDataProvider,
+    IDataVisualization,
     IMaps, IMapVisualization, ITableauVisualization,
     IFileDataProvider,
     IElasticConnector, IFigureNote
@@ -170,3 +171,9 @@ class FigureNoteField(MetadataBase):
     """Insert Figure Note field"""
 
     figure_note = DCFieldProperty(IFigureNote["figure_note"])
+
+
+class DataVisualization(MetadataBase):
+    """Standard Fise Metadata adaptor"""
+
+    visualization = DCFieldProperty(IDataVisualization["visualization"])
