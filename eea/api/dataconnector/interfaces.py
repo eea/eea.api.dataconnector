@@ -177,6 +177,13 @@ class IFigureNote(model.Schema):
     )
 
 
+VIZ_SCHEMA = json.dumps({"type": "object", "properties": {}})
+
+
+class IVisualizationField(Interface):
+    """Marker interface for visualization JSON field"""
+
+
 @provider(IFormFieldProvider)
 class IDataVisualization(model.Schema):
     """A data visualization (chart)"""
