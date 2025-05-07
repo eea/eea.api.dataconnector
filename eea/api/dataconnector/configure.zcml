@@ -16,4 +16,5 @@
   <include package=".browser" />
   <include package=".upgrades" />
 
+  <!-- -*- extra stuff goes here -*- -->
 </configure>

@@ -1,6 +1,5 @@
 """ block-related utils """
 
-import re
 from urllib.parse import urlparse
 from AccessControl import Unauthorized
 from plone import api
@@ -119,85 +118,6 @@ def getMetadata(doc_json):
     }
 
 
-def getVisualizationLayout(chartData):
-    """Get visualization layout with no data"""
-    if not chartData or not chartData.get("data"):
-        return {}
-
-    newData = chartData.get("data")
-
-    for traceIndex, trace in enumerate(newData):
-        for tk in trace:
-            originalColumn = re.sub("src$", "", tk)
-            if tk.endswith("src") and originalColumn in trace:
-                newData[traceIndex][originalColumn] = []
-        if not trace.get("transforms"):
-            continue
-        for transformIndex, _ in enumerate(trace.get("transforms")):
-            newData[traceIndex]["transforms"][transformIndex]["target"] = []
-
-    chartData["data"] = newData
-
-    return chartData
-
-
-def getVisualization(doc_json, layout=True):
-    """
-      Extract visualization information from a doc_json.
-
-      Parameters:
-      - doc_json: The doc_json providing visualization information.
-      - layout (bool, optional): If True, apply layout adjustments to the
-        visualization data. Defaults to True.
-
-      Returns:
-      - dict or None: A dictionary containing visualization information
-      with the following keys:
-        - "chartData": The chart data.
-        - "provider_url": The provider URL.
-        Returns None if the visualization information is not present.
-
-      The function retrieves visualization information from the provided
-      doc_json, including chart data and provider URL. If layout is set
-      to True (default), it applies layout adjustments to the chart data using
-      the getVisualizationLayout function.
-      If visualization information is not present, the function returns None.
-      """
-
-    visualization = doc_json.get("visualization", None)
-
-    if not visualization:
-        return {}
-
-    chartData = visualization.get("chartData", {})
-    provider_url = visualization.get("provider_url", None)
-    use_data_sources = visualization.get("use_data_sources", layout)
-    filters = visualization.get("filters", None)
-    variation = visualization.get("variation", None)
-
-    if use_data_sources:
-        chartData = getVisualizationLayout(chartData)
-
-    response = {
-        "chartData": {
-            "data": chartData.get("data", []),
-            "layout": chartData.get("layout", {}),
-            "frames": chartData.get("frames", [])
-        },
-        "use_data_sources": use_data_sources,
-        "filters": filters,
-        "variation": variation
-    }
-
-    if use_data_sources and provider_url:
-        response["provider_url"] = provider_url
-
-    if use_data_sources and "data_source" in visualization:
-        response["data_source"] = visualization.get("data_source")
-
-    return response
-
-
 @implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
 class EmbedingBlockSerializationTransformer:
@@ -240,8 +160,11 @@ class EmbedingBlockSerializationTransformer:
         """Get url"""
         if not value:
             return None
-        return value.get("url") or value.get("vis_url") or value.get(
-            "tableau_vis_url")
+        return (
+            value.get("url") or
+            value.get("vis_url") or
+            value.get("tableau_vis_url")
+        )
 
     def get_doc(self):
         """Get doc"""
@@ -345,78 +268,13 @@ class EmbedContentDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        if 'properties' in value:
-            del value['properties']
-        if "image_scales" in value:
-            del value["image_scales"]
-        return value
+        for attr in [
+            'properties', 'visualization', 'tableau_visualization',
+            'map_visualization_data', 'maps', 'image_scales', 'vis_url',
+                'tableau_vis_url']:
+            if attr in value:
+                del value[attr]
 
-
-class EmbedVisualizationSerializationTransformer(
-        EmbedingBlockSerializationTransformer):
-    """Embed visualization serialization"""
-
-    order = 9999
-    block_type = "embed_visualization"
-    title = "Chart (Interactive)"
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def __call__(self, value):
-        if not self.initialized:
-            self.init(value)
-
-        url = uid_to_url(self.state.get("url"))
-        doc_json = self.state.get("doc_json")
-
-        value["vis_url"] = url
-
-        if self.error:
-            return {
-                **value,
-                "visualization": {
-                    "error": self.error
-                }
-            }
-
-        if 'visualization' in value:
-            del value['visualization']
-
-        if not doc_json:
-            return value
-
-        use_data_sources = value.get('use_data_sources', True)
-
-        return {
-            **value,
-            "visualization": {
-                **getVisualization(doc_json=doc_json,
-                                   layout=use_data_sources),
-                **getMetadata(doc_json),
-            }
-        }
-
-
-@implementer(IBlockFieldDeserializationTransformer)
-@adapter(IBlocks, IBrowserRequest)
-class EmbedVisualizationDeserializationTransformer:
-    """Embed visualization deserialization"""
-
-    order = 9999
-    block_type = "embed_visualization"
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def __call__(self, value):
-        if 'visualization' in value:
-            del value['visualization']
-        if 'vis_url' in value:
-            value['vis_url'] = path2uid(context=self.context,
-                                        link=getLink(value['vis_url']))
         return value
 
 
@@ -608,44 +466,4 @@ class EmbedMapsDeserializationTransformer:
     def __call__(self, value):
         if 'maps' in value:
             del value['maps']
-        return value
-
-
-@implementer(IBlockFieldSerializationTransformer)
-@adapter(IBlocks, IBrowserRequest)
-class PlotlyChartSerializationTransformer:
-    """Plotly chart serializer"""
-
-    order = 100
-    block_type = "plotly_chart"
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    # def transform(self, value):
-    #     # if value.get("visualization", {}).get("provider_url"):
-    #     #     value["visualization"]["provider_url"] = self.url_to_path(
-    #     #         value["visualization"]["provider_url"]
-    #     #     )
-    #     return value
-
-    def __call__(self, value):
-        if value.get("use_data_sources", True):
-            newData = (value.get("visualization",
-                                 {}).get("chartData", {}).get("data", None))
-            if not newData:
-                return value
-            for traceIndex, trace in enumerate(newData):
-                for tk in trace:
-                    originalColumn = re.sub("src$", "", tk)
-                    if tk.endswith("src") and originalColumn in trace:
-                        newData[traceIndex][originalColumn] = []
-                if not trace.get("transforms"):
-                    continue
-                for transformIndex, _ in enumerate(trace.get("transforms")):
-                    newData[traceIndex]["transforms"][transformIndex][
-                        "target"] = []
-            value["visualization"]["chartData"]["data"] = newData
-
         return value

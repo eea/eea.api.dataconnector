@@ -55,16 +55,6 @@
   />
 
   <plone:behavior
-    name="eea.dataconnector.visualization"
-    title="EEA-Viz_Plotly"
-    description="Allows adding an interactive chart."
-    factory=".behavior.DataVisualization"
-    provides=".interfaces.IDataVisualization"
-    for="plone.dexterity.interfaces.IDexterityContent"
-    marker=".interfaces.IDataVisualization"
-  />
-
-  <plone:behavior
     name="eea.dataconnector.tableau_visualization"
     title="EEA-Viz_Tableau"
     description="Allows adding a dashboard (tableau)"

@@ -2,5 +2,4 @@
 <object name="portal_types" meta_type="Plone Types Tool">
   <object name="tableau_visualization" meta_type="Dexterity FTI" />
   <object name="map_visualization" meta_type="Dexterity FTI" />
-  <object name="visualization" meta_type="Dexterity FTI" />
 </object>

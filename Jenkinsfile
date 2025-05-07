@@ -3,7 +3,7 @@ pipeline {
 
   environment {
         GIT_NAME = "eea.api.dataconnector"
-        SONARQUBE_TAGS = "biodiversity.europa.eu,demo-biodiversity.eea.europa.eu,demo-www.eea.europa.eu,www.eea.europa.eu-en,forest.eea.europa.eu,industry.eea.europa.eu,insitu.copernicus.eu"
+        SONARQUBE_TAGS = "biodiversity.europa.eu,demo-biodiversity.eea.europa.eu,demo-www.eea.europa.eu,www.eea.europa.eu-en,forest.eea.europa.eu,industry.eea.europa.eu,insitu.copernicus.eu,demo-ied.eea.europa.eu,www.ied.eea.europa.eu-en"
     }
 
   stages {

@@ -9,7 +9,6 @@ from plone.app.dexterity.behaviors.metadata import (
     MetadataBase
 )
 from plone.dexterity.interfaces import IDexterityContent
-from plone.rfc822.interfaces import IPrimaryFieldInfo
 from plone.restapi.deserializer import json_body
 from zope.component import adapter
 from zope.interface import implementer
@@ -17,12 +16,12 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 
 from eea.api.dataconnector.queryparser import computeDataQuery
 from eea.api.dataconnector.queryfilter import filteredData
+from eea.api.dataconnector.io_csv import CsvReader
 
 
 from .interfaces import (
     IConnectorDataParameters, IDataConnector,
     IDataProvider,
-    IDataVisualization,
     IMaps, IMapVisualization, ITableauVisualization,
     IFileDataProvider,
     IElasticConnector, IFigureNote
@@ -58,40 +57,48 @@ class DataProviderForFiles:
         self.context = context
         self.request = request
 
+    def fileToJson(self, file):
+        """Convert binary file data to JSON"""
+        if not file:
+            return None
+        data = file.data
+        if not data:
+            return None
+        buff = StringIO(data.decode('utf-8'))
+        try:
+            data = []
+            headers = []
+            i = -1
+            for row in CsvReader(buff):
+                i += 1
+                j = -1
+                for cell in row:
+                    if i == 0:
+                        headers.append(cell)
+                        continue
+                    j += 1
+                    if i > len(data):
+                        data.append({})
+                    data[i - 1][headers[j]] = cell
+            return data
+        except csv.Error:
+            return None
+
     @property
     def provided_data(self):
         """provided data"""
-        field = IPrimaryFieldInfo(self.context)
+        file = self.context.file
 
         page = json_body(self.request).get("form", {}).get("p", 0)
         nrOfHits = json_body(self.request).get("form", {}).get("nrOfHits", 0)
 
-        if not field.value:
+        if not file:
             return []
 
-        text = field.value.data
-        f = StringIO(text.decode("utf-8-sig"))
-        try:
-            reader = csv.reader(f)
-        except Exception:
-            return []
+        data = self.fileToJson(file)
 
-        rows = list(reader)
-
-        if not rows:
-            return []
-
-        keys = rows[0]
-        data = []
-
-        for index, row in enumerate(
-            rows[((page - 1) * nrOfHits + 1):(page * nrOfHits + 1)]
-            if page >= 1 and nrOfHits >= 1
-            else rows[1:]
-        ):
-            data.append({})
-            for i, k in enumerate(keys):
-                data[index][k] = row[i]
+        if page >= 1 and nrOfHits >= 1:
+            data = data[(page - 1) * nrOfHits:page * nrOfHits]
 
         data_query = computeDataQuery(self.request)
 
@@ -122,12 +129,6 @@ class DataProviderForElasticCSVWidget:
             "results": data,
             "metadata": {},  # Add metadata if needed
         }
-
-
-class DataVisualization(MetadataBase):
-    """Standard Fise Metadata adaptor"""
-
-    visualization = DCFieldProperty(IDataVisualization["visualization"])
 
 
 class Maps(MetadataBase):

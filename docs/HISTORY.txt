@@ -1,6 +1,13 @@
 Changelog
 =========
 
+12.0 - (2025-04-14)
+---------------------------
+* Change: Upgrade step to transform Visualizations to use resolveuid in providerurl
+  [dobri1408 - refs #279158]
+* Breaking: Refactor Visualisation
+  [razvanMiu - refs ]
+
 11.5 - (2025-03-06)
 ---------------------------
 * Change: Don't remove embed_content block data

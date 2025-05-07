@@ -28,14 +28,6 @@
 
   <browser:page
     name="view"
-    for="eea.api.dataconnector.interfaces.IDataVisualization"
-    permission="zope2.View"
-    template="pt/visualization_view.pt"
-  />
-
-
-  <browser:page
-    name="view"
     for="eea.api.dataconnector.interfaces.IMapVisualization"
     permission="zope2.View"
     template="pt/arcgis_map_view.pt"
@@ -69,9 +61,6 @@
     factory=".blocks.EmbedContentSerializationTransformer" />
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
-    factory=".blocks.EmbedVisualizationSerializationTransformer" />
-  <subscriber
-    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedTableauVisualizationSerializationTransformer" />
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
@@ -79,19 +68,12 @@
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
     factory=".blocks.EmbedEEAMapBlockSerializationTransformer" />
-  <subscriber
-    provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
-    factory=".blocks.PlotlyChartSerializationTransformer" />
 
-  <adapter factory=".serializer.dxfields.JSONFieldSerializer" />
 
   <!--  Deserializations -->
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
     factory=".blocks.EmbedContentDeserializationTransformer" />
-  <subscriber
-    provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
-    factory=".blocks.EmbedVisualizationDeserializationTransformer" />
   <subscriber
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
     factory=".blocks.EmbedEEAMapBlockDeserializationTransformer" />
@@ -102,6 +84,6 @@
     provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
     factory=".blocks.EmbedMapsDeserializationTransformer" />
 
-  <adapter factory=".deserializer.dxfields.JSONFieldDeserializer" />
 
+  <!-- -*- extra stuff goes here -*- -->
 </configure>

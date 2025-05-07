@@ -40,7 +40,7 @@ def upgrade_visualizations(portal):
 
         provider_url = viz.get('provider_url', None)
 
-        if provider_url and 'resolve_uid' not in provider_url:
+        if provider_url and 'resolveuid' not in provider_url:
             uuid = path2uid(context=obj, link=getLink(provider_url))
             viz['provider_url'] = uuid
             obj.visualization = viz
