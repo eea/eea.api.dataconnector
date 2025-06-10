@@ -14,6 +14,13 @@ The eea.api.dataconnector is a Plone add-on.
 
 Upgrade
 =======
+**12.0 (Breaking)**
+- Logic for plotly visualization was moved to eea.plotly
+- Install eea.plotly >= 1.x
+- Use volto-plotlycharts >= 12.x
+- Enable eea.plotly add-on
+- Activate EEA-Viz_Plotly behavior
+- Run any pending upgrades on eea.api.dataconnector
 
 **8.0**
 - Endpoints for @tableau-visualization and @map-visualization are removed. Use volto-eea-map@^3.0.0 and volto-tableau@^7.0.0
