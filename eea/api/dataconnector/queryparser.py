@@ -153,8 +153,11 @@ def getDataQuery(form):
         op = re.search(
             r"\b(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\b", expression
         )
+        dataType = re.search(
+            r"\b(int|float)\b", expression
+        )
         index = re.sub(
-            r"\[(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\]",
+            r"(\[(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\])|(\:int|float)",
             "",
             expression,
         )
@@ -169,10 +172,19 @@ def getDataQuery(form):
             {
                 "i": index,
                 "o": "eea.api.dataconnector.queryparser._" + op,
-                "v": value,
+                "v": convertValue(value, dataType.group()) if dataType else value,
             }
         )
     return data
+
+
+def convertValue(value, dataType):
+    """ convert value to data type """
+    if dataType == "int":
+        return int(value)
+    elif dataType == "float":
+        return float(value)
+    return value
 
 
 def computeDataQuery(request):
