@@ -1,4 +1,5 @@
-""" queryparser module """
+"""queryparser module"""
+
 import re
 from collections import namedtuple
 from mo_sql_parsing import parse_sqlserver as parse
@@ -151,11 +152,8 @@ def getDataQuery(form):
     for expression in form:
         value = form.get(expression)
         op = re.search(
-            r"\b(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\b", expression
-        )
-        dataType = re.search(
-            r"\b(int|float)\b", expression
-        )
+            r"\b(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\b", expression)
+        dataType = re.search(r"\b(int|float)\b", expression)
         index = re.sub(
             r"(\[(gt|gte|lt|lte|eq|ne|in|nin|like|not_like)\])|(\:int|float)",
             "",
@@ -179,7 +177,7 @@ def getDataQuery(form):
 
 
 def convertValue(value, dataType):
-    """ convert value to data type """
+    """convert value to data type"""
     if dataType == "int":
         return int(value)
     elif dataType == "float":
