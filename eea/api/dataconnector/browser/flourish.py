@@ -85,6 +85,7 @@ class FlourishUpload(BrowserView):
 
 
 def get_content_type(filename):
+    """return mimetype based on filename"""
     mime_type, _ = mimetypes.guess_type(filename)
 
     return mime_type or "application/octet-stream"
@@ -110,7 +111,7 @@ class FlourishDownload(BrowserView):
         set_headers(file, self.request.response)
         request_range = self.handle_request_range(file)
         self.request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
-        fname = self.filename and self.filename[0] or ""
+        fname = self.filename[0] if self.filename else ""
         ct = get_content_type(fname)
         self.request.response.setHeader("Content-Type", ct)
 
