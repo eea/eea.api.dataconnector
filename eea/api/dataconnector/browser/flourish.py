@@ -110,7 +110,8 @@ class FlourishDownload(BrowserView):
         set_headers(file, self.request.response)
         request_range = self.handle_request_range(file)
         self.request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
-        ct = get_content_type(filename[0])
+        fname = self.filename and self.filename[0] or ""
+        ct = get_content_type(fname)
         self.request.response.setHeader("Content-Type", ct)
 
         return stream_data(file, **request_range)
