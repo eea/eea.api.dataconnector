@@ -166,12 +166,9 @@ def getDataQuery(form):
         else:
             op = "equal"
 
+        v = convertValue(value, dataType.group()) if dataType else value
         data.append(
-            {
-                "i": index,
-                "o": "eea.api.dataconnector.queryparser._" + op,
-                "v": convertValue(value, dataType.group()) if dataType else value,
-            }
+            {"i": index, "o": "eea.api.dataconnector.queryparser._" + op, "v": v}
         )
     return data
 
