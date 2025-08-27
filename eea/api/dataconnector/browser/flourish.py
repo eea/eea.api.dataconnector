@@ -108,12 +108,11 @@ class FlourishDownload(BrowserView):
         self.request.response.setHeader("X-Theme-Disabled", "1")
         file = self._getFile()
 
-        set_headers(file, self.request.response)
         request_range = self.handle_request_range(file)
         self.request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
-        fname = self.filename[0] if self.filename else ""
-        ct = get_content_type(fname)
-        self.request.response.setHeader("Content-Type", ct)
+        # fname = self.filename[0] if self.filename else ""
+        # ct = get_content_type(fname)
+        # self.request.response.setHeader("Content-Type", ct)
 
         return stream_data(file, **request_range)
 
@@ -165,4 +164,5 @@ class FlourishDownload(BrowserView):
         if file is None:
             raise NotFound(self, filename, self.request)
 
+        set_headers(file, self.request.response)
         return file
