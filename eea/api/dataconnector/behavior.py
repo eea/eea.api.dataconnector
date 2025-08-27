@@ -65,7 +65,7 @@ class DataProviderForFiles:
         if not data:
             return None
 
-        encodings = ['latin1', 'iso-8859-1', 'cp1252', 'utf-8']
+        encodings = ['latin1', 'iso-8859-1', 'cp1252', 'utf-8-sig']
         for encoding in encodings:
             try:
                 buff = StringIO(data.decode(encoding))
