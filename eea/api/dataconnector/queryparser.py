@@ -181,7 +181,7 @@ def convertValue(value, dataType):
     """convert value to data type"""
     if dataType == "int":
         return int(value)
-    elif dataType == "float":
+    if dataType == "float":
         return float(value)
     return value
 
