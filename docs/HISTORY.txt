@@ -1,6 +1,9 @@
 Changelog
 =========
 
+12.3-dev0 - (unreleased)
+---------------------------
+
 12.2 - (2025-08-27)
 ---------------------------
 * Change: fix csv file data decoding
