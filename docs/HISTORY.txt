@@ -1,6 +1,11 @@
 Changelog
 =========
 
+12.2 - (2025-08-27)
+---------------------------
+* Change: fix csv file data decoding
+  [razvanMiu]
+
 12.1 - (2025-06-10)
 ---------------------------
 * Change: Add upgrade steps for version 12.x
