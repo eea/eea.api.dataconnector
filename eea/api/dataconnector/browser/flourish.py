@@ -1,5 +1,6 @@
 """flourish"""
 
+import mimetypes
 from zipfile import ZipFile, is_zipfile
 
 import requests
@@ -83,6 +84,13 @@ class FlourishUpload(BrowserView):
         return response
 
 
+def get_content_type(filename):
+    """return mimetype based on filename"""
+    mime_type, _ = mimetypes.guess_type(filename)
+
+    return mime_type or "application/octet-stream"
+
+
 @implementer(IPublishTraverse)
 class FlourishDownload(BrowserView):
     """Download a file, via ../context/@@flourish/filename"""
@@ -103,6 +111,10 @@ class FlourishDownload(BrowserView):
         set_headers(file, self.request.response)
         request_range = self.handle_request_range(file)
         self.request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
+        fname = self.filename[0] if self.filename else ""
+        ct = get_content_type(fname)
+        self.request.response.setHeader("Content-Type", ct)
+
         return stream_data(file, **request_range)
 
     def handle_request_range(self, file):

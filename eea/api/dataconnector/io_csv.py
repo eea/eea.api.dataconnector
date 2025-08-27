@@ -34,7 +34,7 @@ class CsvReader:
             inputEntity = args[0] or kwrds.get('csvfile')
             sample = inputEntity.read(1024)
             inputEntity.seek(0)
-            dialect = csv.Sniffer().sniff(sample)
+            dialect = csv.Sniffer().sniff(sample, delimiters=',;\t|')
         except (csv.Error, TypeError):
             # No dialect found, use default
             dialect = csv.excel
