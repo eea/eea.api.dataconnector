@@ -1,6 +1,10 @@
 Changelog
 =========
 
+12.3 - (2025-08-27)
+---------------------------
+* Fix: Broken release
+
 12.2 - (2025-08-27)
 ---------------------------
 * Change: fix csv file data decoding
