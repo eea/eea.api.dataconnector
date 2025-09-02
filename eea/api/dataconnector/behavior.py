@@ -65,15 +65,23 @@ class DataProviderForFiles:
         if not data:
             return None
 
-        encodings = ['latin1', 'iso-8859-1', 'cp1252', 'utf-8-sig']
+        encodings = ['utf-8', 'utf-8-sig', 'latin1', 'iso-8859-1', 'cp1252', 'windows-1252']
+        buff = None
         for encoding in encodings:
             try:
-                buff = StringIO(data.decode(encoding))
+                decoded_text = data.decode(encoding)
+                buff = StringIO(decoded_text)
+                break 
             except UnicodeDecodeError:
                 continue
 
         if not buff:
-            return None
+            try:
+                decoded_text = data.decode('utf-8', errors='ignore')
+                buff = StringIO(decoded_text)
+                logger.warning("File decoded with errors ignored - some characters may be missing")
+            except:
+                return None
 
         try:
             data = []
