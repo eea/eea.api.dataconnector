@@ -51,7 +51,11 @@ pipeline {
                 if (FOUND_FIX != '0') {
                   sh '''find . -name "*.py" -print0 | xargs -0 git add'''
                   sh '''git commit -m "style: Automated code fix" '''
-                  sh '''git push --set-upstream origin $BRANCH_NAME'''
+                  sh '''
+                    git fetch origin $BRANCH_NAME
+                    git rebase origin/$BRANCH_NAME || git pull --rebase origin $BRANCH_NAME
+                    git push --set-upstream origin $BRANCH_NAME
+                  '''
                   sh '''exit 1'''
                 }
               }
@@ -100,7 +104,11 @@ pipeline {
                 if (FOUND_FIX != '0') {
                   sh '''find . -name "*.py" -print0 | xargs -0 git add'''
                   sh '''git commit -m "lint: Automated code fix" '''
-                  sh '''git push --set-upstream origin $BRANCH_NAME'''
+                  sh '''
+                    git fetch origin $BRANCH_NAME
+                    git rebase origin/$BRANCH_NAME || git pull --rebase origin $BRANCH_NAME
+                    git push --set-upstream origin $BRANCH_NAME
+                  '''
                   sh '''exit 1'''
                 }
               }
