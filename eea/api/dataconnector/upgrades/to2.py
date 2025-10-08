@@ -1,4 +1,4 @@
-"""upgrade to 2.0"""
+""" upgrade to 2.0 """
 
 
 def run_upgrade(setup_context):

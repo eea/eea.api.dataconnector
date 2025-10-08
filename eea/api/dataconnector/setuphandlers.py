@@ -1,5 +1,5 @@
-"""Custom setup"""
-
+""" Custom setup
+"""
 from Products.CMFPlone.interfaces import INonInstallable
 from zope.interface import implementer
 

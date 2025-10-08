@@ -1,4 +1,5 @@
-"""behavior module"""
+""" behavior module
+"""
 
 import logging
 import requests
@@ -99,5 +100,5 @@ class DataQueryJsonSchemaProvider(DefaultJsonSchemaProvider):
     """Schema provider for DataQuery"""
 
     def get_type(self):
-        """return type of object"""
+        """ return type of object """
         return "array"

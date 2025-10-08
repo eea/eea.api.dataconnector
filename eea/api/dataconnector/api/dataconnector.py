@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""dataconnector"""
-
+""" dataconnector """
 import logging
 import os
 import requests
-
 # eea imports
 from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
@@ -22,7 +20,7 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 # Set the default logging level to ERROR
-log_level = os.environ.get("LOG_LEVEL", "ERROR")
+log_level = os.environ.get('LOG_LEVEL', 'ERROR')
 numeric_log_level = getattr(logging, log_level, None)
 
 if not isinstance(numeric_log_level, int):
@@ -37,7 +35,8 @@ handler = logging.StreamHandler()
 handler.setLevel(numeric_log_level)
 
 # Create a formatter and add it to the handler
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 
 # Add the handler to the logger
@@ -63,7 +62,8 @@ class ConnectorData:
         if not expand:
             return result
 
-        connector = getMultiAdapter((self.context, self.request), IDataProvider)
+        connector = getMultiAdapter(
+            (self.context, self.request), IDataProvider)
         result["connector-data"]["data"] = connector.provided_data
 
         return result
@@ -162,7 +162,8 @@ class ElasticConnectorData:
                     .get("buckets", [])
                 )
                 if agg_data:
-                    table.update(self._build_table_from_aggs(agg_data, agg_field))
+                    table.update(self._build_table_from_aggs(
+                        agg_data, agg_field))
         else:
             hits = es_data.get("hits", {}).get("hits", [])
             if hits and fields:
@@ -218,7 +219,8 @@ class ElasticConnectorData:
             # Handle second-level aggregation if specified
             second_level_agg = field_obj.get("secondLevelAgg")
             if second_level_agg:
-                sub_buckets = bucket.get(second_level_agg, {}).get("buckets", [])
+                sub_buckets = bucket.get(
+                    second_level_agg, {}).get("buckets", [])
                 for sub_bucket in sub_buckets:
                     sub_key = sub_bucket.get("key")
 
@@ -236,7 +238,8 @@ class ElasticConnectorData:
                 max_col_length = max(len(col) for col in table.values())
                 for col_key, col in table.items():
                     if col_key in table and len(col) < max_col_length:
-                        col.extend([0] * (max_col_length - len(col)))
+                        col.extend([0] * (
+                            max_col_length - len(col)))
         return table
 
 
@@ -253,7 +256,8 @@ class ConnectorDataGet(Service):
 
             return result["connector-data"]
         except ComponentLookupError as ex:
-            raise ValueError("No suitable connector found for the context.") from ex
+            raise ValueError(
+                "No suitable connector found for the context.") from ex
 
 
 class ConnectorDataPost(Service):
@@ -261,7 +265,8 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        connector = getMultiAdapter((self.context, self.request), name="connector-data")
+        connector = getMultiAdapter(
+            (self.context, self.request), name="connector-data")
         result = connector(expand=True)
 
         return result["connector-data"]
