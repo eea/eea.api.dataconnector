@@ -1,12 +1,14 @@
-"""Doc tests"""
-
+""" Doc tests
+"""
 import doctest
 import unittest
 from eea.api.dataconnector.tests.base import FUNCTIONAL_TESTING
 from plone.testing import layered
 
 OPTIONFLAGS = (
-    doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
+    doctest.REPORT_ONLY_FIRST_FAILURE
+    | doctest.ELLIPSIS
+    | doctest.NORMALIZE_WHITESPACE
 )
 
 

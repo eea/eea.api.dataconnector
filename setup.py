@@ -1,5 +1,5 @@
-"""eea.api.dataconnector Installer"""
-
+""" eea.api.dataconnector Installer
+"""
 import os
 from os.path import join
 
@@ -38,7 +38,10 @@ with open(join(*PATH), "r", encoding="utf8") as version_file:
     VERSION = version_file.read().strip()
 
 long_description = (
-    read("README.rst") + "\n" + read(os.path.join("docs", "HISTORY.txt")) + "\n"
+    read("README.rst") +
+    "\n" +
+    read(os.path.join("docs", "HISTORY.txt")) +
+    "\n"
 )
 
 setup(

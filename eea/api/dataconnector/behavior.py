@@ -1,10 +1,13 @@
-"""behavior module"""
+""" behavior module """
 
 import csv
 import logging
 from io import StringIO
 
-from plone.app.dexterity.behaviors.metadata import DCFieldProperty, MetadataBase
+from plone.app.dexterity.behaviors.metadata import (
+    DCFieldProperty,
+    MetadataBase
+)
 from plone.dexterity.interfaces import IDexterityContent
 from plone.restapi.deserializer import json_body
 from zope.component import adapter
@@ -17,15 +20,11 @@ from eea.api.dataconnector.io_csv import CsvReader
 
 
 from .interfaces import (
-    IConnectorDataParameters,
-    IDataConnector,
+    IConnectorDataParameters, IDataConnector,
     IDataProvider,
-    IMaps,
-    IMapVisualization,
-    ITableauVisualization,
+    IMaps, IMapVisualization, ITableauVisualization,
     IFileDataProvider,
-    IElasticConnector,
-    IFigureNote,
+    IElasticConnector, IFigureNote
 )
 
 
@@ -43,7 +42,8 @@ class DataConnector(MetadataBase):
     endpoint_url = DCFieldProperty(IDataConnector["endpoint_url"])
     sql_query = DCFieldProperty(IDataConnector["sql_query"])
     parameters = DCFieldProperty(IDataConnector["parameters"])
-    required_parameters = DCFieldProperty(IDataConnector["required_parameters"])
+    required_parameters = DCFieldProperty(
+        IDataConnector["required_parameters"])
     collate = DCFieldProperty(IDataConnector["collate"])
     readme = DCFieldProperty(IDataConnector["readme"])
 
@@ -65,7 +65,7 @@ class DataProviderForFiles:
         if not data:
             return None
 
-        encodings = ["latin1", "iso-8859-1", "cp1252", "utf-8-sig"]
+        encodings = ['latin1', 'iso-8859-1', 'cp1252', 'utf-8-sig']
         for encoding in encodings:
             try:
                 buff = StringIO(data.decode(encoding))
@@ -108,7 +108,7 @@ class DataProviderForFiles:
         data = self.fileToJson(file)
 
         if page >= 1 and nrOfHits >= 1:
-            data = data[(page - 1) * nrOfHits : page * nrOfHits]
+            data = data[(page - 1) * nrOfHits:page * nrOfHits]
 
         data_query = computeDataQuery(self.request)
 
@@ -172,7 +172,8 @@ class ConnectorDataParameters(MetadataBase):
 class ElasticConnectorWidget(MetadataBase):
     """Build csv data from ES data"""
 
-    elastic_csv_widget = DCFieldProperty(IElasticConnector["elastic_csv_widget"])
+    elastic_csv_widget = DCFieldProperty(
+        IElasticConnector["elastic_csv_widget"])
 
 
 class FigureNoteField(MetadataBase):

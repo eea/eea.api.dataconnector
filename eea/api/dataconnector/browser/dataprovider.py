@@ -1,4 +1,5 @@
-"""data provider"""
+""" data provider
+"""
 
 from io import BytesIO
 import xlsxwriter
@@ -55,7 +56,8 @@ class DataProviderDownload(BrowserView):
 
         sh(
             "Content-Type",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet",
         )
         sh(
             "Content-Disposition",
