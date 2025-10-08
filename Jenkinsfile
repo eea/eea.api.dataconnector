@@ -49,7 +49,7 @@ pipeline {
                 FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
 
                 if (FOUND_FIX != '0') {
-                  sh '''git add eea'''
+                  sh '''find . -name "*.py" -print0 | xargs -0 git add'''
                   sh '''git commit -m "style: Automated code fix" '''
                   sh '''git push --set-upstream origin $BRANCH_NAME'''
                   sh '''exit 1'''
@@ -98,7 +98,7 @@ pipeline {
                 FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
 
                 if (FOUND_FIX != '0') {
-                  sh '''git add eea'''
+                  sh '''find . -name "*.py" -print0 | xargs -0 git add'''
                   sh '''git commit -m "lint: Automated code fix" '''
                   sh '''git push --set-upstream origin $BRANCH_NAME'''
                   sh '''exit 1'''
