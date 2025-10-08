@@ -4,6 +4,7 @@ from collections import namedtuple
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
 from zope.dottedname.resolve import resolve
+import os
 
 Filter = namedtuple("Filter", ["index", "values"])
 
