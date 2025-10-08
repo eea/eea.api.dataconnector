@@ -31,6 +31,7 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
+                checkout scm
                 withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
                   sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                 }
@@ -79,6 +80,7 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
+                checkout scm
                 withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
                   sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                 }
