@@ -31,7 +31,10 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
-                fix_result = sh(script: '''docker run --pull=always --name="$BUILD_TAG-ruff-fix" -v $PWD:/code -w /code -e GIT_SRC="https://github.com/eea/$GIT_NAME.git" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/ruff format''', returnStatus: true)
+                fix_result = sh(script: '''docker run --pull=always --name="$BUILD_TAG-ruff-fix" -e GIT_SRC="https://github.com/eea/$GIT_NAME.git" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/ruff format''', returnStatus: true)
+                sh '''docker cp $BUILD_TAG-ruff-fix:/code/$GIT_NAME .'''
+                sh '''mv eea.api.dataconnector/* .'''
+                sh '''docker rm -v $BUILD_TAG-ruff-fix'''
                 FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
 
                 if (FOUND_FIX != '0') {
@@ -71,7 +74,10 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
-                fix_result = sh(script: '''docker run --pull=always --name="$BUILD_TAG-ruff-fix" -v $PWD:/code -w /code -e GIT_SRC="https://github.com/eea/$GIT_NAME.git" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/ruff check''', returnStatus: true)
+                fix_result = sh(script: '''docker run --pull=always --name="$BUILD_TAG-ruff-fix" -e GIT_SRC="https://github.com/eea/$GIT_NAME.git" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/ruff check''', returnStatus: true)
+                sh '''docker cp $BUILD_TAG-ruff-fix:/code/$GIT_NAME .'''
+                sh '''mv eea.api.dataconnector/* .'''
+                sh '''docker rm -v $BUILD_TAG-ruff-fix'''
                 FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
 
                 if (FOUND_FIX != '0') {
