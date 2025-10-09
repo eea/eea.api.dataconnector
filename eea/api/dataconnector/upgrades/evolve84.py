@@ -1,11 +1,13 @@
-""" Evolve script to cleanup Plotly BOM characters """
+"""Evolve script to cleanup Plotly BOM characters"""
+
 import logging
 from Products.CMFCore.utils import getToolByName
+
 logger = logging.getLogger("eea.api.dataconnector")
 
 
 def cleanup_dict(data):
-    """ Cleanup Plotly BOM characters """
+    """Cleanup Plotly BOM characters"""
     for key, value in data.items():
         if isinstance(value, dict):
             cleanup_dict(value)
@@ -19,7 +21,7 @@ def cleanup_dict(data):
 
 
 def cleanup(context):
-    """ Cleanup Plotly BOM characters """
+    """Cleanup Plotly BOM characters"""
     ctool = getToolByName(context, "portal_catalog")
     portal_type = "visualization"
     brains = ctool.unrestrictedSearchResults(portal_type=portal_type)
@@ -31,7 +33,7 @@ def cleanup(context):
         if doc is None:
             continue
 
-        visualization = getattr(doc, 'visualization', {})
+        visualization = getattr(doc, "visualization", {})
         if not visualization:
             continue
 

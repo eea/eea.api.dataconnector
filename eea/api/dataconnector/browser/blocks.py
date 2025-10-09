@@ -1,4 +1,4 @@
-""" block-related utils """
+"""block-related utils"""
 
 from urllib.parse import urlparse
 from AccessControl import Unauthorized
@@ -19,8 +19,8 @@ from zope.publisher.interfaces.browser import IBrowserRequest
 
 def getLinkHTML(url, text=None):
     """
-      Get link HTML
-      """
+    Get link HTML
+    """
 
     if not url:
         return url
@@ -28,43 +28,43 @@ def getLinkHTML(url, text=None):
     if not text:
         text = url
 
-    return '<a href="' + url + '" target="_blank">' + text + '</a>'
+    return '<a href="' + url + '" target="_blank">' + text + "</a>"
 
 
 def getLink(path):
     """
-      Get link
-      """
+    Get link
+    """
 
     URL = urlparse(path)
 
-    if URL.netloc.startswith('localhost') and URL.scheme:
+    if URL.netloc.startswith("localhost") and URL.scheme:
         return path.replace(URL.scheme + "://" + URL.netloc, "")
     return path
 
 
 def getUid(context, link, retry=True):
     """
-      Get the UID corresponding to a given link.
+    Get the UID corresponding to a given link.
 
-      Parameters:
-      - context: The context or object providing the link.
-      - link (str): The link for which to retrieve the UID.
-      - retry (bool, optional): If True, attempt to resolve the UID
-        even if the initial attempt fails. Defaults to True.
+    Parameters:
+    - context: The context or object providing the link.
+    - link (str): The link for which to retrieve the UID.
+    - retry (bool, optional): If True, attempt to resolve the UID
+      even if the initial attempt fails. Defaults to True.
 
-      Returns:
-      - str or None: The UID corresponding to the provided link,
-        or None if the link is empty or cannot be resolved.
+    Returns:
+    - str or None: The UID corresponding to the provided link,
+      or None if the link is empty or cannot be resolved.
 
-      If the link is empty, the function returns the link itself.
-      If the link cannot be resolved in the initial attempt and retry
-      is True, the function retries resolving the link by calling itself
-      with retry set to False.
+    If the link is empty, the function returns the link itself.
+    If the link cannot be resolved in the initial attempt and retry
+    is True, the function retries resolving the link by calling itself
+    with retry set to False.
 
-      The function uses the RESOLVEUID_RE regular expression to match
-      and extract the UID from the link.
-      """
+    The function uses the RESOLVEUID_RE regular expression to match
+    and extract the UID from the link.
+    """
 
     if not link:
         return link
@@ -73,8 +73,7 @@ def getUid(context, link, retry=True):
         if not retry:
             return link
         # Alin Voinea a zis sa las asa
-        return getUid(context, path2uid(context=context, link=getLink(link)),
-                      False)
+        return getUid(context, path2uid(context=context, link=getLink(link)), False)
 
     uid, _ = match.groups()
     return uid
@@ -82,28 +81,28 @@ def getUid(context, link, retry=True):
 
 def getMetadata(doc_json):
     """
-      Extract metadata information from a doc_json.
+    Extract metadata information from a doc_json.
 
-      Parameters:
-      - doc_json: The doc_json providing metadata information.
+    Parameters:
+    - doc_json: The doc_json providing metadata information.
 
-      Returns:
-      - dict: A dictionary containing metadata information with
-      the following keys:
-        - "@id": The identifier.
-        - "title": The title.
-        - "publisher": The publisher.
-        - "geo_coverage": The geographic coverage.
-        - "temporal_coverage": The temporal coverage.
-        - "other_organisations": Other organizations involved.
-        - "data_provenance": Data provenance information.
-        - "figure_note": Additional notes related to the figure.
+    Returns:
+    - dict: A dictionary containing metadata information with
+    the following keys:
+      - "@id": The identifier.
+      - "title": The title.
+      - "publisher": The publisher.
+      - "geo_coverage": The geographic coverage.
+      - "temporal_coverage": The temporal coverage.
+      - "other_organisations": Other organizations involved.
+      - "data_provenance": Data provenance information.
+      - "figure_note": Additional notes related to the figure.
 
-      The function retrieves metadata information from the provided
-      doc_json and returns it as a dictionary. If a specific metadata
-      field is not present in the doc_json, the corresponding key in
-      the dictionary will have a value of None.
-      """
+    The function retrieves metadata information from the provided
+    doc_json and returns it as a dictionary. If a specific metadata
+    field is not present in the doc_json, the corresponding key in
+    the dictionary will have a value of None.
+    """
 
     return {
         "@id": doc_json.get("@id"),
@@ -114,7 +113,7 @@ def getMetadata(doc_json):
         "temporal_coverage": doc_json.get("temporal_coverage"),
         "other_organisations": doc_json.get("other_organisations"),
         "data_provenance": doc_json.get("data_provenance"),
-        "figure_note": doc_json.get("figure_note")
+        "figure_note": doc_json.get("figure_note"),
     }
 
 
@@ -125,7 +124,7 @@ class EmbedingBlockSerializationTransformer:
 
     order = 9999
     block_type = "unknown"
-    title = 'content'
+    title = "content"
     state = {}
     error = None
     initialized = False
@@ -153,18 +152,14 @@ class EmbedingBlockSerializationTransformer:
         self.state["properties"] = {
             **getMetadata(self.state["doc_json"]),
             "@type": self.state["doc_json"].get("@type"),
-            "UID": self.state["doc_json"].get("UID")
+            "UID": self.state["doc_json"].get("UID"),
         }
 
     def get_url(self, value):
         """Get url"""
         if not value:
             return None
-        return (
-            value.get("url") or
-            value.get("vis_url") or
-            value.get("tableau_vis_url")
-        )
+        return value.get("url") or value.get("vis_url") or value.get("tableau_vis_url")
 
     def get_doc(self):
         """Get doc"""
@@ -173,14 +168,20 @@ class EmbedingBlockSerializationTransformer:
         try:
             return api.content.get(UID=uid)
         except Unauthorized:
-            self.error = "Apologies, it seems this " + getLinkHTML(
-                url, self.title) + " has not been published yet."
+            self.error = (
+                "Apologies, it seems this "
+                + getLinkHTML(url, self.title)
+                + " has not been published yet."
+            )
             return None
 
         except Forbidden:
-            self.error = "Apologies, it seems you do not have " + \
-                "permissions to see this " + getLinkHTML(url, self.title) + \
-                "."
+            self.error = (
+                "Apologies, it seems you do not have "
+                + "permissions to see this "
+                + getLinkHTML(url, self.title)
+                + "."
+            )
             return None
 
     def get_doc_json(self):
@@ -188,19 +189,16 @@ class EmbedingBlockSerializationTransformer:
         doc = self.state["doc"]
         if not doc:
             return None
-        serializer = queryMultiAdapter(
-            (doc, self.request), ISerializeToJson)
+        serializer = queryMultiAdapter((doc, self.request), ISerializeToJson)
         if not serializer:
             return None
-        return serializer(
-            version=self.request.get("version"))
+        return serializer(version=self.request.get("version"))
 
     def get_error(self):
         """Get error"""
 
 
-class EmbedContentSerializationTransformer(
-        EmbedingBlockSerializationTransformer):
+class EmbedContentSerializationTransformer(EmbedingBlockSerializationTransformer):
     """Embed content serialization"""
 
     block_type = "embed_content"
@@ -220,36 +218,36 @@ class EmbedContentSerializationTransformer(
             return value
 
         if self.error:
-            return {
-                **value,
-                "error": self.error
-            }
+            return {**value, "error": self.error}
 
         if not doc_json:
             return {
                 **value,
-                "error": "Apologies, it seems this " + getLinkHTML(
-                    url, self.title) + " does not exist."
+                "error": "Apologies, it seems this "
+                + getLinkHTML(url, self.title)
+                + " does not exist.",
             }
 
         value["properties"] = self.state["properties"]
 
-        content_type = value["properties"].get('@type', None)
-        block_type = 'none'
+        content_type = value["properties"].get("@type", None)
+        block_type = "none"
 
-        if content_type == 'visualization':
-            block_type = 'embed_visualization'
-        if content_type == 'tableau_visualization':
-            block_type = 'embed_tableau_visualization'
-        if content_type == 'map_visualization':
-            block_type = 'embed_eea_map_block'
-        if content_type == 'map_interactive':
-            block_type = 'embed_maps'
+        if content_type == "visualization":
+            block_type = "embed_visualization"
+        if content_type == "tableau_visualization":
+            block_type = "embed_tableau_visualization"
+        if content_type == "map_visualization":
+            block_type = "embed_eea_map_block"
+        if content_type == "map_interactive":
+            block_type = "embed_maps"
 
         new_value = value.copy()
         for handler in iter_block_transform_handlers(
-                self.context, {**value, "@type": block_type},
-                IBlockFieldSerializationTransformer):
+            self.context,
+            {**value, "@type": block_type},
+            IBlockFieldSerializationTransformer,
+        ):
             new_value = handler(new_value)
 
         return new_value
@@ -269,17 +267,24 @@ class EmbedContentDeserializationTransformer:
 
     def __call__(self, value):
         for attr in [
-            'properties', 'visualization', 'tableau_visualization',
-            'map_visualization_data', 'maps', 'image_scales', 'vis_url',
-                'tableau_vis_url']:
+            "properties",
+            "visualization",
+            "tableau_visualization",
+            "map_visualization_data",
+            "maps",
+            "image_scales",
+            "vis_url",
+            "tableau_vis_url",
+        ]:
             if attr in value:
                 del value[attr]
 
         return value
 
 
-class EmbedTableauVisualizationSerializationTransformer((
-        EmbedingBlockSerializationTransformer)):
+class EmbedTableauVisualizationSerializationTransformer(
+    (EmbedingBlockSerializationTransformer)
+):
     """Embed tableau visualization serialization"""
 
     order = 9999
@@ -300,15 +305,10 @@ class EmbedTableauVisualizationSerializationTransformer((
         value["tableau_vis_url"] = url
 
         if self.error:
-            return {
-                **value,
-                "visualization": {
-                    "error": self.error
-                }
-            }
+            return {**value, "visualization": {"error": self.error}}
 
-        if 'tableau_visualization' in value:
-            del value['tableau_visualization']
+        if "tableau_visualization" in value:
+            del value["tableau_visualization"]
 
         if not doc_json:
             return value
@@ -316,9 +316,9 @@ class EmbedTableauVisualizationSerializationTransformer((
         return {
             **value,
             "tableau_visualization": {
-                **doc_json.get('tableau_visualization', {}),
+                **doc_json.get("tableau_visualization", {}),
                 **getMetadata(doc_json),
-            }
+            },
         }
 
 
@@ -335,16 +335,16 @@ class EmbedTableauVisualizationDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        if 'tableau_visualization' in value:
-            del value['tableau_visualization']
-        if 'tableau_vis_url' in value:
-            value['tableau_vis_url'] = path2uid(context=self.context,
-                                                link=value['tableau_vis_url'])
+        if "tableau_visualization" in value:
+            del value["tableau_visualization"]
+        if "tableau_vis_url" in value:
+            value["tableau_vis_url"] = path2uid(
+                context=self.context, link=value["tableau_vis_url"]
+            )
         return value
 
 
-class EmbedEEAMapBlockSerializationTransformer(
-        EmbedingBlockSerializationTransformer):
+class EmbedEEAMapBlockSerializationTransformer(EmbedingBlockSerializationTransformer):
     """Embed eea map block serializer"""
 
     order = 9999
@@ -365,15 +365,10 @@ class EmbedEEAMapBlockSerializationTransformer(
         value["vis_url"] = url
 
         if self.error:
-            return {
-                **value,
-                "visualization": {
-                    "error": self.error
-                }
-            }
+            return {**value, "visualization": {"error": self.error}}
 
-        if 'map_visualization_data' in value:
-            del value['map_visualization_data']
+        if "map_visualization_data" in value:
+            del value["map_visualization_data"]
 
         if not doc_json:
             return value
@@ -381,9 +376,9 @@ class EmbedEEAMapBlockSerializationTransformer(
         return {
             **value,
             "map_visualization_data": {
-                **doc_json.get('map_visualization_data', {}),
+                **doc_json.get("map_visualization_data", {}),
                 **getMetadata(doc_json),
-            }
+            },
         }
 
 
@@ -400,16 +395,14 @@ class EmbedEEAMapBlockDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        if 'map_visualization_data' in value:
-            del value['map_visualization_data']
-        if 'vis_url' in value:
-            value['vis_url'] = path2uid(context=self.context,
-                                        link=value['vis_url'])
+        if "map_visualization_data" in value:
+            del value["map_visualization_data"]
+        if "vis_url" in value:
+            value["vis_url"] = path2uid(context=self.context, link=value["vis_url"])
         return value
 
 
-class EmbedMapsSerializationTransformer(
-        EmbedingBlockSerializationTransformer):
+class EmbedMapsSerializationTransformer(EmbedingBlockSerializationTransformer):
     """Embed maps serializer"""
 
     order = 9999
@@ -430,24 +423,20 @@ class EmbedMapsSerializationTransformer(
         value["url"] = url
 
         if self.error:
-            return {
-                **value,
-                "visualization": {
-                    "error": self.error
-                }
-            }
+            return {**value, "visualization": {"error": self.error}}
 
-        if 'maps' in value:
-            del value['maps']
+        if "maps" in value:
+            del value["maps"]
 
         if not doc_json:
             return value
 
         return {
-            **value, "maps": {
-                **doc_json.get('maps', {}),
+            **value,
+            "maps": {
+                **doc_json.get("maps", {}),
                 **getMetadata(doc_json),
-            }
+            },
         }
 
 
@@ -464,6 +453,6 @@ class EmbedMapsDeserializationTransformer:
         self.request = request
 
     def __call__(self, value):
-        if 'maps' in value:
-            del value['maps']
+        if "maps" in value:
+            del value["maps"]
         return value

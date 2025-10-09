@@ -1,6 +1,8 @@
 """CSV reader/writer that handles NULL values."""
+
 import csv
-NULL = 'NULL'
+
+NULL = "NULL"
 
 
 class CsvWriter:
@@ -15,10 +17,7 @@ class CsvWriter:
 
     def writerow(self, row):
         """Write a single row to the CSV file."""
-        self.csv_writer.writerow(
-            [item if item is not None else NULL
-             for item in row]
-        )
+        self.csv_writer.writerow([item if item is not None else NULL for item in row])
 
     def writerows(self, rows):
         """Write multiple rows to the CSV file."""
@@ -31,10 +30,10 @@ class CsvReader:
 
     def __init__(self, *args, **kwrds):
         try:
-            inputEntity = args[0] or kwrds.get('csvfile')
+            inputEntity = args[0] or kwrds.get("csvfile")
             sample = inputEntity.read(1024)
             inputEntity.seek(0)
-            dialect = csv.Sniffer().sniff(sample, delimiters=',;\t|')
+            dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
         except (csv.Error, TypeError):
             # No dialect found, use default
             dialect = csv.excel
