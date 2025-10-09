@@ -41,14 +41,18 @@ pipeline {
 
                 if (FOUND_FIX != '0') {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
-                    sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
+                    sh '''
+                      sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config
+                      
+                      TARGET_BRANCH=${CHANGE_BRANCH:-$BRANCH_NAME}
+                      git fetch origin $TARGET_BRANCH:$TARGET_BRANCH
+                      git checkout $TARGET_BRANCH
+                      git add -- '*.py'
+                      git diff --quiet || git commit -m "style: Automated code fix"
+                      git push origin $TARGET_BRANCH
+                      exit 1
+                    '''
                   }
-                  sh '''git fetch origin pull/$CHANGE_ID/head:$GIT_BRANCH'''
-                  sh '''git checkout $CHANGE_BRANCH'''
-                  sh '''git add -- '*.py' '''
-                  sh '''git commit -m "style: Automated code fix" '''
-                  sh '''git push origin $CHANGE_BRANCH'''
-                  sh '''exit 1'''
                 }
               }
             }
@@ -86,14 +90,18 @@ pipeline {
 
                 if (FOUND_FIX != '0') {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
-                    sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
+                    sh '''
+                      sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config
+                      
+                      TARGET_BRANCH=${CHANGE_BRANCH:-$BRANCH_NAME}
+                      git fetch origin $TARGET_BRANCH:$TARGET_BRANCH
+                      git checkout $TARGET_BRANCH
+                      git add -- '*.py'
+                      git diff --quiet || git commit -m "lint: Automated code fix"
+                      git push origin $TARGET_BRANCH
+                      exit 1
+                    '''
                   }
-                  sh '''git fetch origin pull/$CHANGE_ID/head:$GIT_BRANCH'''
-                  sh '''git checkout $CHANGE_BRANCH'''
-                  sh '''git add -- '*.py' '''
-                  sh '''git commit -m "lint: Automated code fix" '''
-                  sh '''git push origin $CHANGE_BRANCH'''
-                  sh '''exit 1'''
                 }
               }
             }
