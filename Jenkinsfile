@@ -43,6 +43,7 @@ pipeline {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                   }
+                  sh '''git fetch origin pull/$CHANGE_ID/head:$GIT_BRANCH'''
                   sh '''git checkout $GIT_BRANCH'''
                   sh '''git add -- '*.py' '''
                   sh '''git commit -m "style: Automated code fix" '''
@@ -87,6 +88,7 @@ pipeline {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                   }
+                  sh '''git fetch origin pull/$CHANGE_ID/head:$GIT_BRANCH'''
                   sh '''git checkout $GIT_BRANCH'''
                   sh '''git add -- '*.py' '''
                   sh '''git commit -m "lint: Automated code fix" '''
