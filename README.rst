@@ -112,4 +112,4 @@ Funding
 EEA_ - European Environment Agency (EU)
 
 .. _EEA: https://www.eea.europa.eu/
-.. _`EEA Web Systems Training`: http://www.youtube.com/user/eeacms/videos?view=1
+.. _`EEA Web Systems Training`: http://www.youtube.com/user/eeacms/videos?view=1 
