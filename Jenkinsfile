@@ -44,10 +44,10 @@ pipeline {
                     sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                   }
                   sh '''git fetch origin pull/$CHANGE_ID/head:$GIT_BRANCH'''
-                  sh '''git checkout $BRANCH_NAME'''
+                  sh '''git checkout $CHANGE_BRANCH'''
                   sh '''git add -- '*.py' '''
                   sh '''git commit -m "style: Automated code fix" '''
-                  sh '''git push origin $BRANCH_NAME'''
+                  sh '''git push origin $CHANGE_BRANCH'''
                   sh '''exit 1'''
                 }
               }
@@ -89,10 +89,10 @@ pipeline {
                     sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                   }
                   sh '''git fetch origin pull/$CHANGE_ID/head:$GIT_BRANCH'''
-                  sh '''git checkout $BRANCH_NAME'''
+                  sh '''git checkout $CHANGE_BRANCH'''
                   sh '''git add -- '*.py' '''
                   sh '''git commit -m "lint: Automated code fix" '''
-                  sh '''git push origin $BRANCH_NAME'''
+                  sh '''git push origin $CHANGE_BRANCH'''
                   sh '''exit 1'''
                 }
               }
