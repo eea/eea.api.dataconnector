@@ -11,8 +11,7 @@ class HiddenProfiles:
     def getNonInstallableProfiles(self):
         """Hide uninstall profile from site-creation and quickinstaller."""
         return [
-            "eea.api.dataconnector:uninstall",
-            "eea.api.dataconnector:upgrade_50",
+            "eea.api.dataconnector:uninstall","eea.api.dataconnector:upgrade_50",
             "eea.api.dataconnector:upgrade_60",
             "eea.api.dataconnector:upgrade_82",
         ]
