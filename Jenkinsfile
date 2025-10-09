@@ -43,12 +43,11 @@ pipeline {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                   }
-                sh '''git fetch origin $GIT_BRANCH:$GIT_BRANCH'''
-                sh '''git checkout $GIT_BRANCH'''
-                sh '''git add -- '*.py' '''
-                sh '''git commit -m "style: Automated code fix" '''
-                sh '''git push --set-upstream origin $GIT_BRANCH'''
-                sh '''exit 1'''
+                  sh '''git checkout $GIT_BRANCH'''
+                  sh '''git add -- '*.py' '''
+                  sh '''git commit -m "style: Automated code fix" '''
+                  sh '''git push --set-upstream origin $GIT_BRANCH'''
+                  sh '''exit 1'''
                 }
               }
             }
@@ -88,12 +87,11 @@ pipeline {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''sed -i "s|url = .*|url = https://eea-jenkins:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git|" .git/config'''
                   }
-                sh '''git fetch origin $GIT_BRANCH:$GIT_BRANCH'''
-                sh '''git checkout $GIT_BRANCH'''
-                sh '''git add -- '*.py' '''
-                sh '''git commit -m "lint: Automated code fix" '''
-                sh '''git push --set-upstream origin $GIT_BRANCH'''
-                sh '''exit 1'''
+                  sh '''git checkout $GIT_BRANCH'''
+                  sh '''git add -- '*.py' '''
+                  sh '''git commit -m "lint: Automated code fix" '''
+                  sh '''git push --set-upstream origin $GIT_BRANCH'''
+                  sh '''exit 1'''
                 }
               }
             }
