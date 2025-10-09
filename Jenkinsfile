@@ -48,7 +48,7 @@ pipeline {
                       git fetch origin $TARGET_BRANCH:$TARGET_BRANCH
                       git checkout $TARGET_BRANCH
                       git add -- '*.py'
-                      git diff --quiet || git commit -m "style: Automated code fix"
+                      git commit -m "style: Automated code fix"
                       git push origin $TARGET_BRANCH
                       exit 1
                     '''
@@ -97,7 +97,7 @@ pipeline {
                       git fetch origin $TARGET_BRANCH:$TARGET_BRANCH
                       git checkout $TARGET_BRANCH
                       git add -- '*.py'
-                      git diff --quiet || git commit -m "lint: Automated code fix"
+                      git commit -m "lint: Automated code fix"
                       git push origin $TARGET_BRANCH
                       exit 1
                     '''
