@@ -37,7 +37,7 @@ pipeline {
                 sh '''cp -rf eea.api.dataconnector/* .'''
                 sh '''rm -rf eea.api.dataconnector'''
                 sh '''docker rm -v $BUILD_TAG-ruff-fix'''
-                FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
+                FOUND_FIX = sh(script: '''git diff --name-only '*.py' | wc -l''', returnStdout: true).trim()
 
                 if (FOUND_FIX != '0') {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
@@ -84,7 +84,7 @@ pipeline {
                 sh '''cp -rf eea.api.dataconnector/* .'''
                 sh '''rm -rf eea.api.dataconnector'''
                 sh '''docker rm -v $BUILD_TAG-ruff-fix'''
-                FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
+                FOUND_FIX = sh(script: '''git diff --name-only '*.py' | wc -l''', returnStdout: true).trim()
 
                 if (FOUND_FIX != '0') {
                   withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
