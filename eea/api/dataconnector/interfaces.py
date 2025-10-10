@@ -1,4 +1,5 @@
 """Module where all interfaces, events and exceptions live."""
+
 import json
 from plone.app.z3cform.widget import QueryStringFieldWidget
 from plone.autoform import directives as form
@@ -65,8 +66,7 @@ class IDataConnector(model.Schema):
     )
     required_parameters = schema.List(
         title="Required query parameters",
-        description="Provider doesn't send data if the reuqired parameter is "
-        "not set",
+        description="Provider doesn't send data if the reuqired parameter is not set",
         required=False,
         value_type=schema.TextLine(title="Parameter"),
     )
@@ -140,8 +140,7 @@ class IConnectorDataParameters(model.Schema):
     data_query = schema.List(
         title="Data query parameters",
         description="Define the data query parameters",
-        value_type=schema.Dict(value_type=schema.Field(),
-                               key_type=schema.TextLine()),
+        value_type=schema.Dict(value_type=schema.Field(), key_type=schema.TextLine()),
         required=False,
         missing_value=[],
         default=[],
@@ -149,9 +148,7 @@ class IConnectorDataParameters(model.Schema):
     form.widget("data_query", QueryStringFieldWidget)
 
 
-ELASTIC_CONNECTOR_WIDGET_SCHEMA = json.dumps(
-    {"type": "object", "properties": {}}
-)
+ELASTIC_CONNECTOR_WIDGET_SCHEMA = json.dumps({"type": "object", "properties": {}})
 
 
 @provider(IFormFieldProvider)
