@@ -31,7 +31,7 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
-                if (!(env.BRANCH_NAME != "master" && env.CHANGE_ID == '')) {
+                if (!(env.BRANCH_NAME != "master" && (env.CHANGE_ID == null || env.CHANGE_ID == ''))) {
                   return
                 }
                 checkout scm
@@ -79,7 +79,7 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
-                if (!(env.BRANCH_NAME != "master" && env.CHANGE_ID == '')) {
+                if (!(env.BRANCH_NAME != "master" && (env.CHANGE_ID == null || env.CHANGE_ID == ''))) {
                   return
                 }
                 checkout scm
