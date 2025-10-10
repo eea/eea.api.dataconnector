@@ -31,9 +31,6 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
-                if (!(env.CHANGE_BRANCH != "master" && env.CHANGE_ID == '')) {
-                  return
-                }
                 checkout scm
                 fix_result = sh(script: '''docker run --pull=always --name="$BUILD_TAG-ruff-fix" -e GIT_SRC="https://github.com/eea/$GIT_NAME.git" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/ruff format''', returnStatus: true)
                 sh '''docker cp $BUILD_TAG-ruff-fix:/code/$GIT_NAME .'''
@@ -79,9 +76,6 @@ pipeline {
           "Ruff": {
             node(label: 'docker') {
               script {
-                if (!(env.CHANGE_BRANCH != "master" && env.CHANGE_ID == '')) {
-                  return
-                }
                 checkout scm
                 fix_result = sh(script: '''docker run --pull=always --name="$BUILD_TAG-ruff-fix" -e GIT_SRC="https://github.com/eea/$GIT_NAME.git" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/ruff check''', returnStatus: true)
                 sh '''docker cp $BUILD_TAG-ruff-fix:/code/$GIT_NAME .'''
