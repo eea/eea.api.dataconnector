@@ -4,6 +4,7 @@ from Products.CMFPlone.interfaces import INonInstallable
 from zope.interface import implementer
 import sys
 
+
 @implementer(INonInstallable)
 class HiddenProfiles:
     """Hidden profiles"""
