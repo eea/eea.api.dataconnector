@@ -30,8 +30,10 @@ pipeline {
 
           "Ruff": {
             when {
-              environment name: 'CHANGE_ID', value: ''
-              not { branch 'master' }
+              allOf {
+                environment name: 'CHANGE_ID', value: ''
+                not { branch 'master' }
+              }
             }
             node(label: 'docker') {
               script {
@@ -79,8 +81,10 @@ pipeline {
 
           "Ruff": {
             when {
-              environment name: 'CHANGE_ID', value: ''
-              not { branch 'master' }
+              allOf {
+                environment name: 'CHANGE_ID', value: ''
+                not { branch 'master' }
+              }
             }
             node(label: 'docker') {
               script {
