@@ -20,12 +20,6 @@ jobs:
 
     - stage: code
       env:
-        - CHECK=pyflakes
-      script:
-        - docker run -i --rm -e GIT_BRANCH=$TRAVIS_BRANCH -e GIT_SRC=$GIT_SRC -e GIT_NAME=$GIT_NAME -e GIT_CHANGE_ID=$GIT_CHANGE_ID eeacms/$CHECK
-
-    - stage: code
-      env:
         - CHECK=i18ndude
       script:
         - docker run -i --rm -e GIT_BRANCH=$TRAVIS_BRANCH -e GIT_SRC=$GIT_SRC -e GIT_NAME=$GIT_NAME -e GIT_CHANGE_ID=$GIT_CHANGE_ID eeacms/$CHECK
