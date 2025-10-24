@@ -3,6 +3,8 @@ Changelog
 
 12.4-dev0 - (unreleased)
 ---------------------------
+* Change: Replace Python linting to ruff
+  [mihaidobrescu1111 = refs #286821]
 
 12.3 - (2025-08-27)
 ---------------------------
