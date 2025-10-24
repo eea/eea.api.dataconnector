@@ -65,6 +65,7 @@ class DataProviderForFiles:
         if not data:
             return None
 
+        buff = None
         encodings = ["latin1", "iso-8859-1", "cp1252", "utf-8-sig"]
         for encoding in encodings:
             try:
