@@ -1,6 +1,5 @@
-""" Base test cases
-"""
-# pylint: disable=C0415
+"""Base test cases"""
+
 from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import TEST_USER_ID
@@ -53,6 +52,4 @@ class EEAFixture(PloneSandboxLayer):
 
 
 EEAFIXTURE = EEAFixture()
-FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(EEAFIXTURE,), name="EEAslate:Functional"
-)
+FUNCTIONAL_TESTING = FunctionalTesting(bases=(EEAFIXTURE,), name="EEAslate:Functional")
