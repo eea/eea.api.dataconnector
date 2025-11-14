@@ -1,6 +1,9 @@
 Changelog
 =========
 
+12.5-dev0 - (unreleased)
+---------------------------
+
 12.4 - (2025-11-12)
 ---------------------------
 * Change: Replace Python linting to ruff
