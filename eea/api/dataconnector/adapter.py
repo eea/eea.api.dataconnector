@@ -57,8 +57,8 @@ class DataProviderForConnectors:
             query["where"] = conditions[0]
 
         formatted_query = sql_format(query)
-        if ' <> ' in formatted_query:
-            formatted_query = formatted_query.replace(' <> ', ' != ')
+        if " <> " in formatted_query:
+            formatted_query = formatted_query.replace(" <> ", " != ")
 
         data["query"] = formatted_query
 
