@@ -56,7 +56,11 @@ class DataProviderForConnectors:
         elif len(conditions) == 1:
             query["where"] = conditions[0]
 
-        data["query"] = sql_format(query)
+        formatted_query = sql_format(query)
+        if " <> " in formatted_query:
+            formatted_query = formatted_query.replace(" <> ", " != ")
+
+        data["query"] = formatted_query
 
         if form.get("p"):
             data["p"] = form.get("p")

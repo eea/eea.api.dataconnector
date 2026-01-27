@@ -61,7 +61,7 @@
     factory=".behavior.TableauViewVisualization"
     provides=".interfaces.ITableauVisualization"
     for="plone.dexterity.interfaces.IDexterityContent"
-    marker=".interfaces.ITableauVisualization"
+    marker=".interfaces.ITableauVisualizationView"
   />
 
   <plone:behavior
@@ -71,7 +71,7 @@
     factory=".behavior.MapViewVisualization"
     provides=".interfaces.IMapVisualization"
     for="plone.dexterity.interfaces.IDexterityContent"
-    marker=".interfaces.IMapVisualization"
+    marker=".interfaces.IMapVisualizationView"
   />
 
   <plone:behavior

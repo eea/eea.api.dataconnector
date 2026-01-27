@@ -1,6 +1,11 @@
 Changelog
 =========
 
+12.5 - (2025-12-11)
+---------------------------
+* Change: Release
+  [laszlocseh]
+
 12.4 - (2025-11-12)
 ---------------------------
 * Change: Replace Python linting to ruff
