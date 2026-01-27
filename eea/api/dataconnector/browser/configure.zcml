@@ -28,14 +28,14 @@
 
   <browser:page
     name="view"
-    for="eea.api.dataconnector.interfaces.IMapVisualization"
+    for="eea.api.dataconnector.interfaces.IMapVisualizationView"
     permission="zope2.View"
     template="pt/arcgis_map_view.pt"
   />
 
   <browser:page
     name="view"
-    for="eea.api.dataconnector.interfaces.ITableauVisualization"
+    for="eea.api.dataconnector.interfaces.ITableauVisualizationView"
     permission="zope2.View"
     template="pt/tableau_view.pt"
   />

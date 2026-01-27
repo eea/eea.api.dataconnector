@@ -125,6 +125,13 @@ class ITableauVisualization(model.Schema):
         schema=TABLEAU_VIEW_SCHEMA,
     )
 
+class IMapVisualizationView(IBasicDataProvider):
+    """Marker interface"""
+
+
+class ITableauVisualizationView(IBasicDataProvider):
+    """Marker interface"""
+
 
 @provider(IFormFieldProvider)
 class IConnectorDataParameters(model.Schema):
