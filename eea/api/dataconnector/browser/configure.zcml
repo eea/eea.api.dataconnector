@@ -31,6 +31,7 @@
     for="eea.api.dataconnector.interfaces.IMapVisualizationView"
     permission="zope2.View"
     template="pt/arcgis_map_view.pt"
+    class=".dataprovider.MapVisualizationView"
   />
 
   <browser:page
@@ -38,6 +39,7 @@
     for="eea.api.dataconnector.interfaces.ITableauVisualizationView"
     permission="zope2.View"
     template="pt/tableau_view.pt"
+    class=".dataprovider.TableauVisualizationView"
   />
 
   <browser:page

@@ -2,8 +2,30 @@
 
 from io import BytesIO
 import xlsxwriter
-from eea.api.dataconnector.interfaces import IDataProvider
+from eea.api.dataconnector.interfaces import (
+    IDataProvider,
+    ITableauVisualization,
+    IMapVisualization,
+)
 from Products.Five.browser import BrowserView
+
+
+class TableauVisualizationView(BrowserView):
+    """View for Tableau visualization"""
+
+    @property
+    def tableau_visualization(self):
+        """Return tableau visualization data from behavior"""
+        return ITableauVisualization(self.context).tableau_visualization
+
+
+class MapVisualizationView(BrowserView):
+    """View for Map visualization"""
+
+    @property
+    def map_visualization_data(self):
+        """Return map visualization data from behavior"""
+        return IMapVisualization(self.context).map_visualization_data
 
 
 class DataProviderView(BrowserView):
