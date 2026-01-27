@@ -126,6 +126,14 @@ class ITableauVisualization(model.Schema):
     )
 
 
+class IMapVisualizationView(IBasicDataProvider):
+    """Marker interface"""
+
+
+class ITableauVisualizationView(IBasicDataProvider):
+    """Marker interface"""
+
+
 @provider(IFormFieldProvider)
 class IConnectorDataParameters(model.Schema):
     """Allow content to preset parameters for connector data"""
