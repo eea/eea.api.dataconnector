@@ -44,6 +44,14 @@ class IConnectorDataProvider(IBasicDataProvider):
     """Marker interface for objects that provide data to visualizations"""
 
 
+class ITableauVisualizationView(Interface):
+    """Marker interface for Tableau visualization view"""
+
+
+class IMapVisualizationView(Interface):
+    """Marker interface for Map visualization view"""
+
+
 @provider(IFormFieldProvider)
 class IDataConnector(model.Schema):
     """A generic discodata connector"""

@@ -8,6 +8,8 @@
 
   <interface interface=".interfaces.IConnectorDataProvider" />
   <interface interface=".interfaces.IFileDataProvider" />
+  <interface interface=".interfaces.ITableauVisualizationView" />
+  <interface interface=".interfaces.IMapVisualizationView" />
 
   <adapter factory=".behavior.DataProviderForFiles" />
   <adapter factory=".behavior.DataProviderForElasticCSVWidget" />
@@ -61,7 +63,7 @@
     factory=".behavior.TableauViewVisualization"
     provides=".interfaces.ITableauVisualization"
     for="plone.dexterity.interfaces.IDexterityContent"
-    marker=".interfaces.ITableauVisualization"
+    marker=".interfaces.ITableauVisualizationView"
   />
 
   <plone:behavior
@@ -71,7 +73,7 @@
     factory=".behavior.MapViewVisualization"
     provides=".interfaces.IMapVisualization"
     for="plone.dexterity.interfaces.IDexterityContent"
-    marker=".interfaces.IMapVisualization"
+    marker=".interfaces.IMapVisualizationView"
   />
 
   <plone:behavior
