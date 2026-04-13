@@ -9,7 +9,14 @@ These tests cover pure filter functions that don't require Plone context:
 """
 
 import unittest
-from eea.api.dataconnector.queryfilter import Filter, _equal, _contains, _gte, _all, filteredData
+from eea.api.dataconnector.queryfilter import (
+    Filter,
+    _equal,
+    _contains,
+    _gte,
+    _all,
+    filteredData,
+)
 
 
 class TestEqual(unittest.TestCase):

@@ -246,7 +246,9 @@ class TestGetWhereStatement(unittest.TestCase):
     def test_with_collate(self):
         row = Row(index="title", values="test", table="", collate="utf8")
         result = getWhereStatement(row, "eq")
-        self.assertEqual(result, {"eq": ["title", {"collate": [{"literal": "test"}, "utf8"]}]})
+        self.assertEqual(
+            result, {"eq": ["title", {"collate": [{"literal": "test"}, "utf8"]}]}
+        )
 
     def test_in_list_no_split_when_already_list(self):
         row = Row(index="title", values=["a", "b"], table="", collate=None)
