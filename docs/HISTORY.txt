@@ -1,6 +1,9 @@
 Changelog
 =========
 
+12.7-dev0 - (unreleased)
+---------------------------
+
 12.6 - (2026-04-14)
 ---------------------------
 * Change: Add unit tests for queryparser and queryfilter modules
