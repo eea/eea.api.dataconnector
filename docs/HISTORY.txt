@@ -1,6 +1,11 @@
 Changelog
 =========
 
+12.6 - (2026-04-14)
+---------------------------
+* Change: Add unit tests for queryparser and queryfilter modules
+  [avoinea]
+
 12.5 - (2025-12-11)
 ---------------------------
 * Change: Release
