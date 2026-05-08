@@ -3,6 +3,8 @@ Changelog
 
 12.7-dev0 - (unreleased)
 ---------------------------
+* Fix: list index out of range
+  [avoinea - sentry #420262]
 
 12.6 - (2026-04-14)
 ---------------------------
