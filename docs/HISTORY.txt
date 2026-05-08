@@ -1,6 +1,11 @@
 Changelog
 =========
 
+12.7 - (2026-05-08)
+---------------------------
+* Fix: list index out of range
+  [avoinea - sentry #420262]
+
 12.6 - (2026-04-14)
 ---------------------------
 * Change: Add unit tests for queryparser and queryfilter modules

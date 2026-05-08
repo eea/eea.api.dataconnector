@@ -90,7 +90,8 @@ class DataProviderForFiles:
                     j += 1
                     if i > len(data):
                         data.append({})
-                    data[i - 1][headers[j]] = cell
+                    key = headers[j] if j < len(headers) else f"column_{j + 1}"
+                    data[i - 1][key] = cell
             return data
         except csv.Error:
             return None
