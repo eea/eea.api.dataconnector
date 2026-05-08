@@ -1,7 +1,7 @@
 Changelog
 =========
 
-12.7-dev0 - (unreleased)
+12.7 - (2026-05-08)
 ---------------------------
 * Fix: list index out of range
   [avoinea - sentry #420262]
