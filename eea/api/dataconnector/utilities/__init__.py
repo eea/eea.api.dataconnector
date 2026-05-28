@@ -1,2 +1,1 @@
-""" EEA Dataconnector Utilities
-"""
+"""EEA Dataconnector Utilities"""

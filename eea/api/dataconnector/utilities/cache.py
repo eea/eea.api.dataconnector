@@ -1,4 +1,4 @@
-""" Generic caching utilities for plone.memoize.ram """
+"""Generic caching utilities for plone.memoize.ram"""
 
 import json
 import logging
@@ -26,7 +26,7 @@ class MemcacheAdapter(AbstractDict):
         self.ttl = ttl
 
     def _make_key(self, key):
-        key_bytes = key.encode('utf-8') if isinstance(key, str) else key
+        key_bytes = key.encode("utf-8") if isinstance(key, str) else key
         return hashlib.sha1(key_bytes).hexdigest()
 
     def _storage_key(self, key):
@@ -160,7 +160,7 @@ class CacheChooser:
         if not self.redis_enabled:
             return None
 
-        conn = getattr(self._v_thread_local, 'redis_connection', None)
+        conn = getattr(self._v_thread_local, "redis_connection", None)
         if conn == "broken":
             return None
         if conn is not None:
@@ -174,6 +174,7 @@ class CacheChooser:
         if conn is None:
             try:
                 from redis import Redis
+
                 conn = Redis(
                     host=self.redis_server,
                     port=self.redis_port,
@@ -194,7 +195,7 @@ class CacheChooser:
         if not self.memcached_enabled:
             return None
 
-        client = getattr(self._v_thread_local, 'memcache_connection', None)
+        client = getattr(self._v_thread_local, "memcache_connection", None)
 
         if client == "broken":
             return None
@@ -212,10 +213,9 @@ class CacheChooser:
 
         try:
             import memcache
+
             servers = [s.strip() for s in self.memcached_servers.split(",")]
-            client = memcache.Client(
-                servers, socket_timeout=self.memcached_timeout
-            )
+            client = memcache.Client(servers, socket_timeout=self.memcached_timeout)
             self._v_thread_local.memcache_connection = client
             return client
         except Exception as err:
