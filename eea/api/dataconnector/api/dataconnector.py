@@ -1,25 +1,35 @@
 # -*- coding: utf-8 -*-
 """dataconnector"""
 
+import hashlib
+import json
 import logging
 import os
-import requests
+from time import sleep
+from time import time as _time
 
-# eea imports
-from eea.api.dataconnector.interfaces import IBasicDataProvider
-from eea.api.dataconnector.interfaces import IDataProvider
-from eea.api.dataconnector.interfaces import IElasticDataProvider
+import requests
+from Acquisition import aq_base, aq_inner, aq_parent
+from plone.memoize import ram
+from plone.restapi.deserializer import json_body
 
 # plone imports
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.services import Service
 
 # zope imports
-from zope.component import adapter
-from zope.component import getMultiAdapter
+from zope.component import adapter, getMultiAdapter
+from zope.interface import Interface, implementer
 from zope.interface.interfaces import ComponentLookupError
-from zope.interface import implementer
-from zope.interface import Interface
+
+# eea imports
+from eea.api.dataconnector.interfaces import (
+    IBasicDataProvider,
+    IConnectorDataProvider,
+    IDataProvider,
+    IElasticDataProvider,
+    IFileDataProvider,
+)
 
 # Set the default logging level to ERROR
 log_level = os.environ.get("LOG_LEVEL", "ERROR")
@@ -44,6 +54,12 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
+def _connector_data_cache_key(self, method, context_path, payload_hash):
+    cache_key = (context_path, payload_hash)
+    # cache_key = (context_path, payload_hash, _time() // 300)
+    return cache_key
+
+
 @implementer(IExpandableElement)
 @adapter(IBasicDataProvider, Interface)
 class ConnectorData:
@@ -52,19 +68,84 @@ class ConnectorData:
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.body = None
+
+    def _ensure_request_body(self):
+        context_data_query = getattr(aq_base(self.context), "data_query", None)
+        try:
+            self.body = json_body(self.request)
+        except Exception:
+            self.body = {}
+        if not self.body.get("data_query") and context_data_query is not None:
+            self.body["data_query"] = context_data_query
+        if not self.body.get("form"):
+            self.body["form"] = {}
+        self.request["BODY"] = json.dumps(self.body)
+
+    def _payload_hash(self):
+        form = self.request.form
+        form.update(self.body.get("form", {}))
+        payload = {
+            "data_query": self.body.get("data_query", []),
+            "form": form,
+        }
+        return hashlib.md5(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+    @ram.cache(_connector_data_cache_key)
+    def _expand_connector_data(self, context_path, payload_hash):
+        hasFile = getattr(self.context, "file", None) is not None
+        if hasFile and IFileDataProvider.providedBy(self.context):
+            name = "file"
+        elif IConnectorDataProvider.providedBy(self.context):
+            name = "connector"
+        else:
+            raise ComponentLookupError("No data provider found")
+        connector = getMultiAdapter(
+            (self.context, self.request), IDataProvider, name=name
+        )
+        return connector.provided_data
 
     def __call__(self, expand=False):
+        self._ensure_request_body()
+
+        is_virtual = bool(getattr(self.context, "is_virtual", False))
+        connector_data = getattr(self.context, "connector_data", None)
+
+        if is_virtual:
+            path = aq_parent(aq_inner(self.context)).absolute_url()
+        else:
+            path = self.context.absolute_url()
+
+        form = self.request.form
+        form.update(self.body.get("form", {}))
+
         result = {
             "connector-data": {
-                "@id": "{}/@connector-data".format(self.context.absolute_url())
+                "@id": "{}/@connector-data".format(self.context.absolute_url()),
+                "path": path,
+                "data": {
+                    "results": [],
+                    "metadata": {},
+                },
+                "payload": {
+                    "data_query": self.body.get("data_query", []),
+                    "form": form,
+                },
             }
         }
+
+        if connector_data:
+            result["connector-data"] = connector_data
+            return result
 
         if not expand:
             return result
 
-        connector = getMultiAdapter((self.context, self.request), IDataProvider)
-        result["connector-data"]["data"] = connector.provided_data
+        context_path = "/".join(self.context.getPhysicalPath())
+        payload_hash = self._payload_hash()
+        result["connector-data"]["data"] = self._expand_connector_data(
+            context_path, payload_hash
+        )
 
         return result
 
@@ -246,10 +327,16 @@ class ConnectorDataGet(Service):
     def reply(self):
         """reply"""
         try:
+            start = _time()
+
             connector = getMultiAdapter(
                 (self.context, self.request), name="connector-data"
             )
             result = connector(expand=True)
+
+            elapsed = _time() - start
+            remaining = max(0, 0.5 - elapsed)
+            sleep(remaining)
 
             return result["connector-data"]
         except ComponentLookupError as ex:
@@ -261,7 +348,13 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
+        start = _time()
+
         connector = getMultiAdapter((self.context, self.request), name="connector-data")
         result = connector(expand=True)
+
+        elapsed = _time() - start
+        remaining = max(0, 0.5 - elapsed)
+        sleep(remaining)
 
         return result["connector-data"]

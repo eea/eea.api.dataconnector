@@ -1,0 +1,9 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:zcml="http://namespaces.zope.org/zcml">
+
+  <utility
+    zcml:condition="installed eea.api.dataconnector"
+    factory=".utilities.cache.CacheChooser"
+  />
+</configure>
