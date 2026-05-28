@@ -3,6 +3,10 @@ Changelog
 
 12.7-dev0 - (unreleased)
 ---------------------------
+* Fix: register ``@connector-data`` only for content that provides
+  ``IBasicDataProvider`` so unsupported content returns 404 instead of
+  raising ``ValueError``
+  [codex]
 
 12.6 - (2026-04-14)
 ---------------------------

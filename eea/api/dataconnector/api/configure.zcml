@@ -28,16 +28,15 @@
     <!-- Plone services -->
     <plone:service
         method="GET"
-        for="*"
+        for="eea.api.dataconnector.interfaces.IBasicDataProvider"
         factory=".dataconnector.ConnectorDataGet"
         name="@connector-data"
         permission="zope2.View"
     />
 
-    <!-- TODO: this should be eea.dataconnector.interfaces.IBasicDataProvider -->
     <plone:service
         method="POST"
-        for="*"
+        for="eea.api.dataconnector.interfaces.IBasicDataProvider"
         factory=".dataconnector.ConnectorDataPost"
         name="@connector-data"
         permission="zope2.View"
