@@ -1,6 +1,9 @@
 Changelog
 =========
 
+12.9-dev0 - (unreleased)
+---------------------------
+
 12.8 - (2026-06-09)
 ---------------------------
 * Fix: return 404 from ``@connector-data`` for content without a connector
