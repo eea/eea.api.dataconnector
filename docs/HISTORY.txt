@@ -1,6 +1,12 @@
 Changelog
 =========
 
+12.8 - (2026-06-09)
+---------------------------
+* Fix: return 404 from ``@connector-data`` for content without a connector
+  data provider instead of raising ``ValueError``
+  [dobri1408]
+
 12.7 - (2026-05-08)
 ---------------------------
 * Fix: list index out of range
