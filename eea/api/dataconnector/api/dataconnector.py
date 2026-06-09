@@ -6,7 +6,6 @@ import os
 import requests
 
 # eea imports
-from eea.api.dataconnector.interfaces import IBasicDataProvider
 from eea.api.dataconnector.interfaces import IDataProvider
 from eea.api.dataconnector.interfaces import IElasticDataProvider
 
@@ -17,9 +16,11 @@ from plone.restapi.services import Service
 # zope imports
 from zope.component import adapter
 from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 from zope.interface.interfaces import ComponentLookupError
 from zope.interface import implementer
 from zope.interface import Interface
+from zExceptions import NotFound
 
 # Set the default logging level to ERROR
 log_level = os.environ.get("LOG_LEVEL", "ERROR")
@@ -45,7 +46,6 @@ logger.addHandler(handler)
 
 
 @implementer(IExpandableElement)
-@adapter(IBasicDataProvider, Interface)
 class ConnectorData:
     """connector data"""
 
@@ -240,20 +240,26 @@ class ElasticConnectorData:
         return table
 
 
+def connector_data_response(context, request):
+    """Return connector data or a 404 when the context has no data provider."""
+    connector = queryMultiAdapter((context, request), name="connector-data")
+    if connector is None:
+        raise NotFound(context, "@connector-data", request)
+
+    try:
+        result = connector(expand=True)
+    except ComponentLookupError as ex:
+        raise NotFound(context, "@connector-data", request) from ex
+
+    return result["connector-data"]
+
+
 class ConnectorDataGet(Service):
     """connector data - get"""
 
     def reply(self):
         """reply"""
-        try:
-            connector = getMultiAdapter(
-                (self.context, self.request), name="connector-data"
-            )
-            result = connector(expand=True)
-
-            return result["connector-data"]
-        except ComponentLookupError as ex:
-            raise ValueError("No suitable connector found for the context.") from ex
+        return connector_data_response(self.context, self.request)
 
 
 class ConnectorDataPost(Service):
@@ -261,7 +267,4 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        connector = getMultiAdapter((self.context, self.request), name="connector-data")
-        result = connector(expand=True)
-
-        return result["connector-data"]
+        return connector_data_response(self.context, self.request)

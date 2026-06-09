@@ -12,7 +12,15 @@
         factory=".dataconnector.ConnectorData"
         provides="plone.restapi.interfaces.IExpandableElement"
         name="connector-data"
-        for="eea.api.dataconnector.interfaces.IBasicDataProvider
+        for="eea.api.dataconnector.interfaces.IConnectorDataProvider
+             zope.interface.Interface"
+    />
+
+    <adapter
+        factory=".dataconnector.ConnectorData"
+        provides="plone.restapi.interfaces.IExpandableElement"
+        name="connector-data"
+        for="eea.api.dataconnector.interfaces.IFileDataProvider
              zope.interface.Interface"
     />
 
@@ -28,16 +36,47 @@
     <!-- Plone services -->
     <plone:service
         method="GET"
-        for="*"
+        for="eea.api.dataconnector.interfaces.IConnectorDataProvider"
         factory=".dataconnector.ConnectorDataGet"
         name="@connector-data"
         permission="zope2.View"
     />
 
-    <!-- TODO: this should be eea.dataconnector.interfaces.IBasicDataProvider -->
     <plone:service
         method="POST"
-        for="*"
+        for="eea.api.dataconnector.interfaces.IConnectorDataProvider"
+        factory=".dataconnector.ConnectorDataPost"
+        name="@connector-data"
+        permission="zope2.View"
+    />
+
+    <plone:service
+        method="GET"
+        for="eea.api.dataconnector.interfaces.IFileDataProvider"
+        factory=".dataconnector.ConnectorDataGet"
+        name="@connector-data"
+        permission="zope2.View"
+    />
+
+    <plone:service
+        method="POST"
+        for="eea.api.dataconnector.interfaces.IFileDataProvider"
+        factory=".dataconnector.ConnectorDataPost"
+        name="@connector-data"
+        permission="zope2.View"
+    />
+
+    <plone:service
+        method="GET"
+        for="eea.api.dataconnector.interfaces.IElasticDataProvider"
+        factory=".dataconnector.ConnectorDataGet"
+        name="@connector-data"
+        permission="zope2.View"
+    />
+
+    <plone:service
+        method="POST"
+        for="eea.api.dataconnector.interfaces.IElasticDataProvider"
         factory=".dataconnector.ConnectorDataPost"
         name="@connector-data"
         permission="zope2.View"
