@@ -1,6 +1,11 @@
 Changelog
 =========
 
+12.9 - (2026-07-13)
+---------------------------
+* Change: fix: SonarQube report - refs #305404
+  [avoinea]
+
 12.8 - (2026-06-09)
 ---------------------------
 * Fix: return 404 from ``@connector-data`` for content without a connector
