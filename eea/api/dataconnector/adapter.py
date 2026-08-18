@@ -88,7 +88,7 @@ class DataProviderForConnectors:
     def _provided_data(self):
         """provided data"""
         if not self.context.sql_query:
-            return []
+            return {"results": [], "metadata": self._get_metadata()}
         return self._get_data()
 
     @property

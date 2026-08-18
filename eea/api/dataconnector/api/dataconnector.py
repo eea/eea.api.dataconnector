@@ -52,11 +52,82 @@ handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(handler)
 
+_MISSING = object()
+
 
 def _connector_data_cache_key(self, method, context_path, payload_hash):
     cache_key = (context_path, payload_hash)
     # cache_key = (context_path, payload_hash, _time() // 300)
     return cache_key
+
+
+def _normalize_provider_data(data):
+    """Return the public data shape expected by connector-data consumers."""
+    if not isinstance(data, dict):
+        return {"results": [], "metadata": {}}
+
+    results = data.get("results")
+    metadata = data.get("metadata")
+    return {
+        "results": results if isinstance(results, (dict, list)) and results else [],
+        "metadata": metadata if isinstance(metadata, dict) else {},
+    }
+
+
+def _validate_virtual_connector_data(connector_data):
+    """Validate the internal virtual-page preload envelope."""
+    if not isinstance(connector_data, dict):
+        raise ValueError("Virtual connector_data must be an object")
+
+    if not isinstance(connector_data.get("@id"), str) or not connector_data["@id"]:
+        raise ValueError("Virtual connector_data requires a non-empty @id")
+    if not isinstance(connector_data.get("path"), str) or not connector_data["path"]:
+        raise ValueError("Virtual connector_data requires a non-empty path")
+
+    data = connector_data.get("data")
+    if not isinstance(data, dict):
+        raise ValueError("Virtual connector_data.data must be an object")
+    if not isinstance(data.get("results"), (dict, list)):
+        raise ValueError(
+            "Virtual connector_data.data.results must be an object or array"
+        )
+    if not isinstance(data.get("metadata"), dict):
+        raise ValueError("Virtual connector_data.data.metadata must be an object")
+
+    payload = connector_data.get("payload")
+    if not isinstance(payload, dict):
+        raise ValueError("Virtual connector_data.payload must be an object")
+    if not isinstance(payload.get("data_query"), list):
+        raise ValueError("Virtual connector_data.payload.data_query must be an array")
+    if not isinstance(payload.get("form"), dict):
+        raise ValueError("Virtual connector_data.payload.form must be an object")
+
+    return connector_data
+
+
+def _get_virtual_connector_data(context):
+    """Return an owned, validated preload only for a virtual context."""
+    context = aq_base(context)
+    if not bool(getattr(context, "is_virtual", False)):
+        return None
+
+    connector_data = getattr(context, "connector_data", _MISSING)
+    if connector_data is _MISSING:
+        return None
+    return _validate_virtual_connector_data(connector_data)
+
+
+def _provider_name(context):
+    """Select the provider adapter without acquiring a parent file."""
+    has_file = getattr(aq_base(context), "file", None) is not None
+    is_file_provider = IFileDataProvider.providedBy(context)
+    is_connector_provider = IConnectorDataProvider.providedBy(context)
+
+    if is_file_provider and (has_file or not is_connector_provider):
+        return "file"
+    if is_connector_provider:
+        return "connector"
+    raise ComponentLookupError("No data provider found")
 
 
 @implementer(IExpandableElement)
@@ -81,6 +152,11 @@ class ConnectorData:
         self.request["BODY"] = json.dumps(self.body)
 
     def _payload(self):
+        """Return the public request identity used for frontend preload reuse.
+
+        Authentication belongs in headers or cookies and is intentionally not
+        included in this response metadata.
+        """
         return {
             "data_query": self.body.get("data_query", []),
             "form": canonical_form(
@@ -96,24 +172,20 @@ class ConnectorData:
 
     @ram.cache(_connector_data_cache_key)
     def _expand_connector_data(self, context_path, payload_hash):
-        hasFile = getattr(self.context, "file", None) is not None
-        if hasFile and IFileDataProvider.providedBy(self.context):
-            name = "file"
-        elif IConnectorDataProvider.providedBy(self.context):
-            name = "connector"
-        else:
-            raise ComponentLookupError("No data provider found")
+        name = _provider_name(self.context)
         connector = getMultiAdapter(
             (self.context, self.request), IDataProvider, name=name
         )
-        return connector.provided_data
+        return _normalize_provider_data(connector.provided_data)
 
     def __call__(self, expand=False):
         self._ensure_request_body()
 
-        is_virtual = bool(getattr(self.context, "is_virtual", False))
-        connector_data = getattr(self.context, "connector_data", None)
+        connector_data = _get_virtual_connector_data(self.context)
+        if connector_data is not None:
+            return {"connector-data": connector_data}
 
+        is_virtual = bool(getattr(aq_base(self.context), "is_virtual", False))
         if is_virtual:
             path = aq_parent(aq_inner(self.context)).absolute_url()
         else:
@@ -132,10 +204,6 @@ class ConnectorData:
                 "payload": payload,
             }
         }
-
-        if connector_data:
-            result["connector-data"] = connector_data
-            return result
 
         if not expand:
             return result
