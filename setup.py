@@ -76,8 +76,6 @@ setup(
         "XlsxWriter",
         "collective.folderishtypes",
         "eea.schema.slate",
-        "redis",
-        "python-memcached",
     ],
     extras_require={
         "test": [
