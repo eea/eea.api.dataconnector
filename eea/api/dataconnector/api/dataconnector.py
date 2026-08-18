@@ -53,12 +53,37 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 _MISSING = object()
+_ZODB_INITIAL_SERIAL = b"\x00" * 8
 
 
-def _connector_data_cache_key(self, method, context_path, payload_hash):
-    cache_key = (context_path, payload_hash)
-    # cache_key = (context_path, payload_hash, _time() // 300)
-    return cache_key
+def _connector_data_cache_key(
+    self,
+    method,
+    context_path,
+    payload_hash,
+    context_revision,
+):
+    return (context_path, payload_hash, context_revision)
+
+
+def _context_cache_revision(context):
+    """Return a stable revision that changes when provider content is edited."""
+    context = aq_base(context)
+    serial = getattr(context, "_p_serial", None)
+    if serial == _ZODB_INITIAL_SERIAL:
+        serial = None
+    if serial:
+        try:
+            serial = serial.hex()
+        except AttributeError:
+            serial = str(serial)
+
+    modified = getattr(context, "modified", None)
+    if callable(modified):
+        modified = modified()
+    modified = "" if modified is None else str(modified)
+
+    return ":".join(value for value in (serial, modified) if value)
 
 
 def _normalize_provider_data(data):
@@ -171,7 +196,12 @@ class ConnectorData:
         ).hexdigest()
 
     @ram.cache(_connector_data_cache_key)
-    def _expand_connector_data(self, context_path, payload_hash):
+    def _expand_connector_data(
+        self,
+        context_path,
+        payload_hash,
+        context_revision,
+    ):
         name = _provider_name(self.context)
         connector = getMultiAdapter(
             (self.context, self.request), IDataProvider, name=name
@@ -210,8 +240,11 @@ class ConnectorData:
 
         context_path = "/".join(self.context.getPhysicalPath())
         payload_hash = self._payload_hash()
+        context_revision = _context_cache_revision(self.context)
         result["connector-data"]["data"] = self._expand_connector_data(
-            context_path, payload_hash
+            context_path,
+            payload_hash,
+            context_revision,
         )
 
         return result

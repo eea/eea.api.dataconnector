@@ -16,6 +16,8 @@ from zope.interface.interfaces import ComponentLookupError
 from zExceptions import NotFound
 
 from eea.api.dataconnector.api.dataconnector import (
+    _connector_data_cache_key,
+    _context_cache_revision,
     _get_virtual_connector_data,
     _normalize_provider_data,
     _provider_name,
@@ -52,6 +54,12 @@ class RegisteredConnectorData:
 
 class AcquisitionNode(Implicit):
     """Minimal acquisition-aware context for preload lookup tests."""
+
+
+class ConnectorRequest(dict):
+    """Minimal mapping request with a form attribute."""
+
+    form = {}
 
 
 class ConnectorDataContractTest(unittest.TestCase):
@@ -155,6 +163,83 @@ class ConnectorDataContractTest(unittest.TestCase):
         alsoProvides(context, IFileDataProvider)
 
         self.assertEqual(_provider_name(context), "file")
+
+    def test_context_revision_includes_serial_and_modified(self):
+        context = AcquisitionNode()
+        context._p_serial = b"\x01" * 8
+        context.modified = lambda: "2026-08-18T10:00:00Z"
+
+        self.assertEqual(
+            _context_cache_revision(context),
+            "0101010101010101:2026-08-18T10:00:00Z",
+        )
+
+    def test_context_revision_ignores_uncommitted_zodb_serial(self):
+        context = AcquisitionNode()
+        context._p_serial = b"\x00" * 8
+        context.modified = lambda: "2026-08-18T10:00:00Z"
+
+        self.assertEqual(
+            _context_cache_revision(context),
+            "2026-08-18T10:00:00Z",
+        )
+
+    def test_context_revision_uses_modified_fallback(self):
+        context = AcquisitionNode()
+        context.modified = lambda: "2026-08-18T10:00:00Z"
+
+        self.assertEqual(
+            _context_cache_revision(context),
+            "2026-08-18T10:00:00Z",
+        )
+
+    def test_modified_date_changes_revision_before_serial_changes(self):
+        context = AcquisitionNode()
+        context._p_serial = b"\x01" * 8
+        context.modified = lambda: "2026-08-18T10:00:00Z"
+        first = _context_cache_revision(context)
+        context.modified = lambda: "2026-08-18T10:01:00Z"
+
+        self.assertNotEqual(first, _context_cache_revision(context))
+
+    def test_content_revision_changes_cache_identity(self):
+        first = _connector_data_cache_key(
+            None,
+            None,
+            "/site/provider",
+            "payload-hash",
+            "revision-1",
+        )
+        second = _connector_data_cache_key(
+            None,
+            None,
+            "/site/provider",
+            "payload-hash",
+            "revision-2",
+        )
+
+        self.assertNotEqual(first, second)
+
+    def test_expansion_uses_content_revision(self):
+        context = AcquisitionNode()
+        context.absolute_url = lambda: "http://example.com/provider"
+        context.getPhysicalPath = lambda: ("", "site", "provider")
+        context.modified = lambda: "2026-08-18T10:00:00Z"
+        connector = ConnectorData(context, ConnectorRequest())
+        data = {"results": [], "metadata": {}}
+
+        with patch.object(
+            connector,
+            "_expand_connector_data",
+            return_value=data,
+        ) as expand:
+            result = connector(expand=True)
+
+        self.assertEqual(result["connector-data"]["data"], data)
+        self.assertEqual(
+            expand.call_args.args[2],
+            "2026-08-18T10:00:00Z",
+        )
 
 
 class ConnectorDataResponseTest(unittest.TestCase):

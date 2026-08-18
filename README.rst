@@ -57,6 +57,11 @@ the complete ``@connector-data`` envelope: ``@id``, ``path``, ``data`` and
 ``payload``. The envelope is returned unchanged so its payload continues to
 describe the exact request that produced its data.
 
+Expanded connector data is memoized by provider path, request identity, and
+provider content revision. Editing a provider configuration or replacing its
+file therefore changes the cache identity immediately. Changes in external SQL
+data are bounded by the global ``CACHE_TTL`` configured by ``eea.volto.policy``.
+
 Install
 =======
 

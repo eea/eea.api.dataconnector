@@ -3,6 +3,9 @@ Changelog
 
 13.0 - (2026-08-18)
 ---------------------------
+* Fix: Invalidate memoized connector data when provider content changes; TTL
+  continues to bound staleness of external data sources.
+  [razvanMiu]
 * Fix: normalize empty connector-data responses and validate virtual-page
   preload envelopes.
   [razvanMiu]
