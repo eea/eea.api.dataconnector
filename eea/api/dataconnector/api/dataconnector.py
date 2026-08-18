@@ -18,13 +18,13 @@ from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.services import Service
 
 # zope imports
-from zope.component import adapter, getMultiAdapter
+from zope.component import adapter, getMultiAdapter, queryMultiAdapter
 from zope.interface import Interface, implementer
 from zope.interface.interfaces import ComponentLookupError
+from zExceptions import NotFound
 
 # eea imports
 from eea.api.dataconnector.interfaces import (
-    IBasicDataProvider,
     IConnectorDataProvider,
     IDataProvider,
     IElasticDataProvider,
@@ -62,7 +62,6 @@ def _connector_data_cache_key(self, method, context_path, payload_hash):
 
 
 @implementer(IExpandableElement)
-@adapter(IBasicDataProvider, Interface)
 class ConnectorData:
     """connector data"""
 
@@ -323,26 +322,35 @@ class ElasticConnectorData:
         return table
 
 
+def connector_data_response(context, request):
+    """Return connector data or a 404 when the context has no data provider."""
+    connector = queryMultiAdapter(
+        (context, request),
+        IExpandableElement,
+        name="connector-data",
+    )
+    if connector is None:
+        raise NotFound(context, "@connector-data", request)
+
+    start = _time()
+    try:
+        result = connector(expand=True)
+    except ComponentLookupError as ex:
+        raise NotFound(context, "@connector-data", request) from ex
+
+    elapsed = _time() - start
+    remaining = max(0, 0.5 - elapsed)
+    sleep(remaining)
+
+    return result["connector-data"]
+
+
 class ConnectorDataGet(Service):
     """connector data - get"""
 
     def reply(self):
         """reply"""
-        try:
-            start = _time()
-
-            connector = getMultiAdapter(
-                (self.context, self.request), name="connector-data"
-            )
-            result = connector(expand=True)
-
-            elapsed = _time() - start
-            remaining = max(0, 0.5 - elapsed)
-            sleep(remaining)
-
-            return result["connector-data"]
-        except ComponentLookupError as ex:
-            raise ValueError("No suitable connector found for the context.") from ex
+        return connector_data_response(self.context, self.request)
 
 
 class ConnectorDataPost(Service):
@@ -350,13 +358,4 @@ class ConnectorDataPost(Service):
 
     def reply(self):
         """reply"""
-        start = _time()
-
-        connector = getMultiAdapter((self.context, self.request), name="connector-data")
-        result = connector(expand=True)
-
-        elapsed = _time() - start
-        remaining = max(0, 0.5 - elapsed)
-        sleep(remaining)
-
-        return result["connector-data"]
+        return connector_data_response(self.context, self.request)
