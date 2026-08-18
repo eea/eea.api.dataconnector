@@ -1,7 +1,7 @@
 Changelog
 =========
 
-13.0-dev0 - (unreleased)
+13.0 - (2026-08-18)
 ---------------------------
 * Change: Move the global ``plone.memoize`` cache policy to
   ``eea.volto.policy``.
