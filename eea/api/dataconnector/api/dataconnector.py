@@ -30,6 +30,7 @@ from eea.api.dataconnector.interfaces import (
     IElasticDataProvider,
     IFileDataProvider,
 )
+from eea.api.dataconnector.payload import canonical_form
 
 # Set the default logging level to ERROR
 log_level = os.environ.get("LOG_LEVEL", "ERROR")
@@ -82,14 +83,19 @@ class ConnectorData:
             self.body["form"] = {}
         self.request["BODY"] = json.dumps(self.body)
 
-    def _payload_hash(self):
-        form = self.request.form
-        form.update(self.body.get("form", {}))
-        payload = {
+    def _payload(self):
+        return {
             "data_query": self.body.get("data_query", []),
-            "form": form,
+            "form": canonical_form(
+                self.request.form,
+                self.body.get("form", {}),
+            ),
         }
-        return hashlib.md5(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+    def _payload_hash(self):
+        return hashlib.md5(
+            json.dumps(self._payload(), sort_keys=True).encode()
+        ).hexdigest()
 
     @ram.cache(_connector_data_cache_key)
     def _expand_connector_data(self, context_path, payload_hash):
@@ -116,8 +122,7 @@ class ConnectorData:
         else:
             path = self.context.absolute_url()
 
-        form = self.request.form
-        form.update(self.body.get("form", {}))
+        payload = self._payload()
 
         result = {
             "connector-data": {
@@ -127,10 +132,7 @@ class ConnectorData:
                     "results": [],
                     "metadata": {},
                 },
-                "payload": {
-                    "data_query": self.body.get("data_query", []),
-                    "form": form,
-                },
+                "payload": payload,
             }
         }
 
