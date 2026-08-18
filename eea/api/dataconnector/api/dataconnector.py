@@ -5,8 +5,6 @@ import hashlib
 import json
 import logging
 import os
-from time import sleep
-from time import time as _time
 
 import requests
 from Acquisition import aq_base, aq_inner, aq_parent
@@ -332,15 +330,10 @@ def connector_data_response(context, request):
     if connector is None:
         raise NotFound(context, "@connector-data", request)
 
-    start = _time()
     try:
         result = connector(expand=True)
     except ComponentLookupError as ex:
         raise NotFound(context, "@connector-data", request) from ex
-
-    elapsed = _time() - start
-    remaining = max(0, 0.5 - elapsed)
-    sleep(remaining)
 
     return result["connector-data"]
 

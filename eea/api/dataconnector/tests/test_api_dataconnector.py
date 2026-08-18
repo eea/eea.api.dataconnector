@@ -40,7 +40,7 @@ class RegisteredConnectorData:
 
 
 class ConnectorDataResponseTest(unittest.TestCase):
-    """Verify the merged response timing and error behavior."""
+    """Verify connector lookup and error behavior."""
 
     def setUp(self):
         componentSetUp()
@@ -55,15 +55,11 @@ class ConnectorDataResponseTest(unittest.TestCase):
     def tearDown(self):
         componentTearDown()
 
-    @patch(f"{MODULE}.sleep")
-    @patch(f"{MODULE}._time", side_effect=[10.0, 10.2])
-    def test_finds_registered_adapter_and_delays_success(self, _time, sleep):
+    def test_finds_registered_adapter(self):
         result = connector_data_response(ConnectorContext(), object())
 
         self.assertEqual(result, {"data": {"results": []}})
         self.assertEqual(RegisteredConnectorData.calls, [True])
-        sleep.assert_called_once()
-        self.assertAlmostEqual(sleep.call_args.args[0], 0.3)
 
     def test_returns_not_found_without_connector_adapter(self):
         with self.assertRaises(NotFound):
