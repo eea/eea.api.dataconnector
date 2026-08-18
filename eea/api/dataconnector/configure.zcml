@@ -6,8 +6,13 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <adapter factory=".adapter.DataProviderForConnectors" />
-  <adapter factory=".adapter.DataQueryJsonSchemaProvider" name="data_query" />
+  <adapter
+    factory=".adapter.DataProviderForConnectors"
+    provides=".interfaces.IDataProvider"
+    name="connector" />
+  <adapter
+    factory=".adapter.DataQueryJsonSchemaProvider"
+    name="data_query" />
 
   <include file="profiles.zcml" />
   <include file="permissions.zcml" />
@@ -16,5 +21,4 @@
   <include package=".browser" />
   <include package=".upgrades" />
 
-  <!-- -*- extra stuff goes here -*- -->
 </configure>

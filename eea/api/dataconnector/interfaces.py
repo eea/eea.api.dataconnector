@@ -55,7 +55,7 @@ class IDataConnector(model.Schema):
     )
     sql_query = schema.Text(
         title="SQL Query",
-        required=True,
+        required=False,
         default="Select top 10000 * from [FISE].[v1].[CLC]",
     )
     parameters = schema.List(

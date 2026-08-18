@@ -5,6 +5,8 @@
 *.py?
 *.swp
 # dirs
+.pi-subagents/
+.ruff_cache/
 bin/
 buildout-cache/
 develop-eggs/

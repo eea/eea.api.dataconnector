@@ -8,6 +8,8 @@ from plone.restapi.deserializer import json_body
 from zope.component import getUtility
 from zope.dottedname.resolve import resolve
 
+from eea.api.dataconnector.payload import canonical_form
+
 Row = namedtuple("Row", ["index", "values", "table", "collate"])
 
 
@@ -15,11 +17,9 @@ def parseQuery(context, request):
     """parse query"""
     reg = getUtility(IRegistry)
     conditions = []
-    form = request.form or {}
-    body_form = json_body(request).get("form", {})
-    data_query = json_body(request).get("data_query", [])
-    # Update form with body form
-    form.update(body_form)
+    body = json_body(request)
+    form = canonical_form(request.form, body.get("form", {}))
+    data_query = body.get("data_query", [])
     # Compute data_query from form
     form_data_query = getDataQuery(form)
     # Merge queries
@@ -183,11 +183,9 @@ def convertValue(value, dataType):
 
 def computeDataQuery(request):
     """compute data_query"""
-    form = request.form or {}
-    body_form = json_body(request).get("form") or {}
-    data_query = json_body(request).get("data_query") or []
-    # Update form with body form
-    form.update(body_form)
+    body = json_body(request)
+    form = canonical_form(request.form, body.get("form", {}))
+    data_query = body.get("data_query") or []
     # Compute data_query from form
     form_data_query = getDataQuery(form)
     # Merge queries
