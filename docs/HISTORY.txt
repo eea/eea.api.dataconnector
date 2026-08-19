@@ -1,6 +1,20 @@
 Changelog
 =========
 
+13.0 - (2026-08-18)
+---------------------------
+* Fix: Invalidate memoized connector data when provider content changes; TTL
+  continues to bound staleness of external data sources.
+  [razvanMiu]
+* Fix: normalize empty connector-data responses and validate virtual-page
+  preload envelopes.
+  [razvanMiu]
+* Change: document connector payload as public SSR request identity metadata.
+  [razvanMiu]
+* Change: Move the global ``plone.memoize`` cache policy to
+  ``eea.volto.policy``.
+  [razvanMiu]
+
 12.9 - (2026-07-13)
 ---------------------------
 * Change: fix: SonarQube report - refs #305404

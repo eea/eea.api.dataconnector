@@ -9,7 +9,7 @@
   <interface interface=".interfaces.IConnectorDataProvider" />
   <interface interface=".interfaces.IFileDataProvider" />
 
-  <adapter factory=".behavior.DataProviderForFiles" />
+  <adapter factory=".behavior.DataProviderForFiles" provides=".interfaces.IDataProvider" name="file" />
   <adapter factory=".behavior.DataProviderForElasticCSVWidget" />
 
   <plone:behavior

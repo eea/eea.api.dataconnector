@@ -32,6 +32,36 @@ Main features
 2.
 3.
 
+Connector-data response contract
+================================
+
+Successful ``@connector-data`` responses expose provider data as an object with
+``results`` and ``metadata`` fields. ``results`` is an empty array when no rows
+exist; ``metadata`` remains an object and may contain provider information such
+as ``readme``. The minimal empty shape is::
+
+    {
+      "results": [],
+      "metadata": {}
+    }
+
+The response ``payload`` is public request-identity metadata, not diagnostic
+output. ``volto-datablocks`` uses its canonical ``data_query`` and ``form`` to
+reuse data preloaded during server-side rendering. Authentication credentials
+must be carried in request headers or cookies and must never be passed as
+connector form or data-query values.
+
+Virtual pages may attach a transient ``connector_data`` preload produced by
+this package. It is accepted only from the virtual object itself and must match
+the complete ``@connector-data`` envelope: ``@id``, ``path``, ``data`` and
+``payload``. The envelope is returned unchanged so its payload continues to
+describe the exact request that produced its data.
+
+Expanded connector data is memoized by provider path, request identity, and
+provider content revision. Editing a provider configuration or replacing its
+file therefore changes the cache identity immediately. Changes in external SQL
+data are bounded by the global ``CACHE_TTL`` configured by ``eea.volto.policy``.
+
 Install
 =======
 

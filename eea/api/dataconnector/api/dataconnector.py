@@ -1,26 +1,34 @@
 # -*- coding: utf-8 -*-
 """dataconnector"""
 
+import hashlib
+import json
 import logging
 import os
-import requests
 
-# eea imports
-from eea.api.dataconnector.interfaces import IDataProvider
-from eea.api.dataconnector.interfaces import IElasticDataProvider
+import requests
+from Acquisition import aq_base, aq_inner, aq_parent
+from plone.memoize import ram
+from plone.restapi.deserializer import json_body
 
 # plone imports
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.services import Service
 
 # zope imports
-from zope.component import adapter
-from zope.component import getMultiAdapter
-from zope.component import queryMultiAdapter
+from zope.component import adapter, getMultiAdapter, queryMultiAdapter
+from zope.interface import Interface, implementer
 from zope.interface.interfaces import ComponentLookupError
-from zope.interface import implementer
-from zope.interface import Interface
 from zExceptions import NotFound
+
+# eea imports
+from eea.api.dataconnector.interfaces import (
+    IConnectorDataProvider,
+    IDataProvider,
+    IElasticDataProvider,
+    IFileDataProvider,
+)
+from eea.api.dataconnector.payload import canonical_form
 
 # Set the default logging level to ERROR
 log_level = os.environ.get("LOG_LEVEL", "ERROR")
@@ -44,6 +52,108 @@ handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(handler)
 
+_MISSING = object()
+_ZODB_INITIAL_SERIAL = b"\x00" * 8
+
+
+def _connector_data_cache_key(
+    self,
+    method,
+    context_path,
+    payload_hash,
+    context_revision,
+):
+    return (context_path, payload_hash, context_revision)
+
+
+def _context_cache_revision(context):
+    """Return a stable revision that changes when provider content is edited."""
+    context = aq_base(context)
+    serial = getattr(context, "_p_serial", None)
+    if serial == _ZODB_INITIAL_SERIAL:
+        serial = None
+    if serial:
+        try:
+            serial = serial.hex()
+        except AttributeError:
+            serial = str(serial)
+
+    modified = getattr(context, "modified", None)
+    if callable(modified):
+        modified = modified()
+    modified = "" if modified is None else str(modified)
+
+    return ":".join(value for value in (serial, modified) if value)
+
+
+def _normalize_provider_data(data):
+    """Return the public data shape expected by connector-data consumers."""
+    if not isinstance(data, dict):
+        return {"results": [], "metadata": {}}
+
+    results = data.get("results")
+    metadata = data.get("metadata")
+    return {
+        "results": results if isinstance(results, (dict, list)) and results else [],
+        "metadata": metadata if isinstance(metadata, dict) else {},
+    }
+
+
+def _validate_virtual_connector_data(connector_data):
+    """Validate the internal virtual-page preload envelope."""
+    if not isinstance(connector_data, dict):
+        raise ValueError("Virtual connector_data must be an object")
+
+    if not isinstance(connector_data.get("@id"), str) or not connector_data["@id"]:
+        raise ValueError("Virtual connector_data requires a non-empty @id")
+    if not isinstance(connector_data.get("path"), str) or not connector_data["path"]:
+        raise ValueError("Virtual connector_data requires a non-empty path")
+
+    data = connector_data.get("data")
+    if not isinstance(data, dict):
+        raise ValueError("Virtual connector_data.data must be an object")
+    if not isinstance(data.get("results"), (dict, list)):
+        raise ValueError(
+            "Virtual connector_data.data.results must be an object or array"
+        )
+    if not isinstance(data.get("metadata"), dict):
+        raise ValueError("Virtual connector_data.data.metadata must be an object")
+
+    payload = connector_data.get("payload")
+    if not isinstance(payload, dict):
+        raise ValueError("Virtual connector_data.payload must be an object")
+    if not isinstance(payload.get("data_query"), list):
+        raise ValueError("Virtual connector_data.payload.data_query must be an array")
+    if not isinstance(payload.get("form"), dict):
+        raise ValueError("Virtual connector_data.payload.form must be an object")
+
+    return connector_data
+
+
+def _get_virtual_connector_data(context):
+    """Return an owned, validated preload only for a virtual context."""
+    context = aq_base(context)
+    if not bool(getattr(context, "is_virtual", False)):
+        return None
+
+    connector_data = getattr(context, "connector_data", _MISSING)
+    if connector_data is _MISSING:
+        return None
+    return _validate_virtual_connector_data(connector_data)
+
+
+def _provider_name(context):
+    """Select the provider adapter without acquiring a parent file."""
+    has_file = getattr(aq_base(context), "file", None) is not None
+    is_file_provider = IFileDataProvider.providedBy(context)
+    is_connector_provider = IConnectorDataProvider.providedBy(context)
+
+    if is_file_provider and (has_file or not is_connector_provider):
+        return "file"
+    if is_connector_provider:
+        return "connector"
+    raise ComponentLookupError("No data provider found")
+
 
 @implementer(IExpandableElement)
 class ConnectorData:
@@ -52,19 +162,90 @@ class ConnectorData:
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.body = None
+
+    def _ensure_request_body(self):
+        context_data_query = getattr(aq_base(self.context), "data_query", None)
+        try:
+            self.body = json_body(self.request)
+        except Exception:
+            self.body = {}
+        if not self.body.get("data_query") and context_data_query is not None:
+            self.body["data_query"] = context_data_query
+        if not self.body.get("form"):
+            self.body["form"] = {}
+        self.request["BODY"] = json.dumps(self.body)
+
+    def _payload(self):
+        """Return the public request identity used for frontend preload reuse.
+
+        Authentication belongs in headers or cookies and is intentionally not
+        included in this response metadata.
+        """
+        return {
+            "data_query": self.body.get("data_query", []),
+            "form": canonical_form(
+                self.request.form,
+                self.body.get("form", {}),
+            ),
+        }
+
+    def _payload_hash(self):
+        return hashlib.md5(
+            json.dumps(self._payload(), sort_keys=True).encode()
+        ).hexdigest()
+
+    @ram.cache(_connector_data_cache_key)
+    def _expand_connector_data(
+        self,
+        context_path,
+        payload_hash,
+        context_revision,
+    ):
+        name = _provider_name(self.context)
+        connector = getMultiAdapter(
+            (self.context, self.request), IDataProvider, name=name
+        )
+        return _normalize_provider_data(connector.provided_data)
 
     def __call__(self, expand=False):
+        self._ensure_request_body()
+
+        connector_data = _get_virtual_connector_data(self.context)
+        if connector_data is not None:
+            return {"connector-data": connector_data}
+
+        is_virtual = bool(getattr(aq_base(self.context), "is_virtual", False))
+        if is_virtual:
+            path = aq_parent(aq_inner(self.context)).absolute_url()
+        else:
+            path = self.context.absolute_url()
+
+        payload = self._payload()
+
         result = {
             "connector-data": {
-                "@id": "{}/@connector-data".format(self.context.absolute_url())
+                "@id": "{}/@connector-data".format(self.context.absolute_url()),
+                "path": path,
+                "data": {
+                    "results": [],
+                    "metadata": {},
+                },
+                "payload": payload,
             }
         }
 
         if not expand:
             return result
 
-        connector = getMultiAdapter((self.context, self.request), IDataProvider)
-        result["connector-data"]["data"] = connector.provided_data
+        context_path = "/".join(self.context.getPhysicalPath())
+        payload_hash = self._payload_hash()
+        context_revision = _context_cache_revision(self.context)
+        result["connector-data"]["data"] = self._expand_connector_data(
+            context_path,
+            payload_hash,
+            context_revision,
+        )
 
         return result
 
@@ -242,7 +423,11 @@ class ElasticConnectorData:
 
 def connector_data_response(context, request):
     """Return connector data or a 404 when the context has no data provider."""
-    connector = queryMultiAdapter((context, request), name="connector-data")
+    connector = queryMultiAdapter(
+        (context, request),
+        IExpandableElement,
+        name="connector-data",
+    )
     if connector is None:
         raise NotFound(context, "@connector-data", request)
 
