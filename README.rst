@@ -62,6 +62,24 @@ provider content revision. Editing a provider configuration or replacing its
 file therefore changes the cache identity immediately. Changes in external SQL
 data are bounded by the global ``CACHE_TTL`` configured by ``eea.volto.policy``.
 
+Discodata timeouts and error handling
+=====================================
+
+All requests to the upstream Discodata service enforce configurable HTTP
+timeouts. Timeouts can be configured using environment variables:
+
+- ``DISCODATA_CONNECT_TIMEOUT``: Connection timeout in seconds (default: ``5.0``).
+- ``DISCODATA_READ_TIMEOUT``: Read timeout in seconds (default: ``15.0``).
+- ``DISCODATA_TIMEOUT``: Optional global fallback timeout in seconds applied when
+  either specific connect or read timeout is not explicitly set.
+
+Error handling distinguishes between transient upstream failures and valid data:
+
+- Connection and read timeouts raise HTTP 504 Gateway Timeout.
+- Upstream errors, connection failures, non-2xx responses, and SQL errors raise HTTP 502 Bad Gateway.
+- Provider errors are never cached, preventing transient outages from poisoning the memoize cache with false empty results.
+- Valid responses (including genuine zero-match empty results) are cached normally.
+
 Install
 =======
 

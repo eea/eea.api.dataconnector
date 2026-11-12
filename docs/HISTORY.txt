@@ -3,6 +3,14 @@ Changelog
 
 13.1-dev0 - (unreleased)
 ---------------------------
+* Feature: Added configurable connect and read HTTP timeouts to all Discodata
+  requests.
+  [refs #310184]
+* Fix: Separated provider errors from valid empty results; provider errors raise
+  HTTP 502/504 and are not cached.
+  [refs #310184]
+* Change: Enhanced diagnostic logging on provider errors.
+  [refs #310184]
 
 13.0 - (2026-08-18)
 ---------------------------
