@@ -1,7 +1,7 @@
 Changelog
 =========
 
-13.1-dev0 - (unreleased)
+13.1 - (2026-11-12)
 ---------------------------
 * Feature: Added configurable connect and read HTTP timeouts to all Discodata
   requests.
