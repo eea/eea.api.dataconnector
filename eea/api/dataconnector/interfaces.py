@@ -1,14 +1,16 @@
 """Module where all interfaces, events and exceptions live."""
 
 import json
+
 from plone.app.z3cform.widget import QueryStringFieldWidget
 from plone.autoform import directives as form
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.schema import JSONField
 from plone.supermodel import model
 from zope import schema
-from zope.interface import Interface, Attribute, provider
+from zope.interface import Attribute, Interface, provider
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
 from eea.schema.slate.field import SlateJSONField
 
 
