@@ -129,7 +129,7 @@ class DataProviderForConnectors:
 
         elapsed = time.monotonic() - start_time
         if not (200 <= req.status_code < 300):
-            body_snippet = req.text[:300] if req.text else ""
+            body_snippet = (req.text or "")[:300]
             logger.error(
                 "Discodata returned HTTP %s after %.2fs for endpoint %s: %s",
                 req.status_code,
@@ -144,7 +144,7 @@ class DataProviderForConnectors:
         try:
             payload = req.json()
         except Exception as err:
-            body_snippet = req.text[:300] if req.text else ""
+            body_snippet = (req.text or "")[:300]
             logger.error(
                 "Discodata returned malformed JSON after %.2fs for endpoint %s: %s",
                 elapsed,
@@ -166,8 +166,8 @@ class DataProviderForConnectors:
                 "Discodata returned invalid payload shape (expected object)"
             )
 
-        if "errors" in payload:
-            errors = payload.get("errors")
+        errors = payload.get("errors")
+        if errors:
             logger.error(
                 "Discodata returned error payload after %.2fs for endpoint %s: %s",
                 elapsed,
@@ -176,18 +176,20 @@ class DataProviderForConnectors:
             )
             raise BadGateway(f"Discodata provider error: {errors}")
 
-        results = payload.get("results")
-        if not isinstance(results, list):
+        raw_rows = payload.get("results")
+        if raw_rows is None:
+            raw_rows = []
+        if not isinstance(raw_rows, list):
             logger.error(
                 "Discodata returned invalid results field after %.2fs for endpoint %s: %r",
                 elapsed,
                 self.context.endpoint_url,
-                type(results),
+                type(raw_rows),
             )
             raise BadGateway("Discodata results field is missing or not a list")
 
         return {
-            "results": filteredData(results, data_query) or [],
+            "results": filteredData(raw_rows, data_query) or {},
             "metadata": metadata,
         }
 

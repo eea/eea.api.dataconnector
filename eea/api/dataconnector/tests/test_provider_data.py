@@ -83,8 +83,9 @@ class GetDiscodataTimeoutsTest(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True):
             self.assertEqual(
                 _get_discodata_timeouts(),
-                (DEFAULT_CONNECT_TIMEOUT, DEFAULT_READ_TIMEOUT),
+                (DEFAULT_CONNECT_TIMEOUT, 15.0),
             )
+            self.assertEqual(DEFAULT_READ_TIMEOUT, 15.0)
 
     def test_fallback_discodata_timeout(self):
         with patch.dict(os.environ, {"DISCODATA_TIMEOUT": "20"}, clear=True):
@@ -258,7 +259,7 @@ class ConnectorDataProviderTest(unittest.TestCase):
     @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
     @patch("eea.api.dataconnector.adapter.parseQuery")
     @patch("eea.api.dataconnector.adapter.requests.post")
-    def test_empty_filtered_results_returned_as_empty_list(
+    def test_empty_filtered_results_returned_as_empty_dict(
         self, mock_post, mock_parse, mock_filtered_data
     ):
         mock_parse.return_value = self.fake_sql
@@ -272,10 +273,33 @@ class ConnectorDataProviderTest(unittest.TestCase):
         self.assertEqual(
             data,
             {
-                "results": [],
+                "results": {},
                 "metadata": {"readme": "Connector docs"},
             },
         )
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_null_results_treated_as_empty(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 200
+        response.json.return_value = {"results": None}
+        mock_post.return_value = response
+
+        provider = DataProviderForConnectors(self.context, self.request)
+        data = provider._get_data()
+        self.assertEqual(
+            data,
+            {
+                "results": {},
+                "metadata": {"readme": "Connector docs"},
+            },
+        )
+        mock_filtered_data.assert_called_once_with([], [])
 
 
 class HttpResponseStatusTest(unittest.TestCase):
@@ -340,7 +364,9 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
         componentTearDown()
         global_cache.invalidateAll()
 
-    def test_gateway_timeout_not_cached(self):
+    def test_gateway_timeout_does_not_populate_cache_and_subsequent_request_retries(
+        self,
+    ):
         self.mock_provider.side_effect = GatewayTimeout("Discodata timeout")
 
         with self.assertRaises(GatewayTimeout) as ctx:
@@ -349,11 +375,8 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
             )
         self.assertIn("Discodata timeout", str(ctx.exception))
         self.assertEqual(self.mock_provider.call_count, 1)
-
-        # Cache must not be populated
         self.assertEqual(global_cache.getStatistics(), ())
 
-        # Subsequent call invokes provider again (not serving cached error)
         self.mock_provider.side_effect = None
         self.mock_provider.return_value = {
             "results": [{"col": "val"}],
@@ -368,7 +391,9 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
             {"results": [{"col": "val"}], "metadata": {"readme": "docs"}},
         )
 
-    def test_bad_gateway_not_cached(self):
+    def test_bad_gateway_does_not_populate_cache_and_subsequent_request_retries(
+        self,
+    ):
         self.mock_provider.side_effect = BadGateway("Discodata error")
 
         with self.assertRaises(BadGateway) as ctx:
@@ -377,11 +402,8 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
             )
         self.assertIn("Discodata error", str(ctx.exception))
         self.assertEqual(self.mock_provider.call_count, 1)
-
-        # Cache must not be populated
         self.assertEqual(global_cache.getStatistics(), ())
 
-        # Subsequent call invokes provider again
         self.mock_provider.side_effect = None
         self.mock_provider.return_value = {
             "results": [{"col": "val"}],
@@ -396,13 +418,12 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
             {"results": [{"col": "val"}], "metadata": {"readme": "docs"}},
         )
 
-    def test_valid_empty_results_cached(self):
+    def test_valid_empty_results_populated_and_served_from_cache(self):
         self.mock_provider.return_value = {
             "results": [],
             "metadata": {"readme": "docs"},
         }
 
-        # First call: invokes provider and populates cache
         result1 = self.connector._expand_connector_data(
             self.context_path, self.payload_hash, self.context_revision
         )
@@ -417,7 +438,6 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
         self.assertEqual(stats[0]["entries"], 1)
         self.assertEqual(stats[0]["hits"], 0)
 
-        # Second call with same cache key: served from cache without calling provider
         result2 = self.connector._expand_connector_data(
             self.context_path, self.payload_hash, self.context_revision
         )
@@ -430,13 +450,12 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
         stats = global_cache.getStatistics()
         self.assertEqual(stats[0]["hits"], 1)
 
-    def test_valid_non_empty_results_cached(self):
+    def test_valid_non_empty_results_populated_and_served_from_cache(self):
         self.mock_provider.return_value = {
             "results": [{"col1": "a", "col2": "b"}],
             "metadata": {"readme": "docs"},
         }
 
-        # First call: invokes provider and populates cache
         result1 = self.connector._expand_connector_data(
             self.context_path, self.payload_hash, self.context_revision
         )
@@ -454,7 +473,6 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
         self.assertEqual(stats[0]["entries"], 1)
         self.assertEqual(stats[0]["hits"], 0)
 
-        # Second call with same cache key: served from cache without calling provider
         result2 = self.connector._expand_connector_data(
             self.context_path, self.payload_hash, self.context_revision
         )
@@ -469,20 +487,6 @@ class ConnectorDataCacheImmunityTest(unittest.TestCase):
 
         stats = global_cache.getStatistics()
         self.assertEqual(stats[0]["hits"], 1)
-
-
-class InterfacesWildcardImportTest(unittest.TestCase):
-    """Verify interfaces module exposes expected symbols and no restrictive __all__."""
-
-    def test_interfaces_module_exports(self):
-        import eea.api.dataconnector.interfaces as ifaces
-
-        self.assertFalse(hasattr(ifaces, "__all__"))
-        self.assertTrue(hasattr(ifaces, "IDataConnector"))
-        self.assertTrue(hasattr(ifaces, "IDataProvider"))
-        self.assertTrue(hasattr(ifaces, "BadGateway"))
-        self.assertTrue(hasattr(ifaces, "GatewayTimeout"))
-        self.assertTrue(hasattr(ifaces, "DiscodataProviderError"))
 
 
 def test_suite():

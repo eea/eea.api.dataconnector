@@ -24,6 +24,7 @@ from eea.api.dataconnector.api.dataconnector import (
     connector_data_response,
     ConnectorData,
 )
+from eea.api.dataconnector.exceptions import BadGateway, GatewayTimeout
 from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IFileDataProvider,
@@ -278,6 +279,20 @@ class ConnectorDataResponseTest(unittest.TestCase):
         )
 
         with self.assertRaises(NotFound):
+            connector_data_response(ConnectorContext(), object())
+
+    @patch(f"{MODULE}.queryMultiAdapter")
+    def test_propagates_provider_errors(self, query_multi_adapter):
+        query_multi_adapter.return_value = Mock(
+            side_effect=BadGateway("Discodata error")
+        )
+        with self.assertRaises(BadGateway):
+            connector_data_response(ConnectorContext(), object())
+
+        query_multi_adapter.return_value = Mock(
+            side_effect=GatewayTimeout("Discodata timeout")
+        )
+        with self.assertRaises(GatewayTimeout):
             connector_data_response(ConnectorContext(), object())
 
 

@@ -11,7 +11,3 @@ class BadGateway(DiscodataProviderError, HTTPBadGateway):
 
 class GatewayTimeout(DiscodataProviderError, HTTPGatewayTimeout):
     """HTTP 504 Gateway Timeout for upstream Discodata connect or read timeouts."""
-
-
-DiscodataResponseError = BadGateway
-DiscodataTimeoutError = GatewayTimeout

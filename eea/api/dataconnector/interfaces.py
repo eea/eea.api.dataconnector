@@ -11,13 +11,6 @@ from zope import schema
 from zope.interface import Attribute, Interface, provider
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
-from eea.api.dataconnector.exceptions import (  # noqa: F401
-    BadGateway,
-    DiscodataProviderError,
-    DiscodataResponseError,
-    DiscodataTimeoutError,
-    GatewayTimeout,
-)
 from eea.schema.slate.field import SlateJSONField
 
 
