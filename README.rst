@@ -86,6 +86,25 @@ A SQL error answered with ``{"errors": ...}`` is not a transport failure: the
 response stays HTTP 200, ``results`` is ``{}``, and the answer is cached like any
 other successful one.
 
+Because every connector posts to the same Discodata host, transport failures are
+bounded by two circuit breakers:
+
+- The endpoint breaker opens when the request cannot be completed: a connection
+  error, a connect timeout or any other transport failure. While it is open every
+  request to that endpoint fails fast, with 504 after a connect timeout and 502
+  otherwise.
+- The query breaker opens when Discodata was reached but the exchange failed for
+  that statement: a read timeout or an HTTP 5xx answer. While it is open that
+  statement fails fast - every filter, paging and ``db_version`` variation of it
+  - with 504 after a read timeout and 502 after a 5xx, while other statements on
+  the same endpoint keep working.
+
+An open breaker closes after ``DISCODATA_CIRCUIT_COOLDOWN`` seconds, 15.0 by
+default; a value that is not a positive finite number is ignored. Breaker state
+lives in the worker process, so pods may briefly disagree during a cooldown.
+Nothing else opens a circuit: 4xx answers, invalid JSON, unusable payloads and
+``{"errors": ...}`` answers are never counted.
+
 Install
 =======
 

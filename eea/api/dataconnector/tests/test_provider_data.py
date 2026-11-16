@@ -1,4 +1,4 @@
-"""Tests for connector and file provider responses."""
+"""Tests for the connector providers and their circuit breakers."""
 
 import copy
 import os
@@ -8,14 +8,17 @@ from typing import ClassVar
 from unittest.mock import patch
 
 import requests
-from plone.memoize import ram
+from plone.memoize.interfaces import ICacheChooser
+from plone.memoize.ram import RAMCacheAdapter
 from plone.registry.interfaces import IRegistry
 from zope.component import provideAdapter, provideUtility
 from zope.component.testing import setUp as componentSetUp
 from zope.component.testing import tearDown as componentTearDown
 from zope.interface import Interface, alsoProvides
+from zope.ramcache.ram import RAMCache
 from ZPublisher.HTTPResponse import HTTPResponse
 
+from eea.api.dataconnector import breaker
 from eea.api.dataconnector.adapter import (
     DataProviderForConnectors,
     _get_discodata_timeouts,
@@ -26,7 +29,9 @@ from eea.api.dataconnector.exceptions import BadGateway, GatewayTimeout
 from eea.api.dataconnector.interfaces import IConnectorDataProvider, IDataProvider
 
 MODULE = "eea.api.dataconnector.adapter"
+BREAKER = "eea.api.dataconnector.breaker"
 ENDPOINT = "https://discodata.eea.europa.eu/sql"
+OTHER_ENDPOINT = "https://discodata.example.com/sql"
 README = "Connector documentation"
 SQL = {
     "conditions": [],
@@ -48,6 +53,16 @@ def _discodata_env(overrides):
 
 class RegistryStub(dict):
     """Minimal registry utility for query filter lookups."""
+
+
+class LocalCacheChooser:
+    """Give every memoized function its own in-memory cache."""
+
+    def __init__(self):
+        self.ramcache = RAMCache()
+
+    def __call__(self, fun_name):
+        return RAMCacheAdapter(ramcache=self.ramcache, globalkey=fun_name)
 
 
 class FakeResponse:
@@ -214,6 +229,8 @@ class ProviderOutcomeTest(unittest.TestCase):
         componentSetUp()
         provideUtility(RegistryStub(), IRegistry)
         self.addCleanup(componentTearDown)
+        breaker.reset()
+        self.addCleanup(breaker.reset)
         env = patch.dict(os.environ, _discodata_env({}), clear=True)
         env.start()
         self.addCleanup(env.stop)
@@ -240,6 +257,7 @@ class ProviderOutcomeTest(unittest.TestCase):
     def test_provider_outcomes(self):
         for name, outcome, exception, results, status, level, message in OUTCOMES:
             with self.subTest(name):
+                breaker.reset()
                 with patch(f"{MODULE}.requests.post") as post:
                     if isinstance(outcome, Exception):
                         post.side_effect = outcome
@@ -261,6 +279,170 @@ class ProviderOutcomeTest(unittest.TestCase):
                     response = HTTPResponse()
                     response.setStatus(type(caught))
                     self.assertEqual(response.status, status)
+
+
+class CircuitBreakerTest(unittest.TestCase):
+    """Verify circuit breakers isolate Discodata transport failures."""
+
+    def setUp(self):
+        componentSetUp()
+        provideUtility(RegistryStub(), IRegistry)
+        self.addCleanup(componentTearDown)
+        breaker.reset()
+        self.addCleanup(breaker.reset)
+        env = patch.dict(os.environ, _discodata_env({}), clear=True)
+        env.start()
+        self.addCleanup(env.stop)
+        parser = patch(f"{MODULE}.parseQuery", return_value=copy.deepcopy(SQL))
+        parser.start()
+        self.addCleanup(parser.stop)
+
+    def _provider(self, sql_query="SELECT * FROM t", endpoint_url=ENDPOINT):
+        context = SimpleNamespace(
+            sql_query=sql_query,
+            endpoint_url=endpoint_url,
+            readme=README,
+        )
+        return DataProviderForConnectors(context, object())
+
+    def test_transport_failure_opens_endpoint_breaker(self):
+        failures = [
+            (
+                "connect timeout",
+                requests.ConnectTimeout("connect"),
+                GatewayTimeout,
+                GatewayTimeout,
+            ),
+            (
+                "connection error",
+                requests.ConnectionError("down"),
+                BadGateway,
+                BadGateway,
+            ),
+        ]
+        for name, failure, exception, open_exception in failures:
+            with self.subTest(name):
+                breaker.reset()
+                with patch(f"{MODULE}.requests.post") as post:
+                    post.side_effect = failure
+                    with self.assertRaises(exception):
+                        _ = self._provider().provided_data
+                    with self.assertRaises(open_exception) as caught:
+                        _ = self._provider(
+                            sql_query="SELECT * FROM other"
+                        ).provided_data
+                    self.assertIn("circuit open", str(caught.exception))
+                    self.assertEqual(post.call_count, 1)
+                self.assertEqual(list(breaker._endpoint_circuits), [ENDPOINT])
+                self.assertEqual(breaker._query_circuits, {})
+
+    def test_query_failures_open_query_breaker_only(self):
+        failures = [
+            ("read timeout", requests.Timeout("slow"), GatewayTimeout),
+            ("http 503", FakeResponse(status_code=503, text="unavailable"), BadGateway),
+        ]
+        for name, failure, exception in failures:
+            with self.subTest(name):
+                breaker.reset()
+                with patch(f"{MODULE}.requests.post") as post:
+                    if isinstance(failure, Exception):
+                        post.side_effect = failure
+                    else:
+                        post.return_value = failure
+                    with self.assertRaises(exception):
+                        _ = self._provider().provided_data
+                    with self.assertRaises(exception) as caught:
+                        _ = self._provider().provided_data
+                    self.assertIn("circuit open", str(caught.exception))
+                    self.assertEqual(post.call_count, 1)
+                    self.assertEqual(breaker._endpoint_circuits, {})
+                    self.assertEqual(len(breaker._query_circuits), 1)
+
+                    post.side_effect = None
+                    post.return_value = FakeResponse(payload={"results": [{"a": 1}]})
+                    data = self._provider(sql_query="SELECT * FROM other").provided_data
+
+                    self.assertEqual(post.call_count, 2)
+                    self.assertEqual(data["results"], {"a": [1]})
+
+                    data = self._provider(
+                        sql_query="SELECT * FROM t", endpoint_url=OTHER_ENDPOINT
+                    ).provided_data
+
+                    self.assertEqual(post.call_count, 3)
+                    self.assertEqual(post.call_args.args[0], OTHER_ENDPOINT)
+                    self.assertEqual(data["results"], {"a": [1]})
+
+    def test_non_transport_failure_opens_nothing(self):
+        cases = [
+            ("http 404", FakeResponse(status_code=404, text="missing"), BadGateway),
+            ("sql errors", FakeResponse(payload={"errors": "bad sql"}), None),
+            (
+                "malformed json",
+                FakeResponse(json_error=ValueError("no json"), text="<html>"),
+                BadGateway,
+            ),
+            ("non dict payload", FakeResponse(payload=["x"]), BadGateway),
+            ("unusable results", FakeResponse(payload={"results": "nope"}), BadGateway),
+        ]
+        for name, response, exception in cases:
+            with self.subTest(name):
+                breaker.reset()
+                with patch(f"{MODULE}.requests.post") as post:
+                    post.return_value = response
+                    for _ in range(2):
+                        if exception is None:
+                            data = self._provider().provided_data
+                            self.assertEqual(data["results"], {})
+                        else:
+                            with self.assertRaises(exception):
+                                _ = self._provider().provided_data
+                    self.assertEqual(post.call_count, 2)
+                self.assertEqual(breaker._endpoint_circuits, {})
+                self.assertEqual(breaker._query_circuits, {})
+
+    def test_endpoint_breaker_is_per_endpoint(self):
+        other = "https://discodata.example.com/sql"
+        with patch(f"{MODULE}.requests.post") as post:
+            post.side_effect = requests.ConnectionError("down")
+            with self.assertRaises(BadGateway):
+                _ = self._provider().provided_data
+
+            post.side_effect = None
+            post.return_value = FakeResponse(payload={"results": [{"a": 1}]})
+            data = self._provider(endpoint_url=other).provided_data
+
+            self.assertEqual(post.call_count, 2)
+            self.assertEqual(post.call_args.args[0], other)
+            self.assertEqual(data["results"], {"a": [1]})
+
+    def test_circuit_closes_after_cooldown(self):
+        with patch(f"{MODULE}.requests.post") as post:
+            post.side_effect = requests.ConnectionError("down")
+            with self.assertRaises(BadGateway):
+                _ = self._provider().provided_data
+
+            deadline = breaker._endpoint_circuits[ENDPOINT][0]
+            post.side_effect = None
+            post.return_value = FakeResponse(payload={"results": [{"a": 1}]})
+            with patch(f"{BREAKER}.monotonic", return_value=deadline + 1.0):
+                data = self._provider().provided_data
+
+            self.assertEqual(post.call_count, 2)
+            self.assertEqual(data["results"], {"a": [1]})
+        self.assertEqual(breaker._endpoint_circuits, {})
+        self.assertEqual(breaker._query_circuits, {})
+
+    def test_cooldown_from_environment(self):
+        cases = [
+            ("configured", {"DISCODATA_CIRCUIT_COOLDOWN": "30"}, 30.0),
+            ("unset", {}, 15.0),
+            ("invalid", {"DISCODATA_CIRCUIT_COOLDOWN": "abc"}, 15.0),
+        ]
+        for name, env, expected in cases:
+            environ = patch.dict(os.environ, _discodata_env(env), clear=True)
+            with self.subTest(name), environ:
+                self.assertEqual(breaker._cooldown(), expected)
 
 
 class TimeoutConfigTest(unittest.TestCase):
@@ -309,12 +491,13 @@ class CacheImmunityTest(unittest.TestCase):
             IDataProvider,
             name="connector",
         )
+        provideUtility(LocalCacheChooser(), ICacheChooser)
         StubDataProvider.outcomes = []
         StubDataProvider.calls = 0
-        ram.global_cache.invalidateAll()
+        breaker.reset()
+        self.addCleanup(breaker.reset)
 
     def tearDown(self):
-        ram.global_cache.invalidateAll()
         componentTearDown()
 
     def _connector(self):
@@ -351,7 +534,7 @@ class CacheImmunityTest(unittest.TestCase):
             with self.subTest(results=payload["results"]):
                 StubDataProvider.outcomes = [payload]
                 StubDataProvider.calls = 0
-                ram.global_cache.invalidateAll()
+                provideUtility(LocalCacheChooser(), ICacheChooser)
                 connector = self._connector()
 
                 first = connector(expand=True)["connector-data"]["data"]
@@ -364,6 +547,10 @@ class CacheImmunityTest(unittest.TestCase):
 
 class EmptyProviderDataTest(unittest.TestCase):
     """Verify empty providers preserve the public connector-data shape."""
+
+    def setUp(self):
+        breaker.reset()
+        self.addCleanup(breaker.reset)
 
     def test_connector_without_sql_query(self):
         context = SimpleNamespace(

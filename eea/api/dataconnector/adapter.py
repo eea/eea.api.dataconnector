@@ -20,12 +20,20 @@ from eea.api.dataconnector.interfaces import (
 from eea.api.dataconnector.utils import parse_positive_float, timing
 from eea.api.dataconnector.queryparser import parseQuery
 from eea.api.dataconnector.queryfilter import filteredData
+from eea.api.dataconnector import breaker
 from eea.api.dataconnector.exceptions import BadGateway, GatewayTimeout
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONNECT_TIMEOUT = 5.0
 DEFAULT_READ_TIMEOUT = 30.0
+
+
+def _log_transport_failure(reason, started, endpoint, err):
+    """Log one transport failure with the time it took."""
+    logger.error(
+        "%s after %.3fs on %s: %s", reason, time.monotonic() - started, endpoint, err
+    )
 
 
 def _get_discodata_timeouts():
@@ -90,6 +98,7 @@ class DataProviderForConnectors:
             data["nrOfHits"] = form.get("nrOfHits")
 
         endpoint = self.context.endpoint_url
+        breaker.check(endpoint, self.context.sql_query)
         connect_timeout, read_timeout = _get_discodata_timeouts()
         started = time.monotonic()
         try:
@@ -98,23 +107,17 @@ class DataProviderForConnectors:
                 data,
                 timeout=(connect_timeout, read_timeout),
             )
+        except requests.ConnectTimeout as err:
+            _log_transport_failure("Discodata timeout", started, endpoint, err)
+            breaker.trip_endpoint(endpoint, GatewayTimeout)
+            raise GatewayTimeout(f"Discodata did not answer on {endpoint}") from err
         except requests.Timeout as err:
-            elapsed = time.monotonic() - started
-            logger.error(
-                "Discodata timeout after %.3fs on %s: %s",
-                elapsed,
-                endpoint,
-                err,
-            )
+            _log_transport_failure("Discodata timeout", started, endpoint, err)
+            breaker.trip_query(endpoint, self.context.sql_query)
             raise GatewayTimeout(f"Discodata did not answer on {endpoint}") from err
         except requests.RequestException as err:
-            elapsed = time.monotonic() - started
-            logger.error(
-                "Discodata request failed after %.3fs on %s: %s",
-                elapsed,
-                endpoint,
-                err,
-            )
+            _log_transport_failure("Discodata request failed", started, endpoint, err)
+            breaker.trip_endpoint(endpoint)
             raise BadGateway(f"Discodata request failed on {endpoint}") from err
 
         elapsed = time.monotonic() - started
@@ -126,6 +129,8 @@ class DataProviderForConnectors:
                 endpoint,
                 (req.text or "")[:300],
             )
+            if req.status_code >= 500:
+                breaker.trip_query(endpoint, self.context.sql_query, BadGateway)
             raise BadGateway(f"Discodata answered HTTP {req.status_code} on {endpoint}")
 
         try:

@@ -14,6 +14,11 @@ Changelog
 * Change: provider ``results`` is always an object keyed by column and ``{}``
   when empty - refs #310184
   [razvanMiu]
+* Fix: Discodata transport failures and HTTP 5xx answers open a per-endpoint or
+  per-query circuit breaker for 15.0 seconds, tuned by
+  ``DISCODATA_CIRCUIT_COOLDOWN``, so one slow statement cannot exhaust every
+  connector - refs #310184
+  [razvanMiu]
 
 13.0 - (2026-08-18)
 ---------------------------
