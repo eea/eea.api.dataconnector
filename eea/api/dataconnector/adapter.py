@@ -7,21 +7,21 @@ import time
 
 import requests
 from mo_sql_parsing import format as sql_format
-from plone.restapi.types.adapters import DefaultJsonSchemaProvider
-from plone.restapi.types.interfaces import IJsonSchemaProvider
 from zope.component import adapter
-from zope.interface import Interface, implementer
-from zope.publisher.interfaces.browser import IBrowserRequest
+from zope.interface import implementer
+from zope.interface import Interface
 from zope.schema.interfaces import IField
-
+from zope.publisher.interfaces.browser import IBrowserRequest
+from plone.restapi.types.interfaces import IJsonSchemaProvider
+from plone.restapi.types.adapters import DefaultJsonSchemaProvider
 from eea.api.dataconnector.exceptions import BadGateway, GatewayTimeout
 from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IDataProvider,
 )
-from eea.api.dataconnector.queryfilter import filteredData
-from eea.api.dataconnector.queryparser import parseQuery
 from eea.api.dataconnector.utils import timing
+from eea.api.dataconnector.queryparser import parseQuery
+from eea.api.dataconnector.queryfilter import filteredData
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,8 @@ class DataProviderForConnectors:
                 err,
             )
             raise GatewayTimeout(
-                f"Discodata request timed out after {elapsed:.2f}s: {self.context.endpoint_url}"
+                "Discodata request timed out after "
+                f"{elapsed:.2f}s: {self.context.endpoint_url}"
             ) from err
         except requests.RequestException as err:
             elapsed = time.monotonic() - start_time
@@ -181,7 +182,8 @@ class DataProviderForConnectors:
             raw_rows = []
         if not isinstance(raw_rows, list):
             logger.error(
-                "Discodata returned invalid results field after %.2fs for endpoint %s: %r",
+                "Discodata returned invalid results field after %.2fs "
+                "for endpoint %s: %r",
                 elapsed,
                 self.context.endpoint_url,
                 type(raw_rows),
@@ -189,7 +191,7 @@ class DataProviderForConnectors:
             raise BadGateway("Discodata results field is missing or not a list")
 
         return {
-            "results": filteredData(raw_rows, data_query) or {},
+            "results": filteredData(raw_rows, data_query),
             "metadata": metadata,
         }
 

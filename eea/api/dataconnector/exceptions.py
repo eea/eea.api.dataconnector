@@ -6,7 +6,7 @@ class DiscodataProviderError(Exception):
 
 
 class BadGateway(DiscodataProviderError, HTTPBadGateway):
-    """HTTP 502 Bad Gateway for upstream Discodata errors, connection drops, or malformed payloads."""
+    """HTTP 502 for Discodata errors, connection drops or bad payloads."""
 
 
 class GatewayTimeout(DiscodataProviderError, HTTPGatewayTimeout):
