@@ -83,6 +83,8 @@ class ConnectorDataContractTest(unittest.TestCase):
             _normalize_provider_data({"results": {}, "metadata": None}),
             empty,
         )
+        self.assertEqual(_normalize_provider_data({"results": []}), empty)
+        self.assertEqual(_normalize_provider_data({"results": None}), empty)
 
     def test_preserves_provider_data(self):
         data = {

@@ -15,6 +15,7 @@ from zope.component import provideAdapter, provideUtility
 from zope.component.testing import setUp as componentSetUp
 from zope.component.testing import tearDown as componentTearDown
 from zope.interface import Interface, alsoProvides
+from zope.publisher.interfaces.browser import IBrowserRequest
 from zope.ramcache.ram import RAMCache
 from ZPublisher.HTTPResponse import HTTPResponse
 
@@ -433,6 +434,13 @@ class CircuitBreakerTest(unittest.TestCase):
         self.assertEqual(breaker._endpoint_circuits, {})
         self.assertEqual(breaker._query_circuits, {})
 
+    def test_trip_logs_only_the_transition(self):
+        with self.assertLogs(BREAKER, level="ERROR") as logs:
+            breaker.trip_endpoint(ENDPOINT)
+            breaker.trip_endpoint(ENDPOINT)
+
+        self.assertEqual(len(logs.records), 1)
+
     def test_cooldown_from_environment(self):
         cases = [
             ("configured", {"DISCODATA_CIRCUIT_COOLDOWN": "30"}, 30.0),
@@ -543,6 +551,55 @@ class CacheImmunityTest(unittest.TestCase):
                 self.assertEqual(first, payload)
                 self.assertEqual(second, payload)
                 self.assertEqual(StubDataProvider.calls, 1)
+
+
+class ErrorsPayloadCacheTest(unittest.TestCase):
+    """Verify a SQL error answer is served from cache instead of Discodata."""
+
+    def setUp(self):
+        componentSetUp()
+        provideUtility(RegistryStub(), IRegistry)
+        provideUtility(LocalCacheChooser(), ICacheChooser)
+        provideAdapter(
+            DataProviderForConnectors,
+            (IConnectorDataProvider, IBrowserRequest),
+            IDataProvider,
+            name="connector",
+        )
+        self.addCleanup(componentTearDown)
+        breaker.reset()
+        self.addCleanup(breaker.reset)
+        env = patch.dict(os.environ, _discodata_env({}), clear=True)
+        env.start()
+        self.addCleanup(env.stop)
+        parser = patch(f"{MODULE}.parseQuery", return_value=copy.deepcopy(SQL))
+        parser.start()
+        self.addCleanup(parser.stop)
+
+    def test_sql_error_answer_is_cached(self):
+        context = SimpleNamespace(
+            absolute_url=lambda: "http://example.com/provider",
+            getPhysicalPath=lambda: ("", "site", "provider"),
+            sql_query="SELECT * FROM t",
+            endpoint_url=ENDPOINT,
+            readme=README,
+        )
+        alsoProvides(context, IConnectorDataProvider)
+        request = ConnectorRequest()
+        alsoProvides(request, IBrowserRequest)
+        connector = ConnectorData(context, request)
+
+        with patch(f"{MODULE}.requests.post") as post:
+            post.return_value = FakeResponse(payload={"errors": "bad sql"})
+            logging_ctx = self.assertLogs(MODULE, level="WARNING")
+            with logging_ctx as logs:
+                first = connector(expand=True)["connector-data"]["data"]
+                second = connector(expand=True)["connector-data"]["data"]
+
+        self.assertEqual(first, {"results": {}, "metadata": {"readme": README}})
+        self.assertEqual(second, first)
+        self.assertEqual(post.call_count, 1)
+        self.assertIn("bad sql", "\n".join(logs.output))
 
 
 class EmptyProviderDataTest(unittest.TestCase):

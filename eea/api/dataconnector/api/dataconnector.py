@@ -93,7 +93,7 @@ def _normalize_provider_data(data):
 
     results = data.get("results")
     metadata = data.get("metadata")
-    if not isinstance(results, (dict, list)):
+    if not isinstance(results, (dict, list)) or not results:
         results = {}
     return {
         "results": results,

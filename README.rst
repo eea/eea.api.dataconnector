@@ -67,11 +67,13 @@ Discodata provider
 
 The connector provider posts the parsed SQL query to the configured
 ``endpoint_url`` with a connect timeout of 5.0 seconds and a read timeout of
-30.0 seconds. The environment tunes them: ``DISCODATA_CONNECT_TIMEOUT`` and
-``DISCODATA_READ_TIMEOUT`` override one value each, while ``DISCODATA_TIMEOUT``
-sets both. A value that is not a positive finite number is ignored: the
-connect or read timeout then falls back to ``DISCODATA_TIMEOUT`` when that one
-is valid, and to 5.0 / 30.0 otherwise.
+30.0 seconds. The read timeout applies to each socket read, not to the whole
+exchange, so a large or slowly delivered answer is not bounded by it: what bounds
+an outage is the circuit breaker below, not the timeout. The environment tunes the
+timeouts: ``DISCODATA_CONNECT_TIMEOUT`` and ``DISCODATA_READ_TIMEOUT`` override one
+value each, while ``DISCODATA_TIMEOUT`` sets both. A value that is not a positive
+finite number is ignored: the connect or read timeout then falls back to
+``DISCODATA_TIMEOUT`` when that one is valid, and to 5.0 / 30.0 otherwise.
 
 Transport and payload failures are reported as HTTP errors instead of empty
 data:
@@ -84,7 +86,9 @@ data:
 
 A SQL error answered with ``{"errors": ...}`` is not a transport failure: the
 response stays HTTP 200, ``results`` is ``{}``, and the answer is cached like any
-other successful one.
+other successful one, so every pod serves the empty result until the connector is
+edited or the TTL expires. A ``null`` or empty ``errors`` value is treated as a
+successful answer.
 
 Because every connector posts to the same Discodata host, transport failures are
 bounded by two circuit breakers:
@@ -101,7 +105,11 @@ bounded by two circuit breakers:
 
 An open breaker closes after ``DISCODATA_CIRCUIT_COOLDOWN`` seconds, 15.0 by
 default; a value that is not a positive finite number is ignored. Breaker state
-lives in the worker process, so pods may briefly disagree during a cooldown.
+lives in the worker process while the connector data cache is shared, so during an
+outage the same page can be served from cache by one pod and answered with 502 by
+another. The endpoint breaker treats every transport failure alike, including ones
+that cannot heal on their own such as an invalid URL or a TLS error.
+
 Nothing else opens a circuit: 4xx answers, invalid JSON, unusable payloads and
 ``{"errors": ...}`` answers are never counted.
 

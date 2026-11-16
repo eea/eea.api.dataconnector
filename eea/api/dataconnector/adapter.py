@@ -153,13 +153,13 @@ class DataProviderForConnectors:
             )
             raise BadGateway(f"Discodata returned an unusable payload on {endpoint}")
 
-        errors = payload.get("errors")
-        if errors:
+        sql_errors = payload.get("errors")
+        if sql_errors:
             logger.warning(
                 "Discodata reported errors after %.3fs on %s: %s",
                 elapsed,
                 endpoint,
-                errors,
+                sql_errors,
             )
             return {"results": {}, "metadata": metadata}
 

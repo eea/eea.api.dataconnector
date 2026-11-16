@@ -56,13 +56,14 @@ def _remaining(store, key):
 
 
 def _trip(store, key, label, error):
-    """Open one circuit for a cooldown and log it once."""
+    """Open one circuit for a cooldown and log the transition once."""
     cooldown = _cooldown()
     now = monotonic()
-    for expired in [k for k, entry in store.items() if entry[0] <= now]:
+    for expired in [k for k, entry in store.copy().items() if entry[0] <= now]:
         store.pop(expired, None)
+    if store.get(key, (0.0,))[0] <= now:
+        logger.error("Discodata circuit opened for %s for %.1fs", label, cooldown)
     store[key] = (now + cooldown, error)
-    logger.error("Discodata circuit opened for %s for %.1fs", label, cooldown)
 
 
 def check(endpoint_url, sql_query):
