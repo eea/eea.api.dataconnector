@@ -76,6 +76,7 @@ setup(
         "XlsxWriter",
         "collective.folderishtypes",
         "eea.schema.slate",
+        "zExceptions",
     ],
     extras_require={
         "test": [

@@ -36,12 +36,12 @@ Connector-data response contract
 ================================
 
 Successful ``@connector-data`` responses expose provider data as an object with
-``results`` and ``metadata`` fields. ``results`` is an empty array when no rows
-exist; ``metadata`` remains an object and may contain provider information such
-as ``readme``. The minimal empty shape is::
+``results`` and ``metadata`` fields. ``results`` is an object keyed by column and
+is ``{}`` when no rows exist; ``metadata`` remains an object and may contain
+provider information such as ``readme``. The minimal empty shape is::
 
     {
-      "results": [],
+      "results": {},
       "metadata": {}
     }
 
@@ -61,6 +61,30 @@ Expanded connector data is memoized by provider path, request identity, and
 provider content revision. Editing a provider configuration or replacing its
 file therefore changes the cache identity immediately. Changes in external SQL
 data are bounded by the global ``CACHE_TTL`` configured by ``eea.volto.policy``.
+
+Discodata provider
+==================
+
+The connector provider posts the parsed SQL query to the configured
+``endpoint_url`` with a connect timeout of 5.0 seconds and a read timeout of
+30.0 seconds. The environment tunes them: ``DISCODATA_CONNECT_TIMEOUT`` and
+``DISCODATA_READ_TIMEOUT`` override one value each, while ``DISCODATA_TIMEOUT``
+sets both. A value that is not a positive finite number is ignored: the
+connect or read timeout then falls back to ``DISCODATA_TIMEOUT`` when that one
+is valid, and to 5.0 / 30.0 otherwise.
+
+Transport and payload failures are reported as HTTP errors instead of empty
+data:
+
+- 502 Bad Gateway when the endpoint cannot be reached, answers with a non-2xx
+  status, or returns something other than a JSON object whose ``results`` is
+  either absent, ``null`` or an array of objects.
+- 504 Gateway Timeout when the endpoint does not answer within the configured
+  timeouts.
+
+A SQL error answered with ``{"errors": ...}`` is not a transport failure: the
+response stays HTTP 200, ``results`` is ``{}``, and the answer is cached like any
+other successful one.
 
 Install
 =======

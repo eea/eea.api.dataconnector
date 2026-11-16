@@ -3,6 +3,17 @@ Changelog
 
 13.1-dev0 - (unreleased)
 ---------------------------
+* Fix: Discodata requests use a 5.0s connect and 30.0s read timeout, tuned by
+  ``DISCODATA_CONNECT_TIMEOUT``, ``DISCODATA_READ_TIMEOUT`` and
+  ``DISCODATA_TIMEOUT``; failures answer 502 and timeouts answer 504 instead
+  of returning empty data - refs #310184
+  [razvanMiu]
+* Fix: A SQL error answered with ``{"errors": ...}`` is logged as a warning and
+  cached as empty results - refs #310184
+  [razvanMiu]
+* Change: provider ``results`` is always an object keyed by column and ``{}``
+  when empty - refs #310184
+  [razvanMiu]
 
 13.0 - (2026-08-18)
 ---------------------------
