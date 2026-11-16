@@ -2,6 +2,7 @@
 
 import os
 import unittest
+from time import monotonic
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -13,12 +14,12 @@ from zope.component.testing import tearDown as componentTearDown
 from zope.interface import Interface, implementer
 from ZPublisher.HTTPResponse import HTTPResponse
 
+from eea.api.dataconnector import breaker
 from eea.api.dataconnector.adapter import (
     DEFAULT_CONNECT_TIMEOUT,
     DEFAULT_READ_TIMEOUT,
     DataProviderForConnectors,
     _get_discodata_timeouts,
-    _parse_timeout,
 )
 from eea.api.dataconnector.api.dataconnector import ConnectorData
 from eea.api.dataconnector.behavior import DataProviderForFiles
@@ -27,6 +28,7 @@ from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IDataProvider,
 )
+from eea.api.dataconnector.utils import parse_positive_float
 
 
 class EmptyProviderDataTest(unittest.TestCase):
@@ -59,21 +61,21 @@ class ParseTimeoutTest(unittest.TestCase):
     """Verify timeout parsing helper."""
 
     def test_default_on_none(self):
-        self.assertEqual(_parse_timeout(None, 5.0), 5.0)
+        self.assertEqual(parse_positive_float(None, 5.0), 5.0)
 
     def test_parses_valid_float_and_int(self):
-        self.assertEqual(_parse_timeout("10", 5.0), 10.0)
-        self.assertEqual(_parse_timeout("2.5", 5.0), 2.5)
-        self.assertEqual(_parse_timeout(3, 5.0), 3.0)
-        self.assertEqual(_parse_timeout(4.5, 5.0), 4.5)
+        self.assertEqual(parse_positive_float("10", 5.0), 10.0)
+        self.assertEqual(parse_positive_float("2.5", 5.0), 2.5)
+        self.assertEqual(parse_positive_float(3, 5.0), 3.0)
+        self.assertEqual(parse_positive_float(4.5, 5.0), 4.5)
 
     def test_default_on_invalid_or_non_positive(self):
-        self.assertEqual(_parse_timeout("abc", 5.0), 5.0)
-        self.assertEqual(_parse_timeout("-1", 5.0), 5.0)
-        self.assertEqual(_parse_timeout("0", 5.0), 5.0)
-        self.assertEqual(_parse_timeout("inf", 5.0), 5.0)
-        self.assertEqual(_parse_timeout("nan", 5.0), 5.0)
-        self.assertEqual(_parse_timeout([], 5.0), 5.0)
+        self.assertEqual(parse_positive_float("abc", 5.0), 5.0)
+        self.assertEqual(parse_positive_float("-1", 5.0), 5.0)
+        self.assertEqual(parse_positive_float("0", 5.0), 5.0)
+        self.assertEqual(parse_positive_float("inf", 5.0), 5.0)
+        self.assertEqual(parse_positive_float("nan", 5.0), 5.0)
+        self.assertEqual(parse_positive_float([], 5.0), 5.0)
 
 
 class GetDiscodataTimeoutsTest(unittest.TestCase):
@@ -83,9 +85,9 @@ class GetDiscodataTimeoutsTest(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True):
             self.assertEqual(
                 _get_discodata_timeouts(),
-                (DEFAULT_CONNECT_TIMEOUT, 15.0),
+                (DEFAULT_CONNECT_TIMEOUT, 60.0),
             )
-            self.assertEqual(DEFAULT_READ_TIMEOUT, 15.0)
+            self.assertEqual(DEFAULT_READ_TIMEOUT, 60.0)
 
     def test_fallback_discodata_timeout(self):
         with patch.dict(os.environ, {"DISCODATA_TIMEOUT": "20"}, clear=True):
@@ -108,6 +110,7 @@ class ConnectorDataProviderTest(unittest.TestCase):
     """Verify DataProviderForConnectors error handling and response processing."""
 
     def setUp(self):
+        breaker.reset()
         self.context = SimpleNamespace(
             endpoint_url="https://discodata.eea.europa.eu/sql",
             sql_query="SELECT * FROM tbl",
@@ -120,6 +123,9 @@ class ConnectorDataProviderTest(unittest.TestCase):
             "form": {},
             "query": {"select": "*", "from": "tbl"},
         }
+
+    def tearDown(self):
+        breaker.reset()
 
     @patch("eea.api.dataconnector.adapter.parseQuery")
     @patch("eea.api.dataconnector.adapter.requests.post")
@@ -300,6 +306,301 @@ class ConnectorDataProviderTest(unittest.TestCase):
             },
         )
         mock_filtered_data.assert_called_once_with([], [])
+
+
+class CircuitBreakerTest(unittest.TestCase):
+    """Verify Discodata transport failures fail fast for the cooldown window."""
+
+    def setUp(self):
+        breaker.reset()
+        patcher = patch.dict(os.environ, {}, clear=True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.context = SimpleNamespace(
+            endpoint_url="https://discodata.eea.europa.eu/sql",
+            sql_query="SELECT * FROM tbl",
+            readme="Connector docs",
+        )
+        self.request = object()
+        self.fake_sql = {
+            "conditions": [],
+            "data_query": [],
+            "form": {},
+            "query": {"select": "*", "from": "tbl"},
+        }
+
+    def tearDown(self):
+        breaker.reset()
+
+    def _ok_response(self):
+        response = MagicMock()
+        response.status_code = 200
+        response.json.return_value = {"results": []}
+        return response
+
+    def _other_context(self):
+        return SimpleNamespace(
+            endpoint_url="https://discodata.eea.europa.eu/sql",
+            sql_query="SELECT * FROM other_tbl",
+            readme="Connector docs",
+        )
+
+    def _fetch(self, context):
+        return DataProviderForConnectors(context, self.request)._get_data()
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_connect_timeout_trips_endpoint_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        mock_post.side_effect = requests.ConnectTimeout("Connect timed out")
+
+        with self.assertRaises(GatewayTimeout) as ctx:
+            self._fetch(self.context)
+        self.assertIn("Discodata request timed out", str(ctx.exception))
+        with self.assertRaises(BadGateway) as ctx:
+            self._fetch(self._other_context())
+        self.assertIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 1)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_connection_error_trips_endpoint_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        mock_post.side_effect = requests.ConnectionError("Connection refused")
+
+        with self.assertRaises(BadGateway):
+            self._fetch(self.context)
+        with self.assertRaises(BadGateway) as ctx:
+            self._fetch(self._other_context())
+        self.assertIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 1)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_http_5xx_trips_endpoint_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 503
+        response.text = "Service Unavailable"
+        mock_post.return_value = response
+
+        with self.assertRaises(BadGateway) as ctx:
+            self._fetch(self.context)
+        self.assertIn("Discodata returned HTTP 503", str(ctx.exception))
+        with self.assertRaises(BadGateway) as ctx:
+            self._fetch(self._other_context())
+        self.assertIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 1)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_read_timeout_trips_query_breaker_only(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        mock_post.side_effect = requests.ReadTimeout("Read timed out")
+
+        with self.assertRaises(GatewayTimeout):
+            self._fetch(self.context)
+        with self.assertRaises(GatewayTimeout) as ctx:
+            self._fetch(self.context)
+        self.assertIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 1)
+        self.assertEqual(breaker._endpoint_open_until, {})
+
+        mock_post.side_effect = None
+        mock_post.return_value = self._ok_response()
+
+        self._fetch(self._other_context())
+
+        self.assertEqual(mock_post.call_count, 2)
+        self.assertEqual(
+            mock_post.call_args[0][0], "https://discodata.eea.europa.eu/sql"
+        )
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_http_4xx_does_not_trip_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 400
+        response.text = "Bad Request"
+        mock_post.return_value = response
+
+        provider = DataProviderForConnectors(self.context, self.request)
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertIn("Discodata returned HTTP 400", str(ctx.exception))
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertNotIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 2)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_sql_errors_payload_does_not_trip_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 200
+        response.json.return_value = {"errors": "bad sql"}
+        mock_post.return_value = response
+
+        provider = DataProviderForConnectors(self.context, self.request)
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertIn("Discodata provider error: bad sql", str(ctx.exception))
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertNotIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 2)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_malformed_json_does_not_trip_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 200
+        response.text = "<html>oops</html>"
+        response.json.side_effect = ValueError("Invalid JSON")
+        mock_post.return_value = response
+
+        provider = DataProviderForConnectors(self.context, self.request)
+        with self.assertRaises(BadGateway):
+            provider._get_data()
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertNotIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 2)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_non_dict_payload_does_not_trip_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 200
+        response.json.return_value = ["not", "a", "dict"]
+        mock_post.return_value = response
+
+        provider = DataProviderForConnectors(self.context, self.request)
+        with self.assertRaises(BadGateway):
+            provider._get_data()
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertNotIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 2)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_invalid_results_field_does_not_trip_breaker(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        response = MagicMock()
+        response.status_code = 200
+        response.json.return_value = {"results": "not a list"}
+        mock_post.return_value = response
+
+        provider = DataProviderForConnectors(self.context, self.request)
+        with self.assertRaises(BadGateway):
+            provider._get_data()
+        with self.assertRaises(BadGateway) as ctx:
+            provider._get_data()
+        self.assertNotIn("circuit open", str(ctx.exception))
+        self.assertEqual(mock_post.call_count, 2)
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_breaker_is_scoped_per_endpoint(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        mock_post.side_effect = requests.ConnectionError("Connection refused")
+
+        failing = SimpleNamespace(
+            endpoint_url="https://discodata.eea.europa.eu/sql",
+            sql_query="SELECT * FROM tbl",
+            readme="Connector docs",
+        )
+        with self.assertRaises(BadGateway):
+            self._fetch(failing)
+
+        mock_post.side_effect = None
+        mock_post.return_value = self._ok_response()
+        healthy = SimpleNamespace(
+            endpoint_url="https://discodata.example.org/sql",
+            sql_query="SELECT * FROM tbl",
+            readme="Connector docs",
+        )
+
+        self._fetch(healthy)
+
+        self.assertEqual(mock_post.call_count, 2)
+        self.assertEqual(mock_post.call_args[0][0], "https://discodata.example.org/sql")
+
+    @patch("eea.api.dataconnector.adapter.filteredData", return_value={})
+    @patch("eea.api.dataconnector.adapter.parseQuery")
+    @patch("eea.api.dataconnector.adapter.requests.post")
+    def test_breaker_recovers_after_cooldown(
+        self, mock_post, mock_parse, mock_filtered_data
+    ):
+        mock_parse.return_value = self.fake_sql
+        mock_post.side_effect = requests.Timeout("Read timed out")
+        with self.assertRaises(GatewayTimeout):
+            self._fetch(self.context)
+
+        mock_post.side_effect = requests.ConnectionError("Connection refused")
+        with self.assertRaises(BadGateway):
+            self._fetch(self._other_context())
+
+        mock_post.reset_mock()
+        mock_post.side_effect = None
+        mock_post.return_value = self._ok_response()
+        later = monotonic() + breaker.DEFAULT_COOLDOWN + 1.0
+
+        with patch("eea.api.dataconnector.breaker.monotonic", return_value=later):
+            self._fetch(self.context)
+
+        self.assertEqual(mock_post.call_count, 1)
+        self.assertNotIn(self.context.endpoint_url, breaker._endpoint_open_until)
+        self.assertEqual(breaker._query_open_until, {})
+
+    def test_cooldown_from_environment(self):
+        with patch.dict(os.environ, {"DISCODATA_CIRCUIT_COOLDOWN": "30"}, clear=True):
+            self.assertEqual(breaker._cooldown(), 30.0)
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(breaker._cooldown(), breaker.DEFAULT_COOLDOWN)
+            self.assertEqual(breaker.DEFAULT_COOLDOWN, 15.0)
+        for invalid in ("abc", "0", "-5", "nan"):
+            with patch.dict(
+                os.environ,
+                {"DISCODATA_CIRCUIT_COOLDOWN": invalid},
+                clear=True,
+            ):
+                self.assertEqual(breaker._cooldown(), breaker.DEFAULT_COOLDOWN)
 
 
 class HttpResponseStatusTest(unittest.TestCase):

@@ -1,7 +1,6 @@
 """behavior module"""
 
 import logging
-import math
 import os
 import time
 
@@ -14,41 +13,32 @@ from zope.schema.interfaces import IField
 from zope.publisher.interfaces.browser import IBrowserRequest
 from plone.restapi.types.interfaces import IJsonSchemaProvider
 from plone.restapi.types.adapters import DefaultJsonSchemaProvider
+from eea.api.dataconnector import breaker
 from eea.api.dataconnector.exceptions import BadGateway, GatewayTimeout
 from eea.api.dataconnector.interfaces import (
     IConnectorDataProvider,
     IDataProvider,
 )
-from eea.api.dataconnector.utils import timing
+from eea.api.dataconnector.utils import parse_positive_float, timing
 from eea.api.dataconnector.queryparser import parseQuery
 from eea.api.dataconnector.queryfilter import filteredData
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONNECT_TIMEOUT = 5.0
-DEFAULT_READ_TIMEOUT = 15.0
+DEFAULT_READ_TIMEOUT = 60.0
 
-
-def _parse_timeout(value, default):
-    if value is None:
-        return default
-    try:
-        parsed = float(value)
-        if math.isfinite(parsed) and parsed > 0:
-            return parsed
-    except (ValueError, TypeError):
-        pass
-    return default
+_TIMEOUT_MESSAGE = "Discodata request timed out after {elapsed:.2f}s: {endpoint}"
 
 
 def _get_discodata_timeouts():
-    fallback = _parse_timeout(os.environ.get("DISCODATA_TIMEOUT"), None)
+    fallback = parse_positive_float(os.environ.get("DISCODATA_TIMEOUT"), None)
     connect_default = fallback if fallback is not None else DEFAULT_CONNECT_TIMEOUT
     read_default = fallback if fallback is not None else DEFAULT_READ_TIMEOUT
-    connect_timeout = _parse_timeout(
+    connect_timeout = parse_positive_float(
         os.environ.get("DISCODATA_CONNECT_TIMEOUT"), connect_default
     )
-    read_timeout = _parse_timeout(
+    read_timeout = parse_positive_float(
         os.environ.get("DISCODATA_READ_TIMEOUT"), read_default
     )
     return (connect_timeout, read_timeout)
@@ -101,11 +91,26 @@ class DataProviderForConnectors:
         if form.get("nrOfHits"):
             data["nrOfHits"] = form.get("nrOfHits")
 
+        breaker.check(self.context.endpoint_url, self.context.sql_query)
+
         start_time = time.monotonic()
         timeouts = _get_discodata_timeouts()
 
         try:
             req = requests.post(self.context.endpoint_url, data, timeout=timeouts)
+        except requests.ConnectTimeout as err:
+            elapsed = time.monotonic() - start_time
+            logger.error(
+                "Discodata request timed out after %.2fs for endpoint %s: %s",
+                elapsed,
+                self.context.endpoint_url,
+                err,
+            )
+            breaker.trip_endpoint(self.context.endpoint_url)
+            message = _TIMEOUT_MESSAGE.format(
+                elapsed=elapsed, endpoint=self.context.endpoint_url
+            )
+            raise GatewayTimeout(message) from err
         except requests.Timeout as err:
             elapsed = time.monotonic() - start_time
             logger.error(
@@ -114,10 +119,11 @@ class DataProviderForConnectors:
                 self.context.endpoint_url,
                 err,
             )
-            raise GatewayTimeout(
-                "Discodata request timed out after "
-                f"{elapsed:.2f}s: {self.context.endpoint_url}"
-            ) from err
+            breaker.trip_query(self.context.endpoint_url, self.context.sql_query)
+            message = _TIMEOUT_MESSAGE.format(
+                elapsed=elapsed, endpoint=self.context.endpoint_url
+            )
+            raise GatewayTimeout(message) from err
         except requests.RequestException as err:
             elapsed = time.monotonic() - start_time
             logger.error(
@@ -126,6 +132,7 @@ class DataProviderForConnectors:
                 self.context.endpoint_url,
                 err,
             )
+            breaker.trip_endpoint(self.context.endpoint_url)
             raise BadGateway(f"Discodata connection failure: {err}") from err
 
         elapsed = time.monotonic() - start_time
@@ -138,13 +145,15 @@ class DataProviderForConnectors:
                 self.context.endpoint_url,
                 body_snippet,
             )
+            if req.status_code >= 500:
+                breaker.trip_endpoint(self.context.endpoint_url)
             raise BadGateway(
                 f"Discodata returned HTTP {req.status_code}: {body_snippet}"
             )
 
         try:
             payload = req.json()
-        except Exception as err:
+        except ValueError as err:
             body_snippet = (req.text or "")[:300]
             logger.error(
                 "Discodata returned malformed JSON after %.2fs for endpoint %s: %s",

@@ -69,16 +69,29 @@ All requests to the upstream Discodata service enforce configurable HTTP
 timeouts. Timeouts can be configured using environment variables:
 
 - ``DISCODATA_CONNECT_TIMEOUT``: Connection timeout in seconds (default: ``5.0``).
-- ``DISCODATA_READ_TIMEOUT``: Read timeout in seconds (default: ``15.0``).
+- ``DISCODATA_READ_TIMEOUT``: Read timeout in seconds (default: ``60.0``). A read
+  timeout only degrades the connector definition that hit it, so the default is
+  patient enough for legitimate 20-40 s statements.
 - ``DISCODATA_TIMEOUT``: Optional global fallback timeout in seconds applied when
   either specific connect or read timeout is not explicitly set.
+- ``DISCODATA_CIRCUIT_COOLDOWN``: Circuit breaker cooldown in seconds (default:
+  ``15.0``). Two breakers are tracked. Connection failures, connect timeouts and
+  5xx responses open the **endpoint** breaker, so all connectors on that
+  endpoint fail fast with HTTP 502 for this many seconds instead of consuming a
+  worker thread for a full timeout. Read timeouts open only the
+  **connector-definition** breaker of the query that timed out, so other
+  connectors on the same endpoint keep working; requests served from that open
+  breaker fail fast with HTTP 504. Non-5xx responses, malformed payloads and
+  SQL-level errors returned by Discodata open nothing.
 
 Error handling distinguishes between transient upstream failures and valid data:
 
 - Connection and read timeouts raise HTTP 504 Gateway Timeout.
-- Upstream errors, connection failures, non-2xx responses, and SQL errors raise HTTP 502 Bad Gateway.
-- Provider errors are never cached, preventing transient outages from poisoning the memoize cache with false empty results.
-- Valid responses (including genuine zero-match empty results) are cached normally.
+- Upstream connection failures and 5xx responses raise HTTP 502 and open the
+  endpoint breaker; SQL errors raise HTTP 502 only.
+- Provider errors are never cached, so a transient outage cannot be stored as
+  an empty result.
+- Valid responses, including genuine zero-match results, are cached normally.
 
 Install
 =======

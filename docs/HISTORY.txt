@@ -11,6 +11,13 @@ Changelog
   [refs #310184]
 * Change: Enhanced diagnostic logging on provider errors.
   [refs #310184]
+* Feature: Reworked the Discodata circuit breaker into two levels; connection
+  failures, connect timeouts and 5xx responses open a per-endpoint breaker so
+  all connectors sharing the endpoint fail fast, while read timeouts open only
+  a per-connector-definition breaker so unrelated connectors keep working. The
+  default read timeout is raised to 60 s because a slow statement no longer
+  degrades other connectors.
+  [refs #310184]
 
 13.0 - (2026-08-18)
 ---------------------------
