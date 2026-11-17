@@ -28,7 +28,6 @@ from .interfaces import (
     IFigureNote,
 )
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -105,11 +104,11 @@ class DataProviderForFiles:
         nrOfHits = json_body(self.request).get("form", {}).get("nrOfHits", 0)
 
         if not file:
-            return {"results": [], "metadata": {}}
+            return {"results": {}, "metadata": {}}
 
         data = self.fileToJson(file)
         if not data:
-            return {"results": [], "metadata": {}}
+            return {"results": {}, "metadata": {}}
 
         if page >= 1 and nrOfHits >= 1:
             data = data[(page - 1) * nrOfHits : page * nrOfHits]

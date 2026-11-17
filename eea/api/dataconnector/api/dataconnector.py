@@ -89,12 +89,14 @@ def _context_cache_revision(context):
 def _normalize_provider_data(data):
     """Return the public data shape expected by connector-data consumers."""
     if not isinstance(data, dict):
-        return {"results": [], "metadata": {}}
+        return {"results": {}, "metadata": {}}
 
     results = data.get("results")
     metadata = data.get("metadata")
+    if not isinstance(results, (dict, list)) or not results:
+        results = {}
     return {
-        "results": results if isinstance(results, (dict, list)) and results else [],
+        "results": results,
         "metadata": metadata if isinstance(metadata, dict) else {},
     }
 
@@ -228,7 +230,7 @@ class ConnectorData:
                 "@id": "{}/@connector-data".format(self.context.absolute_url()),
                 "path": path,
                 "data": {
-                    "results": [],
+                    "results": {},
                     "metadata": {},
                 },
                 "payload": payload,
@@ -273,7 +275,7 @@ class ElasticConnectorData:
         payload_config = req_config.get("payloadConfig")
 
         if not es_endpoint or not payload_config:
-            return {"results": [], "metadata": {}}
+            return {"results": {}, "metadata": {}}
 
         # Fetch data from Elasticsearch
         table_data = self._fetch_from_elasticsearch(

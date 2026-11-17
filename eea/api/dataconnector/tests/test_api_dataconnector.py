@@ -74,22 +74,27 @@ class ConnectorDataContractTest(unittest.TestCase):
         }
 
     def test_normalizes_empty_provider_data(self):
-        empty = {"results": [], "metadata": {}}
+        empty = {"results": {}, "metadata": {}}
 
         self.assertEqual(_normalize_provider_data(None), empty)
         self.assertEqual(_normalize_provider_data([]), empty)
+        self.assertEqual(_normalize_provider_data({}), empty)
         self.assertEqual(
             _normalize_provider_data({"results": {}, "metadata": None}),
             empty,
         )
+        self.assertEqual(_normalize_provider_data({"results": []}), empty)
+        self.assertEqual(_normalize_provider_data({"results": None}), empty)
 
-    def test_preserves_non_empty_provider_data(self):
+    def test_preserves_provider_data(self):
         data = {
             "results": {"facilityLocalId": ["5000671"]},
             "metadata": {"readme": "Facility data"},
         }
+        rows = {"results": [{"a": 1}], "metadata": {}}
 
         self.assertEqual(_normalize_provider_data(data), data)
+        self.assertEqual(_normalize_provider_data(rows), rows)
 
     def test_accepts_owned_virtual_connector_data(self):
         connector_data = self._valid_connector_data()

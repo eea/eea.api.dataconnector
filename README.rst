@@ -36,12 +36,12 @@ Connector-data response contract
 ================================
 
 Successful ``@connector-data`` responses expose provider data as an object with
-``results`` and ``metadata`` fields. ``results`` is an empty array when no rows
-exist; ``metadata`` remains an object and may contain provider information such
-as ``readme``. The minimal empty shape is::
+``results`` and ``metadata`` fields. ``results`` is an object keyed by column and
+is ``{}`` when no rows exist; ``metadata`` remains an object and may contain
+provider information such as ``readme``. The minimal empty shape is::
 
     {
-      "results": [],
+      "results": {},
       "metadata": {}
     }
 
@@ -61,6 +61,57 @@ Expanded connector data is memoized by provider path, request identity, and
 provider content revision. Editing a provider configuration or replacing its
 file therefore changes the cache identity immediately. Changes in external SQL
 data are bounded by the global ``CACHE_TTL`` configured by ``eea.volto.policy``.
+
+Discodata provider
+==================
+
+The connector provider posts the parsed SQL query to the configured
+``endpoint_url`` with a connect timeout of 5.0 seconds and a read timeout of
+30.0 seconds. The read timeout applies to each socket read, not to the whole
+exchange, so a large or slowly delivered answer is not bounded by it: what bounds
+an outage is the circuit breaker below, not the timeout. The environment tunes the
+timeouts: ``DISCODATA_CONNECT_TIMEOUT`` and ``DISCODATA_READ_TIMEOUT`` override one
+value each, while ``DISCODATA_TIMEOUT`` sets both. A value that is not a positive
+finite number is ignored: the connect or read timeout then falls back to
+``DISCODATA_TIMEOUT`` when that one is valid, and to 5.0 / 30.0 otherwise.
+
+Transport and payload failures are reported as HTTP errors instead of empty
+data:
+
+- 502 Bad Gateway when the endpoint cannot be reached, answers with a non-2xx
+  status, or returns something other than a JSON object whose ``results`` is
+  either absent, ``null`` or an array of objects.
+- 504 Gateway Timeout when the endpoint does not answer within the configured
+  timeouts.
+
+A SQL error answered with ``{"errors": ...}`` is not a transport failure: the
+response stays HTTP 200, ``results`` is ``{}``, and the answer is cached like any
+other successful one, so every pod serves the empty result until the connector is
+edited or the TTL expires. A ``null`` or empty ``errors`` value is treated as a
+successful answer.
+
+Because every connector posts to the same Discodata host, transport failures are
+bounded by two circuit breakers:
+
+- The endpoint breaker opens when the request cannot be completed: a connection
+  error, a connect timeout or any other transport failure. While it is open every
+  request to that endpoint fails fast, with 504 after a connect timeout and 502
+  otherwise.
+- The query breaker opens when Discodata was reached but the exchange failed for
+  that statement: a read timeout or an HTTP 5xx answer. While it is open that
+  statement fails fast - every filter, paging and ``db_version`` variation of it
+  - with 504 after a read timeout and 502 after a 5xx, while other statements on
+  the same endpoint keep working.
+
+An open breaker closes after ``DISCODATA_CIRCUIT_COOLDOWN`` seconds, 15.0 by
+default; a value that is not a positive finite number is ignored. Breaker state
+lives in the worker process while the connector data cache is shared, so during an
+outage the same page can be served from cache by one pod and answered with 502 by
+another. The endpoint breaker treats every transport failure alike, including ones
+that cannot heal on their own such as an invalid URL or a TLS error.
+
+Nothing else opens a circuit: 4xx answers, invalid JSON, unusable payloads and
+``{"errors": ...}`` answers are never counted.
 
 Install
 =======
