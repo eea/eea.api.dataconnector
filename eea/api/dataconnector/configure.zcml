@@ -14,6 +14,16 @@
     factory=".adapter.DataQueryJsonSchemaProvider"
     name="data_query" />
 
+  <!-- map_interactive preview images rendered by ArcGIS -->
+  <subscriber
+    for=".interfaces.IMaps
+         zope.lifecycleevent.interfaces.IObjectAddedEvent"
+    handler=".map_preview.on_added" />
+  <subscriber
+    for=".interfaces.IMaps
+         zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+    handler=".map_preview.on_modified" />
+
   <include file="profiles.zcml" />
   <include file="permissions.zcml" />
   <include file="behavior.zcml" />
